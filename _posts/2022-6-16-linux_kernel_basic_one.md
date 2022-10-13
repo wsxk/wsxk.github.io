@@ -1,7 +1,7 @@
 ---
 layout : post
 title: "linux内核基础 一"
-tags: [pwn]
+tags: [kernel_pwn]
 date: 2022-6-16
 comments: true
 author: wsxk

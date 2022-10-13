@@ -1,6 +1,6 @@
 ---
 layout: post
-tags: [pwn]
+tags: [kernel_pwn]
 title: "linux内核基础 二"
 date: 2022-10-12
 author: wsxk

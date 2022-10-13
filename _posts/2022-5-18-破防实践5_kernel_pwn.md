@@ -2,7 +2,7 @@
 layout: post
 title: "破防实践5 kernel pwn利用"
 date:   2022-5-18
-tags: [pwn]
+tags: [kernel_pwn]
 comments: true
 author: wsxk
 ---
