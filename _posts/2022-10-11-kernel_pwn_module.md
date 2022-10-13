@@ -1,6 +1,6 @@
 ---
 layout: post
-tags: [pwn]
+tags: [kernel_pwn]
 title: "kernel pwn module"
 author: wsxk
 date: 2022-10-11
