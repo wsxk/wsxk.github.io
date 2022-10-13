@@ -1,11 +1,13 @@
 ---
 layout : post
-title: "linux内核基础"
-tags: [linux]
+title: "linux内核基础 一"
+tags: [pwn]
 date: 2022-6-16
 comments: true
 author: wsxk
 ---
+
+`更新于2022-10-12`<br>
 - [什么是内核<br>](#什么是内核)
 - [内核架构<br>](#内核架构)
   - [宏内核(Monolithic Kernel)<br>](#宏内核monolithic-kernel)
