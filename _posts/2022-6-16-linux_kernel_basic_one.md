@@ -1,6 +1,6 @@
 ---
 layout : post
-title: "linux内核基础 一"
+title: "linux内核基础 一 常识"
 tags: [kernel_pwn]
 date: 2022-6-16
 comments: true

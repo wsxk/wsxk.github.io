@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [kernel_pwn]
-title: "linux内核基础 二"
+title: "linux内核基础 二 物理内存映射区"
 date: 2022-10-12
 author: wsxk
 comments: true
