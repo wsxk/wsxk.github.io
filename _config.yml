@@ -14,7 +14,7 @@ description: "小菜鸡"
 # URL of your avatar or profile pic (you could use your GitHub profile pic)
 avatar: 
 # 你的favicon（出现在浏览器tab上）图片URL，建议使用较小(64px × 64px)的图片
-favicon: https://github.com/wsxk/wsxk.github.io/tree/main/images/wsxk.jpg
+favicon: https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2022-6-27-DNS/wsxk.jpg
 
 # Tabs in header. There are 'Blog', 'About', 'Archive', 'Tags'
 # and URL Link(e.g. 'Theme' tab below) tabs. If you don't need one, just delete
