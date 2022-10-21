@@ -44,7 +44,7 @@ ropper -f vmlinux --nocolor > gadget.txt
 ### 3.gdb用法<br>
 ```gdb
 gdb vmlinux
-add-symbol-file xxx.ko addr -s data addr -s bss addr (addr内核root权限通过 cat /sys/module/xxx.ko/sections/.text .data .bss获得)
+add-symbol-file xxx.ko addr -s .data addr -s .bss addr (addr内核root权限通过 cat /sys/module/xxx.ko/sections/.text .data .bss获得)
 target remote :1234
 b entry_SYSCALL_64 #可以在执行syscall后进行调试
 ```
