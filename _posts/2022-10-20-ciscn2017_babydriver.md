@@ -100,7 +100,7 @@ void __init cred_init(void)
 在 `/dev` 下有一个伪终端设备 ptmx ，在我们打开这个设备时内核中会创建一个 tty_struct 结构体，与其他类型设备相同，tty驱动设备中同样存在着一个存放着函数指针的结构体 `tty_operations`，并且该结构体并没有开启堆块隔离。<br>
 因此思路如下：通过劫持tty_struct结构体控制`tty_operations`，修改函数指针，关闭`SMEP`保护，进行  `stack migration`,然后执行提权。<br>
 代码如下：
-```C
+```c
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
