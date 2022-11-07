@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [kernel_pwn]
-title: "ciscn 2017 babydriver 复现(UAF)"
+title: "ciscn 2017 babydriver 复现(UAF 堆块隔离绕过/ptmx)"
 date: 2022-10-20
 author: wsxk
 comments: true

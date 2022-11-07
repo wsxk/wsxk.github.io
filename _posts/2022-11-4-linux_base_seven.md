@@ -245,7 +245,7 @@ userfault机制提供了内核竞争的稳定利用<br>
 (通过上述的机制描述，我们发现，我们可以向内核传入未映射物理内存的区域时会触发缺页异常使发生该问题的线程进入睡眠，因而可以控制内核竞争的执行流程，大大提高利用率)<br>
 
 ### 弥补:sysctl_unprivileged_userfaultfd=0<br>
-新版的linux内核（5.11往上）都默认设置了sysctl_unprivileged_userfaultfd = 0，这使得普通权限的用户执行userfault失败（权限不足）<br>
+新版的linux内核（5.11及往上）都默认设置了sysctl_unprivileged_userfaultfd = 0，这使得普通权限的用户执行userfault失败（权限不足）<br>
 
 ## references<br>
 [https://ctf-wiki.org/pwn/linux/kernel-mode/exploitation/userfaultfd/](https://ctf-wiki.org/pwn/linux/kernel-mode/exploitation/userfaultfd/)<br>
