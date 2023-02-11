@@ -7,7 +7,16 @@ date: 2023-2-9
 comments: false
 ---
 
-- [基础复习阶段](#基础复习阶段)
+- [IOT fuzz 现状](#iot-fuzz-现状)
+- [解决方案](#解决方案)
+  - [1. Static Instrumentation](#1-static-instrumentation)
+  - [2. Binary Rewriting](#2-binary-rewriting)
+  - [3.Physical Re-Hosting](#3physical-re-hosting)
+  - [4.Full Emulation](#4full-emulation)
+  - [5.Partial Emulation](#5partial-emulation)
+  - [6.Hardware-Supported Instrumentation](#6hardware-supported-instrumentation)
+- [题外话](#题外话)
+
 
 ## IOT fuzz 现状<br>
 根据先前的 [iot安全背景知识](https://wsxk.github.io/iot%E5%85%A5%E9%97%A8%E4%B8%80/),我们总结过，嵌入式设备大概分为I型，II型，III三型，其中I型和II型比较接近现有的传统`PC计算机`，起码是有分为`内核态和用户态`的，换句话说，`I型和II型嵌入式固件多少是有检测机制的(segment fault ,etc)`，这些设备其实可以用传统的`fuzz`技术来进行测试。<br>
