@@ -23,7 +23,7 @@ comments: false
 然而，对于`III型嵌入式固件(monolithic firmware)`而言，它是没有分成内核和用户态的，所有的程序都集成到了一个程序当中。这类程序通常没有相应的检测机制（节省空间），安装这种固件的嵌入式设备，通常资源都是有限的，对于fuzz来说，无疑是晴天霹雳。<br>
 > 1. 资源有限导致fuzz效率很差
 > 2. 没有检测机制导致fuzz无法捕捉到相应的错误
-> > 这是因为 fuzz依靠给出的crash来判断input可以触发漏洞，然而，III型firmware通常没有检测机制，其实触发了，重启/运行出错也不会立即产生效果。
+> > 具体而言，fuzz依靠Observing exit status（查看返回的错误代码），Catching the crashing exception（hook exception handler），Leveraging mechanisms provided by the OS（借助os提供的保护机制）。
 
 针对上面提到的两个主要毛病，有许多`有代价`的解决方案。
 
@@ -55,4 +55,4 @@ comments: false
 在我读的`What You Corrupt Is Not What You Crash: Challenges in Fuzzing Embedded Devices`论文中，论文作者提出了6种启发式方法，其实对于这些个启发式方法的实现，这些个方法，是基于模拟器修改的，在模拟器的基础上增加了一个额外的监控器，包括`Segment Tracking，Format Specifier Tracking，Heap Object Tracking，Call Stack Tracking，Call Frame Tracking，Stack Object Tracking`<br>
 其实感觉吧，也算是Emulation的延申吧。
 
-另外，在读`Discovery and Identification of Memory Corruption Vulnerabilities on Bare-metal Embedded Devices`时，作者通过`binary rewriting`方法实现了个插入检测机制，还算比较有趣。<br>
+另外，在读`Discovery and Identification of Memory Corruption Vulnerabilities on Bare-metal Embedded Devices`时，作者通过`binary rewriting`方法插入检测机制，还算比较有趣。<br>
