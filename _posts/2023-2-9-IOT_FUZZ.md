@@ -56,3 +56,7 @@ comments: false
 其实感觉吧，也算是Emulation的延申吧。
 
 另外，在读`Discovery and Identification of Memory Corruption Vulnerabilities on Bare-metal Embedded Devices`时，作者通过`binary rewriting`方法插入检测机制，还算比较有趣。<br>
+`µSBS: Static Binary Sanitization of Bare-metal Embedded Devices for Fault Observability`跟上面的一篇文章讲得是同一个东西，哈哈哈哈，这种情况还是比较罕见的，但是不得不承认，看完后对于它的实现原理有了更深入的了解。<br>
+之后应该会针对这个工具的实现原理进行一个细致的分析，并重写得到一个新的解析器。<br>
+
+
