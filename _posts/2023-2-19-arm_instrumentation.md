@@ -65,13 +65,20 @@ comments: true
 
 解决了二进制插桩产生的问题后，接下来进入`Sanitization Specification`环节，即确定插入的东西是什么<br>
 作者原话:<br>
-**µSBS utilizes a metadata store that keeps the status of allocated memory bytes.µSBS surrounds every memory value with a so-called redzone representing out-of-bounds memory and marks it as invalid memory in the metadata store**
+**µSBS utilizes a metadata store that keeps the status of allocated memory bytes.µSBS surrounds every memory value with a so-called redzone representing out-of-bounds memory and marks it as invalid memory in the metadata store.Then, µSBS instruments every memory instruction (i.e., load and store) in order to consult the metadata store whenever the firmware attempts to access memory**
 <br>
 他用了一个叫做`redzone`的方法来实现，即在每个内存的值上下都环绕一个`redzone`，然后用当程序访问了`redzone`时，会修改`metadata`，实现监控内存访问问题。<br>
 ***具体而言，其实论文作者对所有的ldr和str指令进行了插桩,其实是插入了检测指令，在执行这2条指令前，先根据要访问的地址咨询一下metadata，看看是否产生了越界***<br>
-
 
 ### 3. Reassembler<br>
 重新汇编，用的是十分流行的`keystone`，这也没什么好说的<br>
 
 ## 实现细节<br>
+**在重新修改函数的跳转时，可能跳转的函数地址太大了，超过原来汇编指令的容量，对此论文作者在修改前，对每个跳转的汇编代码进行替换，换成可以容纳更大偏移的地址的汇编指令。**<br>
+然后是`间接跳转`和`间接调用`的处理方式<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE_20230220_192629.png)
+
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE_20230220_192633.png)
+
+另一个是插桩方式<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/20230220193424.png)
