@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [iot]
-title: "arm instrumentation"
+title: "uSBS arm instrumentation"
 date: 2023-2-19
 author: wsxk
 comments: true
