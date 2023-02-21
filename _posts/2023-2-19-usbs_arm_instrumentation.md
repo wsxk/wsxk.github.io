@@ -8,7 +8,7 @@ comments: true
 ---
 
 这篇文章是基于论文`Discovery and Identification of Memory Corruption Vulnerabilities on Bare-metal Embedded Devices`和`µSBS: Static Binary Sanitization of Bare-metal Embedded Devices for Fault Observability`的理解得到的，有需要的可以自行搜寻(十分好找)<br>
-`PS: 这两篇都是顶会，写的工具却是一样的，所以结合两篇文章可以更好的理解它的实现原理`<br>
+`PS: 这两篇写的工具是一样的，所以结合两篇文章可以更好的理解它的实现原理`<br>
 
 - [uSBS安装](#usbs安装)
   - [step1: 安装ubuntu18](#step1-安装ubuntu18)
