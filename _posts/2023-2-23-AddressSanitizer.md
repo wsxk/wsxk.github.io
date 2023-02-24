@@ -74,7 +74,7 @@ comments: true
 > 3. 负数表示前 8个字节均不可访问
 
 
-**实际上scale可以是1~7的任意值，scale越大，shadow memory占据的位置越小(1/2^N^)，然而 使用的 redzong区域会更大(2^N^)
+**实际上scale可以是1~7的任意值，scale越大，shadow memory占据的位置越小(1/2^N^)，然而 使用的 redzong区域会更大(2^N^)**
 
 
 ### 2. Instrumentation<br>
