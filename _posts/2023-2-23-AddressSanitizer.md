@@ -30,6 +30,7 @@ comments: true
   - [3. Run-time Library](#3-run-time-library)
   - [4. Stack And Globals](#4-stack-and-globals)
   - [5. Thread](#5-thread)
+- [实践](#实践)
 
 
 ## 前言<br>
@@ -104,3 +105,30 @@ comments: true
 
 ### 5. Thread<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/20230224161352.png)
+
+
+## 实践<br>
+`AddressSanitizer`已经被集成到了`llvm`上，下载`llvm`后即可使用。<br>
+使用文档如下<br>
+[https://github.com/google/sanitizers/wiki/AddressSanitizer](https://github.com/google/sanitizers/wiki/AddressSanitizer)<br>
+实际跑个代码试试
+```c
+#include <stdlib.h>
+int main() {
+  char *x = (char*)malloc(10 * sizeof(char*));
+  free(x);
+  return x[5];
+}
+```
+```
+clang -fsanitize=address test.c -o test_asan //编译一个有asan的
+clang test.c -o test //原始的
+```
+
+运行 有asan的会出现如下内容:
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/20230224161809.png)
+
+ida查看<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/20230224161833.png)
+再来看看原版的
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/20230224161854.png)
