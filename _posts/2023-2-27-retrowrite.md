@@ -8,14 +8,18 @@ comments: true
 ---
 
 - [前言](#前言)
-- [overview](#overview)
+- [retrowrite overview](#retrowrite-overview)
   - [1. Processing](#1-processing)
   - [2. Symbolization](#2-symbolization)
   - [3. Instrumentation Passes](#3-instrumentation-passes)
   - [4. Instrumentation Optimization](#4-instrumentation-optimization)
   - [5. Reassembly(ASM)](#5-reassemblyasm)
   - [思路优点](#思路优点)
-- [框架实现方法](#框架实现方法)
+- [retrowrite框架实现方法](#retrowrite框架实现方法)
+- [和Asan的联合使用](#和asan的联合使用)
+  - [design](#design)
+  - [implement](#implement)
+- [和AFL的联合使用](#和afl的联合使用)
 
 
 ## 前言<br>
@@ -26,7 +30,7 @@ comments: true
 在这篇论文中，作者首先对当前的二进制重写工具进行了一系列评估，并认为它们的效率太差了。于是提出了一个新的二进制重写思路，并使用这个思路写出了新的开源二进制框架，并表示：`我的开源框架很猛，效率比当前的其他框架，效率能加个好几倍！`<br>
 
 
-## overview<br>
+## retrowrite overview<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/20230227202037.png)
 这个工具的工作流程被总结成了5步。<br>
 即`1.Processing 2.Symbolization 3.Instrumentation Passes 4.Instrumentation Optimization 5.Reassembly`<br>
@@ -66,4 +70,31 @@ comments: true
 四、因为不是使用启发式算法，因此没用误报和漏报，说明这个框架是通用的，应用范围很广。<br>
 
 
-## 框架实现方法<br>
+## retrowrite框架实现方法<br>
+用`capstone`实现反汇编，用`pyelftools`加载elf文件信息并处理重定向信息。<br>
+在`symbolization`步骤中，生成可重新汇编的汇编代码。<br>
+为了能够安全的`instrumentation`插桩(即插入之后不影响程序的正常功能运行，有3个问题需要解决）:
+**(i) a logical abstraction for analysis and instrumentation passes to operate on, e.g., modules, functions, or basic block level granularity** （即需要一些函数的相关信息等等）。 `对此，解决办法是获得函数的名称等等，对于stripped后的二进制文件，可以采用现有的工具（比如ida）对函数名称进行还原`.<br>
+**(ii) working around the ABI to ensure the instrumentation does not break the binary**（围绕应用程序二进制接口进行工作，避免损坏二进制文件）。`为此，需要在汇编层面根据函数的调用约定，传参，返回值，隐式规则等等进行匹配`<br> 
+**(iii) automatic register allocation to achieve compiler-like overhead.**（自动进行寄存器的申请，以达到跟编译器一样的开销）`其实最安全的方法是将所有寄存器被使用前都保存下来，但一来需要空间，二来耗时；对此使用intra-function liveness analysis来找到在进行调用时有用的寄存器，将它们的值存储下来（必须是sound的方法，保证所有活寄存器可以被保留。`<br>
+
+
+## 和Asan的联合使用<br>
+原话是这样的`Our goal is to implement a binary version of ASan in RetroWrite that closely resembles and integrates seamlessly with the source-based sanitizer.`.
+### design<br>
+论文作者认为，将asan应用到二进制文件上的主要问题在于**没有变量、类型、缓冲区长度的信息**，虽然静态分析可以缓解这些问题，但是实用，无法大规模使用，因此作了折中。<br>
+下图可以看出ASan和二进制级别的`Asan-retrowrite`的区别。<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/20230228164732.png)
+对于栈，只对栈帧进行检测<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/20230228164836.png)
+并且，并不是对所有的函数的栈帧加入`redzone`，而是找到加入`canary`的函数加入`redzone`，并将原本canary的空间留作`redzone`。<br>
+在函数返回时，`unpoison`相应区域，对于`longjmp`的指令
+不对global变量进行修改（可以看原文，还是存在问题的）<br>
+
+
+### implement<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/20230228165622.png)
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/20230228165640.png)
+
+## 和AFL的联合使用<br>
+因为`retrowrite`得到的汇编代码和compiler的类似，而AFL的插桩是直接基于汇编代码进行的。因此可以直接使用`afl-gcc` 生成二进制文件，链接动态库等等。
