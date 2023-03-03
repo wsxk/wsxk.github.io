@@ -9,6 +9,9 @@ comments: true
 
 开始分析retrowrite的源码<br>
 它的源码因为支持x64和aarch64位的，看起来会比较抽象，因此我把它主要运行代码关于x64的源码扣了出来，方便观看<br>
+
+
+## main function<br>
 ```python
 import argparse
 import json
@@ -121,3 +124,9 @@ rw.symbolize()
 asan(rw, loader) # address sanitizer
 rw.dump()
 ```
+
+单看主代码还是比较简洁的<br>
+实际上也符合论文描述。<br>
+首先加载二进制程序，并做一些处理，然后符号化，最后插桩。<br>
+至于为什么缺少了重新汇编的功能，因为它重新汇编需要依赖本地的编译环境<br>
+之后会着重看一下其中几个类型的实现，然后继续补充<br>
