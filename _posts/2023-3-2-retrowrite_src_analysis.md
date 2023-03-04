@@ -10,6 +10,8 @@ comments: true
 开始分析retrowrite的源码<br>
 它的源码因为支持x64和aarch64位的，看起来会比较抽象，因此我把它主要运行代码关于x64的源码扣了出来，方便观看<br>
 
+- [main function](#main-function)
+
 
 ## main function<br>
 ```python
