@@ -81,7 +81,7 @@ arm-none-eabi<br>
 ## 总结<br>
 > 1. 用arm-none-eabi系列工具生成microcontroller可执行的程序
 > 2. 使用arm-none-eabi-gdb（debug server）进行调试
-> 3. OpenOCD会将可执行程序和调试信息进行转换，发送给USB debug-adapter
+> 3. OpenOCD会将可执行程序和gdb的调试命令 进行转换，发送给USB debug-adapter
 > 4. USB debug-adapter将USB信号转换为JTAG/SWD 信号或相反
 > 5. 开发板上的 debug-controler接收到信号后，进行相应的操作，并进行反馈
 
