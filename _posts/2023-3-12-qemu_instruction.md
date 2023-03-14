@@ -14,7 +14,7 @@ comments: true
 
     ./qemu-system-arm -M help #查看可支持的架构
     
-    ./qemu-system-arm -M netduinoplus2 -cpu cortex-m4 -m 1M -nongraphic -d in_asm.nochain -kernel task1.elf -D log.txt
+    ./qemu-system-arm -M netduinoplus2 -cpu cortex-m4 -m 1M -nographic -d in_asm,nochain -kernel task1.elf -D log.txt
     # -M选择开发板架构 
     #-cpu选择处理器架构 
     #-m 内存大小
