@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [c++]
-title: "c++ template"
+title: "c++ template& std::array"
 author: wsxk
 comments: true
 date: 2023-3-14
@@ -9,6 +9,8 @@ date: 2023-3-14
 
 
 - [template](#template)
+- [std::array](#stdarray)
+- [array 和 vector的区别](#array-和-vector的区别)
 
 
 ## template<br>
@@ -99,3 +101,35 @@ int main() {
 十分高级<br>
 
 
+## std::array<br>
+`std::array`位于`<array>`这个标准库中，**它是一个静态数组，一旦确认，不能更改大小**<br>
+```c++
+#include <iostream>
+#include <array>
+#include <vector>
+
+template <int N>  //这里使用template是为了让传参时不必把5写上去
+void PrintArray(std::array<int, N>& a) {
+	for (int i = 0; i < a.size(); i++) {
+		std::cout << a[i] << std::endl;
+	}
+}
+
+int main() {
+	std::array<int, 5> data;
+	data[0] = 1;
+	data[4] = 5;
+	PrintArray(data);
+}
+```
+**std::array在栈上分配，然而不分配内存来存储size**<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/20230316172809.png)
+因为 `_Size`是一个模板，所以在代码使用它后，他会实际填到这个函数中，也就说，这个函数返回一个常数，因此不需要内存来存储size.<br>
+
+**std::array可以有边界检查，当然是可选的**<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/20230316172614.png)
+
+## array 和 vector的区别<br>
+实际上区别如下:<br>
+> 1. array是静态数组，vector是动态的
+> 2. array在栈上分配，vector在heap中分配,因此用array会比vector快
