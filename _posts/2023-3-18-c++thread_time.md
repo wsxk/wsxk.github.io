@@ -80,6 +80,7 @@ public:
 void Function() {
 	Timer time;
 	for (int i = 0; i < 100; i++) {
+		//std::cout << "hello world\n";
 		std::cout << "hello world" << std::endl;
 	}
 }
@@ -88,3 +89,6 @@ int main() {
 	Function();
 }
 ```
+
+这里有一个有趣的点，其实`std::endl`是很费时的<br>
+单单改了一个符号，就能让程序执行速度快很多！<br>
