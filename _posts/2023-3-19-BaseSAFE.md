@@ -13,6 +13,10 @@ comments: true
   - [2. unicorn](#2-unicorn)
   - [3. Cellular Baseband](#3-cellular-baseband)
 - [程序运行逻辑](#程序运行逻辑)
+  - [1. afl\_forkserver\_start](#1-afl_forkserver_start)
+  - [2. afl\_next](#2-afl_next)
+  - [3. afl\_emu\_start](#3-afl_emu_start)
+  - [4. afl\_fuzz](#4-afl_fuzz)
 - [安全检测实现思路](#安全检测实现思路)
 
 
@@ -37,8 +41,20 @@ Unicorn的工作原理和qemu类似<br>
 
 ## 程序运行逻辑<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/20230319151047.png)
-相关API可以去文章里看<br>
+扩展的api如下<br>
+### 1. afl_forkserver_start<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/20230319210904.png)
 
+### 2. afl_next<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/20230319210844.png)
+
+### 3. afl_emu_start<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/20230319210818.png)
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/20230319210830.png)
+
+### 4. afl_fuzz<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/20230319210716.png)
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/20230319210731.png)
 
 ## 安全检测实现思路<br>
 利用了`unicorn`提供的API以及自扩展的`rs-bindings`，对内存分配进行hook，执行自己的策略<br>
