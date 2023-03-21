@@ -18,6 +18,7 @@ comments: true
   - [3. afl\_emu\_start](#3-afl_emu_start)
   - [4. afl\_fuzz](#4-afl_fuzz)
 - [安全检测实现思路](#安全检测实现思路)
+- [harness](#harness)
 
 
 ## 前言<br>
@@ -64,3 +65,68 @@ Unicorn的工作原理和qemu类似<br>
 > 1. 用 unicorn提供的hooking functionality，直接在JITed code里插入条件检查和回调函数
 > 2. 事先分配一个很大的内存，访问时，触发access-hook，分配时会使用自己的分配器，取消access hook，根据分配大小，每个被分配块两边都会挂上一个canary块
 > 3. 取消分配时，又挂上access hook，chunksize置为0（独立于结构体之外,因此不会被消除）
+
+
+## harness<br>
+一个简单的harness编写<br>
+```python
+#../AFLplusplus/afl-fuzz -U -m none -i ./sample_inputs -o ./output -- python3 test_harness.py @@ 
+import argparse
+import os
+import signal
+from unicornafl import *
+from unicornafl.mips_const import *
+
+BINARY_FILE = "./simple_target.bin"
+# Memory map for the code to be tested
+CODE_ADDRESS = 0x00100000  # Arbitrary address where code to test will be loaded
+CODE_SIZE_MAX = 0x00010000  # Max size for the code (64kb)
+STACK_ADDRESS = 0x00200000  # Address of the stack (arbitrarily chosen)
+STACK_SIZE = 0x00010000  # Size of the stack (arbitrarily chosen)
+DATA_ADDRESS = 0x00300000  # Address where mutated data will be placed
+DATA_SIZE_MAX = 0x00010000  # Maximum allowable size of mutated data
+
+# Instantiate a MIPS32 big endian Unicorn Engine instance
+uc = Uc(UC_ARCH_MIPS, UC_MODE_MIPS32 + UC_MODE_BIG_ENDIAN)
+print("Loading data input from {}".format(BINARY_FILE))
+binary_file = open(BINARY_FILE, "rb")
+binary_code = binary_file.read()
+binary_file.close()
+
+# Apply constraints to the mutated input
+if len(binary_code) > CODE_SIZE_MAX:
+    print("Binary code is too large (> {} bytes)".format(CODE_SIZE_MAX))
+    exit()
+
+# Write the mutated command into the data buffer
+uc.mem_map(CODE_ADDRESS, CODE_SIZE_MAX)
+uc.mem_write(CODE_ADDRESS, binary_code)
+
+# Set the program counter to the start of the code
+start_address = CODE_ADDRESS  # Address of entry point of main()
+end_address = CODE_ADDRESS + 0xF4  # Address of last instruction in main()
+uc.reg_write(UC_MIPS_REG_PC, start_address)
+
+# Setup the stack
+uc.mem_map(STACK_ADDRESS, STACK_SIZE)
+uc.reg_write(UC_MIPS_REG_SP, STACK_ADDRESS + STACK_SIZE)
+
+# reserve some space for data
+uc.mem_map(DATA_ADDRESS, DATA_SIZE_MAX)
+
+# -----------------------------------------------------
+# Set up a callback to place input data (do little work here, it's called for every single iteration)
+# We did not pass in any data and don't use persistent mode, so we can ignore these params.
+# Be sure to check out the docstrings for the uc.afl_* functions.
+def place_input_callback(uc, input, persistent_round, data):
+    # Apply constraints to the mutated input
+    if len(input) > DATA_SIZE_MAX:
+        # print("Test input is too long (> {} bytes)")
+        return False
+
+    # Write the mutated command into the data buffer
+    uc.mem_write(DATA_ADDRESS, input)
+
+# Start the fuzzer.
+uc.afl_fuzz(BINARY_FILE, place_input_callback, [end_address])
+```
