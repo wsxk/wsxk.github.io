@@ -17,6 +17,7 @@ comments: true
 - [Loading and Debugging](#loading-and-debugging)
 - [GNU ARM Toolchain](#gnu-arm-toolchain)
 - [Tools to Produce The Binaries](#tools-to-produce-the-binaries)
+  - [elf axf coff的区别](#elf-axf-coff的区别)
 - [Tools to Help Debug Code](#tools-to-help-debug-code)
 - [总结](#总结)
 - [参考](#参考)
@@ -73,6 +74,12 @@ arm-none-eabi<br>
 3是链接器<br>
 4是一个特殊的工具:<br>
 **There are several formats an object file can be produced in. Popular formats include Extended Linker Format (.elf format) and Common Object File Format (.coff). But these formats are usually for running binaries on PCs and they contain some extra information about the binary.<br>For microcontrollers, the binaries are usually tightly packed without any extra metadata. objcopy is the tool responsible for taking the elf or coff binaries and pack them in a way that can be flashed onto the microcontroller!**
+
+### elf axf coff的区别<br>
+AXF (ARM Executable Format)：AXF 文件是专为 ARM 处理器设计的文件格式。它主要用于嵌入式系统和实时操作系统（RTOS）。AXF 文件格式基于 ELF，因此具有 ELF 文件的大部分特性。它支持在 ARM 架构上进行地址空间随机化（ASLR），并提供了一种描述程序执行的方式，包括代码段、数据段和符号表等。<br>
+ELF (Executable and Linkable Format)：ELF 文件是一种通用的可执行文件、可链接文件和可重定位文件格式。它在许多不同的操作系统中被广泛使用，例如 Linux，FreeBSD，Solaris 等。ELF 文件包含了程序的二进制代码、数据、符号表和其他信息，以便在链接、加载和执行过程中使用。ELF 文件格式支持多种处理器架构（如 x86，x86-64，ARM，MIPS 等）和多种操作系统。<br>
+COFF (Common Object File Format)：COFF 是一种较旧的可重定位文件格式，主要在微软的 Windows 系统和一些 Unix 系统（如 AIX）中使用。COFF 文件包含程序的二进制代码、数据、符号表等信息。与 ELF 相比，COFF 文件格式具有较低的可扩展性和灵活性。微软 Windows 系统已将其替换为更先进的 PE（Portable Executable）格式。<br>
+**需要注意的是，直接烧录进嵌入式设备的通常是bin文件or hex文件**<br>
 
 ## Tools to Help Debug Code<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/20230312113153.png)
