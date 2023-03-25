@@ -10,6 +10,7 @@ comments: true
 - [前言](#前言)
 - [前提条件](#前提条件)
 - [dwarf](#dwarf)
+  - [DIE](#die)
 - [利用pyelftools编写code](#利用pyelftools编写code)
 
 
@@ -34,6 +35,19 @@ DWARF 的一些主要特点包括：<br>
     3. 高效性：DWARF 使用紧凑的二进制编码，以节省存储空间和提高解析速度。
 
 DWARF 已经成为现代编译器和调试器的事实标准，广泛应用于 Linux、macOS 等操作系统的软件开发和调试。<br>
+### DIE<br>
+DIE（Debugging Information Entry）是 DWARF 调试信息中的基本构建块。DIE 描述了程序中的一个实体，例如一个变量、类型或函数。DIE 由一系列属性（attributes）组成，这些属性提供了有关实体的详细信息，如名称、类型、地址、行号等。<br>
+DIE 在 DWARF 调试信息中以树状结构组织。根据实体之间的关系，DIE 可以具有父节点、子节点和兄弟节点。例如，一个函数的 DIE 可能包含子节点，分别表示函数的参数、局部变量和返回类型。这种树状结构使得调试器能够更好地理解程序的结构和组织。<br>
+每个 DIE 都有一个唯一的标签（tag），表示实体的类型。例如：<br>
+> 1. DW_TAG_variable：表示一个变量
+> 2. DW_TAG_base_type：表示一个基本类型，如 int、float 等
+> 3. DW_TAG_pointer_type：表示一个指针类型
+> 4. DW_TAG_array_type：表示一个数组类型
+> 5. DW_TAG_structure_type：表示一个结构体类型
+> 6. DW_TAG_union_type：表示一个联合体类型
+> 7. DW_TAG_enumeration_type：表示一个枚举类型
+> 8. DW_TAG_subprogram：表示一个函数或方法
+调试器可以根据 DIE 的标签和属性提取有关程序实体的详细信息，从而实现源代码级别的调试功能。<br>
 
 ## 利用pyelftools编写code<br>
 ```python
