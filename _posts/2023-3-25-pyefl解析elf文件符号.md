@@ -93,9 +93,14 @@ def process_function(die,elffile):
             params.append(process_param(child))
     # 打印函数原型
     address= get_function_addresses(elffile,name)
-    print(f"{name}({', '.join(params)}) address:{address}")
+    true_param =''
+    if len(params)>=1:
+        true_param = ', '.join(params)
+    else:
+        true_param = 'no_arguments'
+    print(f"{name}({true_param}) address:{address}")
     #binary_function[func_name] = [params,get_function_addresses(elffile,name)]
-    
+
 def process_param(die):
     if 'DW_AT_name' not in die.attributes or 'DW_AT_type' not in die.attributes:
         return ""
