@@ -11,6 +11,7 @@ comments: true
 - [Unicorn](#unicorn)
   - [Unicorn VS qemu](#unicorn-vs-qemu)
 - [UnicornAFL install](#unicornafl-install)
+- [Unicorn AFL运行原理](#unicorn-afl运行原理)
 - [Unicorn API](#unicorn-api)
 - [实践](#实践)
 
@@ -36,11 +37,21 @@ comments: true
 然后去unicorn_mode目录下运行`./build_unicorn_support.sh`<br>
 [https://github.com/AFLplusplus/AFLplusplus/tree/stable/unicorn_mode](https://github.com/AFLplusplus/AFLplusplus/tree/stable/unicorn_mode)
 
+## Unicorn AFL运行原理<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/20230326152058.png)
+这张图节选自[https://hackernoon.com/afl-unicorn-part-2-fuzzing-the-unfuzzable-bea8de3540a5](https://hackernoon.com/afl-unicorn-part-2-fuzzing-the-unfuzzable-bea8de3540a5)<br>
+如图所示。<br>
+第一步你需要通过一些逆向操作，识别出你要fuzz的起始位置和终止位置，并找到代码是如何接受input的。<br>
+第二步说的是，需要尽可能的找到input的约束条件，因为在代码中，有的input可能直接被过滤掉了（无法到达你要测试的代码位置）<br>
+第三步，我们可以通过调试器运行到fuzz的起始地址，然后用`Unicorn Context Dumper`的脚本，保留这个情况下的程序状态<br>
+第四步，我们需要写一个harness，即unicornafl的运行脚本，加载程序的状态，接受afl的input，以及捕获crash的机制。<br>
+第五步，创造一些有效的input作为fuzz的seed，以便fuzz可以更有效的生成输入<br>
+第六步，跑脚本，期待捕获crash!<br>
+
 ## Unicorn API<br>
 有一些API需要了解<br>
 网址在这里[https://github.com/kabeor/Unicorn-Engine-Documentation/](https://github.com/kabeor/Unicorn-Engine-Documentation/)<br>
 自行翻阅
-
 
 ## 实践<br>
 写了个程序
