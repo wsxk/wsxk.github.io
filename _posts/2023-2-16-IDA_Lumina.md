@@ -19,4 +19,5 @@ Lumina可以在线识别未命名函数<br>
 [https://abda.nl/lumen/](https://abda.nl/lumen/)<br>
 
 PS: 跟他类似的还有一个阿里云公开的插件 `Finger`<br>
+**注意，在使用Finger时，不要使用科学上网！！！**<br>
 
