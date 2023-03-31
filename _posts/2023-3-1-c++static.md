@@ -7,6 +7,11 @@ author: wsxk
 comments: true
 ---
 
+- [c++中的全局静态](#c中的全局静态)
+- [c++类中的static](#c类中的static)
+- [c++中的局部static](#c中的局部static)
+
+
 ## c++中的全局静态<br>
 ```c++
 static int i;

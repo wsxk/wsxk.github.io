@@ -10,6 +10,7 @@ comments: true
 - [introduction](#introduction)
 - [大致逻辑图](#大致逻辑图)
   - [oncall\_table](#oncall_table)
+  - [ecall\_table](#ecall_table)
 - [sgx\_create\_enclave](#sgx_create_enclave)
 - [sgx\_ecall](#sgx_ecall)
 
@@ -31,6 +32,8 @@ ocall_table的作用主要有两个方面：<br>
 安全性：通过限制Enclave可以调用的不可信函数，可以减少潜在的安全风险。Enclave内的代码只能调用已在ocall_table中定义的函数，这有助于避免不必要的代码执行或数据泄露。<br>
 模块化：ocall_table允许开发者在Enclave内部实现与主机应用程序之间的接口，使Enclave内的代码能够与外部系统交互。这有助于将受信任的代码与不可信的代码分离，实现代码的模块化。
 
+### ecall_table<br>
+ecall_table是一个数组，用于存储用户定义的可信函数<br>
 
 ## sgx_create_enclave<br>
 `sgx_create_enclave`是一个用于创建和初始化 Intel SGX Enclave 的函数。Intel SGX（Software Guard Extensions）是一种安全技术，用于保护应用程序的敏感数据和代码免受未经授权访问。Enclave 是 SGX 中的一个受保护内存区域，用于安全地执行敏感操作。<br>
