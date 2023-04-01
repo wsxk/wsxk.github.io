@@ -1,8 +1,8 @@
 ---
 layout: post
 tags: [c++]
-title: "c++ std::string optimize & 单例模式"
-date: 2023-3-31
+title: "c++ std::string optimize & 单例模式 & malloc_tracing"
+date: 2023-3-24
 author: wsxk
 comments: true
 ---
@@ -12,6 +12,8 @@ comments: true
 	- [const char \*](#const-char-)
 - [单例模式](#单例模式)
 	- [随机数生成器](#随机数生成器)
+- [malloc tracing](#malloc-tracing)
+	- [template](#template)
 
 
 ## std::string optimize<br>
@@ -142,6 +144,80 @@ Random Random::SingleInstance;
 int main() {
 	float a = Random::Float();
 	std::cout << a << std::endl;
+	return 0;
+}
+```
+
+## malloc tracing<br>
+有时候我们想要追踪程序到底使用了多少内存，或者某个类型的变量使用了多少内存，尽管我们可以用其他的工具，我们也可以简单的写一段代码来进行跟踪。<br>
+**代码跟踪的原理是，利用重写operator来添加信息**<br>
+下面是一个例子<br>
+```c++
+#include <iostream>
+
+void* operator new(size_t size) {
+	std::cout << "malloc " << size << " bytes \n";
+	return malloc(size);
+}
+void operator delete(void* memory,size_t size) {
+	std::cout << "free " << size << " bytes\n";
+	free(memory);
+}
+
+struct Object {
+	int x, y, z;
+};
+
+int main() {
+	{
+		std::unique_ptr<Object*> a = std::make_unique<Object*>();
+	}
+	return 0;
+}
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/20230401150206.png)
+其实到这里，有人可能会问，为什么delete不是不加参数吗，咋后面还能再加一个`size_t size`，其实这是`c++17`的新特性<br>
+**在C++17中，operator delete可以包含一个额外的 size 参数。这个参数表示要释放的对象的大小。这里是为了优化内存分配器的性能。如果您为类定义了一个带有 size 参数的 operator delete，那么C++17及更新版本的编译器会优先选择这个版本。**<br>
+
+### template<br>
+有一个模板可供使用<br>
+```c++
+#include <iostream>
+
+struct MemoryTracing {
+	size_t TotalAlloc = 0;
+	size_t TotalFree = 0;
+	void CurrentUsage() {
+		std::cout << "currently use " << TotalAlloc - TotalFree << " bytes\n";
+	}
+};
+
+static MemoryTracing AllocaionMetrics;
+
+void* operator new(size_t size) {
+	AllocaionMetrics.TotalAlloc += size;
+	return malloc(size);
+}
+void operator delete(void* memory,size_t size) {
+	AllocaionMetrics.TotalFree += size;
+	free(memory);
+}
+
+void PrintMemoryUsage() {
+	AllocaionMetrics.CurrentUsage();
+}
+
+struct Object {
+	int x, y, z;
+};
+
+int main() {
+	PrintMemoryUsage();
+	{
+		std::unique_ptr<Object*> a = std::make_unique<Object*>();
+		PrintMemoryUsage();
+	}
+	PrintMemoryUsage();
 	return 0;
 }
 ```
