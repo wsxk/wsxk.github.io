@@ -2,7 +2,7 @@
 layout: post
 tags: [c++]
 title: "c++ 手写array & vector"
-date: 2023-4-3
+date: 2023-3-27
 author: wsxk
 comments: true
 ---
