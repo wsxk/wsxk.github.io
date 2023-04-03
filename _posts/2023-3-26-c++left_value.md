@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [c++]
-title: "c++ 左值和右值 & argument evaluation order & 移动语义"
+title: "c++ 左值和右值 & argument evaluation order & 移动语义 & 移动赋值运算符"
 date: 2023-3-26
 author: wsxk
 comments: true
@@ -13,6 +13,7 @@ comments: true
 - [argument evaluation order](#argument-evaluation-order)
 - [movement semantic](#movement-semantic)
 	- [solution](#solution)
+- [移动赋值运算符](#移动赋值运算符)
 
 
 ## 左值和右值<br>
@@ -96,6 +97,7 @@ int main() {
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/20230401164007.png)
 
 **左值引用仅接受左值（加const可以兼容右值），右值引用只能接受右值**<br>
+**值得一提的是，右值引用在传入函数内部后已经变成了左值，所以使用时需要显示的用std::move**<br>
 
 ## argument evaluation order<br>
 直接说结论，永远不要写这种神秘代码!<br>
@@ -342,5 +344,141 @@ public:
 int main() {
 	Entity e(String("wsxk"));//这里String("wsxk")其实也是临时变量，是右值，所以会先调用右值引用的函数
 	e.Print();
+}
+```
+
+## 移动赋值运算符<br>
+还是用上文用到的代码来看看情况。<br>
+```c++
+#include <iostream>
+
+class String {
+private:
+	char* m_data;
+	size_t m_size;
+public:
+	String(const char* name) {
+		printf("created\n");
+		m_size = strlen(name);
+		m_data = new char[m_size];
+		memcpy(m_data, name, m_size);
+	}
+	String(const String& other) {
+		printf("copied\n");
+		m_size = other.m_size;
+		m_data = new char[m_size];
+		memcpy(m_data, other.m_data, m_size);
+	}
+	String(String&& other) noexcept {
+		printf("moved\n");
+		m_size = other.m_size;
+		m_data = other.m_data;
+		other.m_size = 0;
+		other.m_data = nullptr;
+	}
+	~String() {
+		printf("Destroied\n");
+		delete m_data;
+	}
+	void Print() {
+		for (int i = 0; i < m_size; i++) {
+			printf("%c", m_data[i]);
+		}
+		printf("\n");
+	}
+};
+
+class Entity {
+private:
+	String m_string;
+public:
+	Entity(const String& name):m_string(name) {
+	}
+	void Print() {
+		m_string.Print();
+	}
+	Entity(String && name):m_string(std::move(name)){}
+};
+
+int main() {
+	String b = "wsxkwsxk";//create
+	String s=b;// copy
+	String c = std::move(b);//move
+}
+```
+在这种情况时，我们用 `=` 其实都是创建一个新的变量，因此都是调用`String`类的构造函数。<br>
+接下来还出现了类似于`c = b`的情况，其实会调用赋值运算函数。<br>
+看一个具体例子:
+```c++
+#include <iostream>
+
+class String {
+private:
+	char* m_data;
+	size_t m_size;
+public:
+	String() = default;
+	String(const char* name) {
+		printf("created\n");
+		m_size = strlen(name);
+		m_data = new char[m_size];
+		memcpy(m_data, name, m_size);
+	}
+	String(const String& other) {
+		printf("copied\n");
+		m_size = other.m_size;
+		m_data = new char[m_size];
+		memcpy(m_data, other.m_data, m_size);
+	}
+	String(String&& other) noexcept {
+		printf("moved\n");
+		m_size = other.m_size;
+		m_data = other.m_data;
+		other.m_size = 0;
+		other.m_data = nullptr;
+	}
+	String& operator=(String&& other) {
+		printf("assigned\n");
+		if (this != &other) {//防止other就是这个变量，不能有a=a的情况发生，这没有意义而且使得内存遭到破坏
+			delete[] m_data;//赋值前的变量可能已经分配了内存，需要提前释放
+			m_size = other.m_size;
+			m_data = other.m_data;
+			other.m_size = 0;
+			other.m_data = nullptr;
+		}
+		return *this;
+	}
+	~String() {
+		printf("Destroied\n");
+		delete m_data;
+	}
+	void Print() {
+		for (int i = 0; i < m_size; i++) {
+			printf("%c", m_data[i]);
+		}
+		printf("\n");
+	}
+};
+
+class Entity {
+private:
+	String m_string;
+public:
+	Entity(const String& name):m_string(name) {
+	}
+	void Print() {
+		m_string.Print();
+	}
+	Entity(String && name):m_string(std::move(name)){}
+};
+
+int main() {
+	String b = "wsxkwsxk";//这个=是构造函数，创建变量时都是调用构造函数
+	String c;
+	c = std::move(b); // 这个=是移动赋值函数，对已存在变量进行修改都是调用 operator=
+	std::cout << "c: ";
+	c.Print();
+	std::cout << "b: ";
+	b.Print();
 }
 ```
