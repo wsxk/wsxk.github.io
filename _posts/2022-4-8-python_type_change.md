@@ -2,10 +2,13 @@
 layout: post
 title: "python 类型转换"
 date:   2022-4-8
-tags: [knowledge]
+tags: [python]
 comments: true
 author: wsxk
 ---
+
+- [简述](#简述)
+
 
 ## 简述
 
