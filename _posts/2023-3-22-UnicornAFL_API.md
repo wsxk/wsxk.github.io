@@ -14,6 +14,7 @@ comments: true
 - [Unicorn AFL运行原理](#unicorn-afl运行原理)
 - [Unicorn API](#unicorn-api)
 - [实践](#实践)
+  - [为unicorn AFL添加 heap allocator](#为unicorn-afl添加-heap-allocator)
 
 
 ## Unicorn<br>
@@ -182,4 +183,6 @@ uc.afl_fuzz(BINARY_FILE, place_input_callback, [end_address])
 # sudo ../AFLplusplus/afl-fuzz -U -m none -i ./sample_inputs -o ./output -- python3 harness_malloc_test.py @@ 
 ```
 
-
+### 为unicorn AFL添加 heap allocator<br>
+众所周知，为许多 firmware 对于内存破坏的漏洞，并不能很好的发现和捕获。<br>
+为此，为了让fuzzer可以捕获到内存破坏漏洞，我计划写一个heap allocator，可以帮助fuzz firmware时，更有效的捕获漏洞。<br>
