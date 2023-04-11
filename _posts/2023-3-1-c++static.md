@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [c++]
-title: "c++ static"
+title: "c++ static 构造 & 析构"
 date: 2023-3-1
 author: wsxk
 comments: true
@@ -10,6 +10,8 @@ comments: true
 - [c++中的全局静态](#c中的全局静态)
 - [c++类中的static](#c类中的static)
 - [c++中的局部static](#c中的局部static)
+- [构造](#构造)
+- [析构](#析构)
 
 
 ## c++中的全局静态<br>
@@ -53,3 +55,67 @@ void func(){
 }
 ```
 **局部static只会创建一次并一直到程序终止时都存活，只不过只能在当前函数中访问它。**<br>
+
+## 构造<br>
+构造函数，当声明一个类实例时自动调用，初始化类的某些数据和功能。<br>
+
+```c++
+#include <iostream>
+class Entity {
+public:
+	float x, y;
+	Entity() {  // 必须与类名称同名
+		x = 0.0f;
+		y = 0.0f;
+	}
+	Entity(float X, float Y) {
+		x = X;
+		y = Y;
+	}
+	void print() {
+		std::cout << x <<','<< y << std::endl;
+	}
+};
+
+int main() {
+
+	Entity e(3,4);
+	e.print();
+
+}	
+```
+
+## 析构<br>
+```c++
+#include <iostream>
+class Entity {
+public:
+	float x, y;
+	Entity() {
+		x = 0.0f;
+		y = 0.0f;
+	}
+	Entity(float X, float Y) {
+		x = X;
+		y = Y;
+	}
+	~Entity() {
+		std::cout << "Destory Entity" << std::endl;
+	}
+	void print() {
+		std::cout << x <<','<< y << std::endl;
+	}
+};
+
+void function() {
+	Entity e(3, 4);
+	e.print();
+	e.~Entity();
+}
+
+int main() {
+
+	function();
+
+}	
+```

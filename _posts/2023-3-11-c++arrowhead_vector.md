@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [c++]
-title: "c++ ->重载&动态数组std::vector"
+title: "c++ ->重载 & 动态数组std::vector"
 author: wsxk
 date: 2023-3-11
 comments: true

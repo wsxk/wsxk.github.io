@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [c++]
-title: "c++ 函数指针&lambda&namespace"
+title: "c++ 函数指针 & lambda & namespace"
 author: wsxk
 comments: true
 date: 2023-3-17

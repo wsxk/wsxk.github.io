@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [c++]
-title: "c++ new&delete&explict"
+title: "c++ new & delete & explict"
 date: 2023-3-8
 author: wsxk
 comments: true

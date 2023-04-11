@@ -1,16 +1,16 @@
 ---
 layout: post
 tags: [c++]
-title: "c++ 智能指针&拷贝构造函数"
+title: "c++ 智能指针 & 拷贝构造函数"
 date: 2023-3-10
 author: wsxk
 comments: true
 ---
 
 - [智能指针](#智能指针)
-  - [unique\_ptr](#unique_ptr)
-  - [shared\_ptr](#shared_ptr)
-  - [weak\_ptr](#weak_ptr)
+	- [unique\_ptr](#unique_ptr)
+	- [shared\_ptr](#shared_ptr)
+	- [weak\_ptr](#weak_ptr)
 - [拷贝构造函数](#拷贝构造函数)
 
 

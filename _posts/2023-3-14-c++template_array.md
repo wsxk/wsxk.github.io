@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [c++]
-title: "c++ template& std::array"
+title: "c++ template & std::array"
 author: wsxk
 comments: true
 date: 2023-3-14
