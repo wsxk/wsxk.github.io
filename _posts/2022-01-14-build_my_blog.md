@@ -7,9 +7,14 @@ comments: true
 author: wsxk
 ---
 好久以前我就有搭建博客记录自己所学的想法了。今天终于得偿所愿。
-第一遍博客的内容当然是‘搭建自己的博客’啦。
+第一遍博客的内容当然是‘搭建自己的博客’啦。<br>
 
-##### 1.找到模板
+- [1.找到模板](#1找到模板)
+- [2.修改模板](#2修改模板)
+- [3.gitalk](#3gitalk)
+
+
+## 1.找到模板
 我找到的模板如下：
 [模板](https://github.com/lemonchann/lemonchann.github.io)
 
@@ -18,7 +23,7 @@ author: wsxk
 
 fork一个分支到自己的github 
 
-##### 2.修改模板
+## 2.修改模板
 fork一个分支后，里面有很多东西都是别人的，你需要修改文件内容。
 
 一、_config.yml
@@ -40,7 +45,7 @@ fork一个分支后，里面有很多东西都是别人的，你需要修改文�
 username.github.io
 能访问到里的网页，里面什么都没有
 
-##### 3.gitalk
+## 3.gitalk
 gitalk是评论区功能。开启步骤如下：
 首先单击自己头像，点击settings
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2022-01-14-build_my_blog/2.png)
