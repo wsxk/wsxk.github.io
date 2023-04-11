@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [c++]
-title: "c++ static 构造 & 析构"
+title: "c++ static& 构造 & 析构"
 date: 2023-3-1
 author: wsxk
 comments: true
