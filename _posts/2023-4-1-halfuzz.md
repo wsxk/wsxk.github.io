@@ -7,15 +7,18 @@ author: wsxk
 comments: true
 ---
 
-- [install](#install)
+- [install python](#install-python)
   - [安装python](#安装python)
   - [安装python3虚拟环境](#安装python3虚拟环境)
   - [使用python3虚拟环境进行安装](#使用python3虚拟环境进行安装)
 - [安装hal\_fuzz](#安装hal_fuzz)
+- [hal-fuzz](#hal-fuzz)
+  - [1. 论文思路](#1-论文思路)
+  - [2. 实现方法](#2-实现方法)
 - [references](#references)
 
 
-## install<br>
+## install python<br>
 **环境 ubuntu18.04**<br>
 ### 安装python<br>
 
@@ -59,6 +62,20 @@ comments: true
 ## 安装hal_fuzz<br>
 官网在这里[https://github.com/ucsb-seclab/hal-fuzz](https://github.com/ucsb-seclab/hal-fuzz)<br>
 根据这个命令做就好了
+
+## hal-fuzz<br>
+论文名称为`HALucinator: Firmware Re-hosting ARTIFACT
+Through Abstraction Layer Emulation`<br>
+### 1. 论文思路<br>
+发现各个硬件制造产商提供了一个叫做`Hardware Abstraction Layers (HALs)`的东西。<br>
+**HALs是提供给编程师的软件库，其提供了高级别的硬件操作，同时隐藏固件执行时 各个芯片 或 系统的执行细节。这使得程序员的代码移植变得容易起来**<br>
+论文作者发现，基于HALs的固件在设计上，更加与硬件脱钩，因此可以方便的实现模拟。<br>
+作者想到，结合**HALs和可重复使用的替代功能，即HLE（High Level Emulation）,可是实行高效率的firmware fuzz**<br>
+### 2. 实现方法<br>
+首先识别 在firmware中的 那些和硬件交互的 HAL 函数<br>
+其次 提供一个简单的，由分析师创建的，高级别的替代函数（可以提供和HAL函数在概念上一致的功能）<br>
+**值得注意的是，为了找到硬件交互的HAL函数，源码是需要的（至少也要有带符号的firmware）**<br>
+
 
 ## references<br>
 [https://www.dgrt.cn/news/show-128188.html?action=onClick](https://www.dgrt.cn/news/show-128188.html?action=onClick)<br>
