@@ -89,9 +89,22 @@ Through Abstraction Layer Emulation`<br>
 ### 4. 实现细节<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/20230417125459.png)
 
-(1) locate the HAL library functions in the firmware (e.g., via library matching)
-(2) provide high-level replacements for HAL functions
-(3) enable external interaction with the emulated firmware
+
+***(1) locate the HAL library functions in the firmware (e.g., via library matching)*** <br>
+这一步很重要，因为firmware都是完整的，所以firmware自然包含 HAL library中的function，我们要做的是，firmware和 HAL library中的函数进行比对，找到匹配的函数<br>
+但是这一步有很多困难： 一般HAL library的函数在编译时会被优化，可能和HAL library中生成的代码不一致；有一些小型的HAL library函数会被预处理；而且一些 HAL library函数还会调用应用程序函数，可能还是可以重写的，十分麻烦<br>
+论文作者使用的方法是：<br>
+对HAL library进行编译，后生成的库中的每一个函数收录CFG和IR表示，造一个数据库<br>
+第一步:  Statistical comparison,通过比对 基本块的数量，CFG边和函数调用，去除不必要的<br>
+第二步： Basic Block Comparison，用第一步的输出作为输入，比较两个函数的IR表达是否一致，然而，这个比对并不包括一些指针和相对偏移，以及函数调用等等<br>
+第三步： Contextual Matching，用第二步的输出作为输入，因为会有一些错误匹配，因此借助目标函数在firmware中的调用上下文来消除歧义。通过在程序中使用匹配来查找位置来推断其函数可能是什么。使用caller context and callee context<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/20230417193340.png)
+说白了，就是用firmware中这个函数中调用的所有函数名称集合，和匹配到HAL library函数中调用的所有函数名称集合进行比对。再用 firmware中这个函数被调用的所有函数的名称集合，和匹配到的HAL library函数被调用的所有函数名称集合进行比对<br>
+第四步： The Final Match，A valid match is identified if a unique
+name is assigned to a given function in the target binary<br>
+
+***(2) provide high-level replacements for HAL functions*** <br>
+***(3) enable external interaction with the emulated firmware*** <br>
 
 
 ## references<br>
