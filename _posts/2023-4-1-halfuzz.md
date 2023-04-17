@@ -15,6 +15,8 @@ comments: true
 - [hal-fuzz](#hal-fuzz)
   - [1. 论文思路](#1-论文思路)
   - [2. 实现方法](#2-实现方法)
+  - [3. 前置条件](#3-前置条件)
+  - [4. 实现细节](#4-实现细节)
 - [references](#references)
 
 
@@ -75,6 +77,21 @@ Through Abstraction Layer Emulation`<br>
 首先识别 在firmware中的 那些和硬件交互的 HAL 函数<br>
 其次 提供一个简单的，由分析师创建的，高级别的替代函数（可以提供和HAL函数在概念上一致的功能）<br>
 **值得注意的是，为了找到硬件交互的HAL函数，源码是需要的（至少也要有带符号的firmware）**<br>
+找到了这些交互函数后，用自己实现的函数进行替代。<br>
+
+### 3. 前置条件<br>
+> 1. 需要事先知道firmware的架构和内存布局（比如Flash和Ram的位置）（可以在手册上找到）
+> 2. 已经获得了要模拟的固件所需的底层库，例如 OS library，middleware或者networking stacks，还有固件制造商的工具编译链来编译它们（官网有）
+> 3. 一个用于执行模拟指令的程序，例如qemu
+
+总结一下，需要拿到firmware，知道生产商，获得它们的SDK<br>
+
+### 4. 实现细节<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/20230417125459.png)
+
+(1) locate the HAL library functions in the firmware (e.g., via library matching)
+(2) provide high-level replacements for HAL functions
+(3) enable external interaction with the emulated firmware
 
 
 ## references<br>
