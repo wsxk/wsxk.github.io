@@ -3,7 +3,7 @@ layout: post
 tags: [c++]
 title: "c++ program specification"
 author: wsxk
-date: 2023-4-19
+date: 2023-4-20
 comments: true
 ---
 
