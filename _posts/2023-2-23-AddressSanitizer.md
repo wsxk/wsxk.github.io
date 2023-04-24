@@ -7,6 +7,18 @@ author: wsxk
 comments: true
 ---
 
+<head>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            tex2jax: {
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+            inlineMath: [['$','$']]
+            }
+        });
+    </script>
+</head>
+
 - [前言](#前言)
 - [AddressSanitizer composition](#addresssanitizer-composition)
   - [1. Shadow Memory](#1-shadow-memory)
@@ -20,17 +32,6 @@ comments: true
   - [5. Thread](#5-thread)
 - [实践](#实践)
 
-<head>
-    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
-    <script type="text/x-mathjax-config">
-        MathJax.Hub.Config({
-            tex2jax: {
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
-            inlineMath: [['$','$']]
-            }
-        });
-    </script>
-</head>
 
 ## 前言<br>
 这篇内容其实是来自于文章**AddressSanitizer: A Fast Address Sanity Checker** 的阅读笔记。<br>
