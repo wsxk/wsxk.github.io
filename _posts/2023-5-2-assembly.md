@@ -1,28 +1,35 @@
 ---
 layout: post
-tags: [iot]
-title: "arm 神秘指令"
-date: 2023-2-22
+tags: [re]
+title: "Assembly Instruction"
+date: 2023-5-2
 author: wsxk
 comments: true
 ---
 
-- [前言](#前言)
-- [神秘指令序列](#神秘指令序列)
-  - [1. neg](#1-neg)
-  - [2. IT{x{y{z}}} {cond}](#2-itxyz-cond)
+- [写在前面](#写在前面)
+- [1. x86\_64](#1-x86_64)
+  - [浮点运算](#浮点运算)
+- [2. arm32](#2-arm32)
+  - [neg](#neg)
+  - [IT{x{y{z}}} {cond}](#itxyz-cond)
 
-## 前言<br>
-各个 ISA 的神秘指令太多了哩<br>
-这篇文章用于记录出现在arm汇编的神秘指令<br>
 
-## 神秘指令序列<br>
-### 1. neg<br>
+## 写在前面<br>
+本章用来记录一下不常见的，各种架构下的汇编指令。<br>
+
+## 1. x86_64<br>
+### 浮点运算<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-4-27-vscode_cmake/20230503130250.png)
+
+
+## 2. arm32<br>
+### neg<br>
 其实是求补码的指令,即取反后加1
 
 1111（-1） 求补码为 0001（1）
 
-### 2. IT{x{y{z}}} {cond}<br>
+### IT{x{y{z}}} {cond}<br>
 ```
 IT (If-Then) 指令由四条后续条件指令（IT 块）句组成。 这些条件可以完全相同，也可以互为逻辑反。
 IT 块中的指令（包括跳转）还必须在语法的 {cond} 部分中指定条件。
@@ -51,5 +58,3 @@ SETEND
 
 
 可以看看[这篇文章](https://juejin.cn/post/6844903968972210190)
-
-
