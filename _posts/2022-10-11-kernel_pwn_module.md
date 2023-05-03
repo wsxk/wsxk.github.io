@@ -7,6 +7,16 @@ date: 2022-10-11
 comments: true
 ---
 
+- [常用字节码](#常用字节码)
+- [kernel module](#kernel-module)
+
+
+## 常用字节码<br>
+
+    iretq: 48 cf
+    swapgs: 0f 01 f8
+
+## kernel module<br>
 以目前浅薄的kernel pwn经验，总结了一套kernel pwn时会用到的基本操作，不定时更新~<br>
 ```c
 #include <sys/types.h>
