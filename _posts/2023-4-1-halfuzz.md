@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [iot]
-title: "halfuzz"
+title: "HALucinator: Firmware Re-hosting ARTIFACT Through Abstraction Layer Emulation"
 date: 2023-4-1
 author: wsxk
 comments: true

@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [iot]
-title: "retrowrite"
+title: "RetroWrite: Statically Instrumenting COTS Binaries for Fuzzing and Sanitization"
 date: 2023-2-27
 author: wsxk
 comments: true
@@ -38,32 +38,25 @@ comments: true
 即`1.Processing 2.Symbolization 3.Instrumentation Passes 4.Instrumentation Optimization 5.Reassembly`<br>
 
 ### 1. Processing<br>
-在这个阶段，该框架做了如下几件事:
-**分析二进制文件并加载 text & date section，还从中抽取出符号信息和重定位信息。**<br>
-**将二进制码用 `linear sweep`方法反汇编成汇编代码**<br>
-**在前两步的基础上，进行轻量的分析，构造cfg（直接跳转才能被加边）**<br>
+**Preprocessing步骤，在这个阶段，该框架做了如下几件事: 预处理。第一步是加载重新组装所需的二进制部分，即文本和数据部分。RetroWrite还加载辅助信息，例如二进制文件中的符号和重定位信息。该步骤还包括使用线性扫描进行分解，并恢复尽力而为控制流图（CFG）：识别并添加用于直接控制流传输的边。RetroWrite不需要重量级分析来推断间接控制流目标，从而限制分析时间并扩展到更大的二进制文件。**<br>
 
 ### 2. Symbolization<br>
-利用 第一步生成的 cfg 以及 重定位信息 识别在text、data段中的可符号化的常数，并用`assembly labels`来替换他们。<br>
-此时已经有了带有`assembly labels`的汇编代码(assembly)<br>
-再具体而言，符号化的操作经过了3个步骤<br>
-![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/20230227204425.png)
-**首先找出 call和jump的指令，并用assembly labels替换它们**<br>
-**其次找出 PIC中找到计算PC-relative addresses的指，用assembly labels替换它们**<br>
-**最后在data段中，根据重定向条目指向的偏移，用assembly labels替换它们**<br>
+**Symbolization步骤，符号化是RetroWrite重写过程的核心。RetroWrite使用加载阶段的重新定位信息和恢复的控制流图来识别数据和代码部分中的可符号化常量，并将其转换为汇编程序标签。RetroWrite在该步骤结束时输出可重新组装的汇编文件。可重新组装的组件可以通过RetroWrite中开发的其他工具或仪器通道进行进一步处理利用。再具体而言，符号化的操作经过了3个步骤**<br>
 
+一、控制流符号化：控制流指令（即调用和跳转）的操作数被转换为汇编器标签，从而实现代码到代码的引用。<br>
+二、PC（程序计数器）相对寻址：由于位置无关代码不能引用固定地址，因此引用是相对于程序计数器（在x86-64上是rip）计算的。调整计算PC相对地址的指令的操作数，使其使用汇编器标签。然后，在指令引用的位置（静态计算）处定义相应的汇编器标签。这些标签包括代码到代码和代码到数据的引用。通过在获取地址的点符号化函数引用，这种方法隐式地涵盖了间接跳转和调用的情况，从而具体化了（到目前为止不精确的）控制流图（CFG）。<br>
+三、数据重定位：最后，处理数据引用。实质上是模拟动态链接器加载器执行重定位：在重定位条目指向的偏移处，我们用汇编器标签替换字节。然后，根据重定位所指向的地址（具体公式取决于重定位类型）定义相应的标签。这个过程处理了数据到数据和数据到代码的引用。<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/20230227204425.png)
 
 ### 3. Instrumentation Passes<br>
-就是进行一些插桩操作<br>
+Instrumentation Passes步骤，通过对可重新组装的汇编代码进行相应操作来对目标二进制文件进行插桩和修改。rewrowrite的API既灵活又富有表现力，可以在二进制代码上执行重量级转换。
 
 ### 4. Instrumentation Optimization<br>
-对现有的插桩进行优化，包括分析插桩并确定需要用到的寄存器数量以及副作用<br>
-这一步归结起来主要做2件事<br>
-**选择性的保留/恢复 状态变化**<br>
-**为插桩来申请寄存器**<br>
+Instrumentation Optimization步骤，retroWrite分析插桩后的代码以确定所需的寄存器数量和副作用。然后，这些分析的结果用于在每个插桩站点之前（和之后）选择性地保存（和恢复）状态变化，例如条件标志，以及为插桩实现分配寄存器。<br>
 
 ### 5. Reassembly(ASM)<br>
-再重新将汇编代码转变成二进制代码<br>
+Reassembly步骤，这步骤就是将修改后的汇编文件借助现代编译器（例如gcc，clang）重新编译为可执行文件。<br>
+***通过论文的分析，我们也可以得知x64架构下的retrowrite的使用前提是被分析的二进制程序需要是保留符号，且必须是位置无关代码（PIE）。***<br>
 
 ### 思路优点<br>
 一、不需要将汇编代码再提升一个层次到IR中,（通常这种做法很耗时，而且容易出错<br>
