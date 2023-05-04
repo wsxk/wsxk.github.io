@@ -10,6 +10,7 @@ comments: true
 - [写在前面](#写在前面)
 - [1. x86\_64](#1-x86_64)
   - [浮点运算](#浮点运算)
+  - [跳转指令合集](#跳转指令合集)
 - [2. arm32](#2-arm32)
   - [neg](#neg)
   - [IT{x{y{z}}} {cond}](#itxyz-cond)
@@ -21,6 +22,8 @@ comments: true
 ## 1. x86_64<br>
 ### 浮点运算<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-4-27-vscode_cmake/20230503130250.png)
+### 跳转指令合集<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-4-27-vscode_cmake/20230504191152.png)
 
 
 ## 2. arm32<br>
