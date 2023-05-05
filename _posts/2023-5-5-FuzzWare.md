@@ -14,6 +14,8 @@ comments: true
   - [3. Interrupts and DMA](#3-interrupts-and-dma)
   - [4. Re-Hosting Embedded Systems](#4-re-hosting-embedded-systems)
 - [有关MMIO的模拟的问题讨论](#有关mmio的模拟的问题讨论)
+  - [1. Input Overhead](#1-input-overhead)
+  - [2. 当前的MMIO models 方法](#2-当前的mmio-models-方法)
 
 
 ## 写在前面<br>
@@ -47,4 +49,30 @@ DMA是通过MMIO实现的方法，外设拥有权限直接往内存写入东西�
 
 
 ## 有关MMIO的模拟的问题讨论<br>
-因为MMIO是有关
+这一节讨论 为什么用fuzzer解决MMIO问题会导致很大的开销，另外探寻一下现存的去除这些开销的方法。<br>
+
+### 1. Input Overhead<br>
+假设一种天真的方法，其中模糊器生成的随机字节流中的比特被用作硬件生成的值（即，从固件的角度来看，由硬件MMIO寄存器提供的值）。我们将这些比特称为模糊器变异输入空间，然后由固件逻辑进行处理。这个输入空间既包含相关的位，即影响固件逻辑的位，也包含输入开销。对于每个MMIO访问，我们区分两种类型的输入开销。<br>
+
+> 1. Full input overhead : 即fuzzer生成的随机数据，没有一个bit对固件运行是相关的，事实上，这可以用一个任意值替代，不需要fuzzer生成的随机数据。
+>
+> 2. Partial input overhead : 即，fuzzer生成的随机数据中，只有部分bits是有用的。比如访问一个4字节的内存，然而其中只有1字节是需要用到的。剩下的3字节是没有用的
+
+对于fuzzer来说，有一部分值没有被使用到可以说是十分地浪费资源（因为每一个随机输入都是fuzzer通过变异机制得到的，都需要耗费一定的资源）。<br>
+论文作者提出一个例子帮助我们更好的理解。<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-4-27-vscode_cmake/20230505220203.png)
+这个函数的功能很简单，首先在轮询，等待有数据进入，需要处理；<br>
+然后触发GPIO的写操作（可能是开个led灯，anyway）**注意，GPIO也利用了MMIO机制**<br>
+最后取了数据，返回这个数据的第一个字节。<br>
+
+在步骤1，对于fuzzer来说，HAS_DATA是一个4字节的值，通过随机值喂入，让他触发返回数据的逻辑是相对困难的，因为只有一个特定的值可以被接受。这是一个很典型的`full input overhead`的例子。<br>
+
+在步骤2，虽然向GPIO写入可能被视为MMIO写入操作，但GPIO位通常被打包到寄存器中，32位代表32个GPIO引脚。因此，要在不影响附近位的情况下执行GPIO操作，我们必须读取4个字节，翻转所需位，然后将结果写回。一开始读取的初始化的4字节是没有用的（也是`full input overhead`）。<br>
+
+在步骤3，你读取的4个字节中，有3个字节其实是固件运行不需要的（`partial input overhead`），这么算下来，咱们发现，其实fuzzer生成的随机数据，基本上都不需要用到，那生成这些数据就没有意义，耗费了时光了。<br>
+
+咱们再看一下另一个例子<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-4-27-vscode_cmake/20230505221607.png)
+这个例子中，有一个`mmio->op`操作，我们需要喂入4字节的随机数据，然而只有4个选择（可以用2bits表示，这造成了`partial input overhead`）。另外，还有一个`mmio->status`操作，也需要4个字节，然而，只需要1bits就能判断这个状态。显然，这也是一个`partial input overhead`。而且，fuzzzer随机喂入的值能达到目标又要花费巨大时间。<br>
+
+### 2. 当前的MMIO models 方法<br>
