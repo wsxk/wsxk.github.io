@@ -13,6 +13,7 @@ comments: true
   - [2. Linker](#2-linker)
   - [3. Locator](#3-locator)
   - [Startup Code](#startup-code)
+  - [detailed STM32 memory layout](#detailed-stm32-memory-layout)
 - [Binary production for PCs vs microcontrollers](#binary-production-for-pcs-vs-microcontrollers)
 - [Loading and Debugging](#loading-and-debugging)
 - [GNU ARM Toolchain](#gnu-arm-toolchain)
@@ -40,11 +41,12 @@ comments: true
 
 ### 3. Locator<br>
 因为不同类型的microcontroller都有不同的内存分布，来一个经典的:
-![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/20230311191957.png)
-因此Locator的作用在于重新编排可执行文件的布局，使得该程序可以在microcontroller上运行，具体而言，**Locator需要正确的标记.text段，.data段，.bss段的地址，以便一但所有的内容加载到microcontroller的flash中，.data段的地址可以刷到RAM中。**<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/20230311191957.png)<br>
+
+因此Locator的作用在于重新编排可执行文件的布局，使得该程序可以在microcontroller上运行，具体而言，**Locator需要正确的标记.text段，.data段，.bss段的地址，以便.text段的内容加载到microcontroller的flash中，.data段、.bss段的内容刷到RAM中。**<br>
 
 ### Startup Code<br>
-一个microcontroller的项目通常都有一个称作`startup code`的东西，通常该文件名称位`startup.asm`,`startup.c`,`crt0.s`，一但微控制器通电，它会往特定内存处运行特定的代码（通常是0x00000000处，即运行startup code），从通电到运行main函数之间，运行的都是start up code。**The duty of the startup code is to take the machine from power-on point to the point where the main() function starts executing the application code.**<br>
+一个microcontroller的项目通常都有一个称作`startup code`的东西，通常该文件名称位`startup.asm`,`startup.c`,`crt0.s`，一但微控制器通电，它会从特定内存处加载复位向量（通常是0x00000000处，即startup code的代码起始地址），从通电到运行main函数之间，运行的都是start up code。**The duty of the startup code is to take the machine from power-on point to the point where the main() function starts executing the application code.**<br>
 在通电和运行main函数之间，startup code做了如下几件事情
 
     1. initializes the important peripherals
@@ -53,6 +55,16 @@ comments: true
     4. main() is called
 
 **During the locating process this startup code must be placed at address 0x0000 and all the sections must be labeled with correct addresses so that the microcontroller can do the rest!**<br>
+
+### detailed STM32 memory layout<br>
+还是这张经典的图。<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/20230311191957.png)<br>
+我们需要明确一点：因为stm32是32位arm程序，可以寻址的内存范围起始是4GB，然而实际上一个stm32微控制器是没有那么多内存空间的（一个100+的板子，要4gb的内存，你怕是想太多了😊）<br>
+现在我们要做的是仔细思考各个块之间到底放了些什么：<br>
+**1. Code**: 这该地址范围的前16字节包含复位向量表，其中包括初始堆栈指针和复位向量（复位向量指向startup code的代码起始位置）,还有比较常用的是0x0800 0000开始的flash（也称作rom）区间，startup code和 实际固件逻辑的代码都位于flash中。**注意，此时data段和bss段在flash中也有备份，需要通过startup code拷贝到RAM中**<br>
+**2. SRAM**: 这个地址空间中，从低到高分布着 data段，bss段，heap段，stack段。**注意：heap段向上增长，stack段向下增长，如果使用不慎，heap和stack是有可能重合的**<br>
+**3. Peripherals** :这个范围内的地址主要用于访问和控制外设，如GPIO、串行通信接口、定时器等。采用MMIO的方式。通过将外设寄存器映射到这个区域，软件可以像访问内存单元一样访问这些寄存器，从而实现对外设的控制和配置。这种内存映射I/O方法简化了硬件和软件之间的接口，提高了处理器和外设之间的通信效率。**注意，DMA控制器的相关配置也放在这里**<br>
+**4. internal peripherals**: 其实这也是控制外设相关的部分，但是这个区间中主要包含与ARM Cortex-M内核相关的功能和寄存器，这些功能通常不是特定于STM32的，而是与ARM Cortex-M系列处理器共享的.<br>
 
 ## Binary production for PCs vs microcontrollers<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/20230312004359.png)<br>
