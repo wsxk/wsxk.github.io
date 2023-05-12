@@ -10,7 +10,6 @@ comments: true
 - [install python](#install-python)
   - [安装python](#安装python)
   - [安装python3虚拟环境](#安装python3虚拟环境)
-  - [使用python3虚拟环境进行安装](#使用python3虚拟环境进行安装)
 - [安装hal\_fuzz](#安装hal_fuzz)
 - [hal-fuzz](#hal-fuzz)
   - [1. 论文思路](#1-论文思路)
@@ -42,28 +41,21 @@ comments: true
 
     export WORKON_HOME=$HOME/.virtualenvs
     export VIRTUALENVWRAPPER_PYTHON='/usr/bin/python3.6'
-    source /usr/local/bin/virtualenvwrapper.sh
+    source /usr/local/bin/virtualenvwrapper.sh  #实际安装的virtualenvwrapper.sh的路径，可以用 which virtualenvwrapper.sh查看
 
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/20230401132130.png)
 
-### 使用python3虚拟环境进行安装<br>
-
-首先从github上clone hal-fuzz下来，然后
-
-    python3 -m venv hal-fuzz-python
-    source hal-fuzz-python/bin/activate
-    sudo ./setup.sh
-    
-![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-2-18-reverse/20230401132130.png)
-保存后推出，使用如下命令
+然后使用如下命令
 
     source ~/.bashrc
 
-接下来就可以使用 mkvirtualenv来创建虚拟环境<br>
 
 ## 安装hal_fuzz<br>
 官网在这里[https://github.com/ucsb-seclab/hal-fuzz](https://github.com/ucsb-seclab/hal-fuzz)<br>
-根据这个命令做就好了
+首先从github上clone hal-fuzz下来，然后<br>
+
+    mkvirtualenv -p /usr/bin/python3 halfuzz
+    sudo ./setup.sh
 
 ## hal-fuzz<br>
 论文名称为`HALucinator: Firmware Re-hosting ARTIFACT
