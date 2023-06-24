@@ -7,12 +7,14 @@ comments: true
 author: wsxk
 ---
 
-- [相关环境<br>](#相关环境)
-- [QQ<br>](#qq)
+`PS:更新于2023-6-23日`<br>
+
+- [相关环境](#相关环境)
+- [QQ](#qq)
     - [单独聊天撤回](#单独聊天撤回)
     - [群聊撤回](#群聊撤回)
     - [最终](#最终)
-- [微信<br>](#微信)
+- [微信](#微信)
 
 起因是我跟我朋友聊天的时候，他撤回了东西，之后问他，他又不说，还卖关子，我特别生气
 于是搜了一下QQ的防撤回
@@ -82,5 +84,9 @@ ida打开IM.dll
 
 ## 微信<br>
 微信的撤回功能在WeChatWin.dll里<br>
-ida打开，搜索字符串"revokemsg"<br>
-重点是revokemsg前一个jz跳转指令改为jnz<br>
+~~ida打开，搜索字符串"revokemsg"~~<br>
+~~重点是revokemsg前一个jz跳转指令改为jnz~~<br>
+最新版本的微信是`3.9.5.81`，我发现他们版本出现了更替。<br>
+修改的位置不再是`revokemsg`，而是`L'datastatus'`，注意，是`UTF-16格式下的datastatus`
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/20230624112930.png)
+把这个字符串下面的`jz`指令改为`jnz`即可完成防撤回功能<br>
