@@ -1,6 +1,6 @@
 ---
 layout: post
-tags: [iot]
+tags: [fuzz]
 title: "BaseSAFE: Baseband SAnitized Fuzzing through Emulation"
 author: wsxk
 date: 2023-3-19

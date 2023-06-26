@@ -1,6 +1,6 @@
 ---
 layout: post
-tags: [iot]
+tags: [fuzz]
 title: "AddressSanitizer: A Fast Address Sanity Checker"
 date: 2023-2-23
 author: wsxk

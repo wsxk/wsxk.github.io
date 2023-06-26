@@ -1,6 +1,6 @@
 ---
 layout: post
-tags: [iot]
+tags: [fuzz]
 title: "uSBS arm instrumentation"
 date: 2023-2-19
 author: wsxk

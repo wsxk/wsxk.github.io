@@ -1,6 +1,6 @@
 ---
 layout: post
-tags: [iot]
+tags: [fuzz]
 title: "UnicornAFL Harness"
 author: wsxk
 date: 2023-4-19

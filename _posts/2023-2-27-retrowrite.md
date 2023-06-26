@@ -1,6 +1,6 @@
 ---
 layout: post
-tags: [iot]
+tags: [fuzz]
 title: "RetroWrite: Statically Instrumenting COTS Binaries for Fuzzing and Sanitization"
 date: 2023-2-27
 author: wsxk

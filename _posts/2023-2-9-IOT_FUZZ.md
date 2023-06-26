@@ -1,6 +1,6 @@
 ---
 layout: post
-tags: [iot]
+tags: [fuzz]
 title: "IOT fuzz 面向漏洞检测的物联网设备辅助异常与崩溃捕获工具的研究"
 author: wsxk
 date: 2023-2-9

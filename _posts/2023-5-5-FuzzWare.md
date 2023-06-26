@@ -1,6 +1,6 @@
 ---
 layout: post
-tags: [iot]
+tags: [fuzz]
 title: "Fuzzware: Using Precise MMIO Modeling for Effective Firmware Fuzzing"
 author: wsxk
 date: 2023-5-5

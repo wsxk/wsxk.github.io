@@ -1,6 +1,6 @@
 ---
 layout: post
-tags: [iot]
+tags: [fuzz]
 title: "cb-multios install"
 author: wsxk
 date: 2023-4-2
