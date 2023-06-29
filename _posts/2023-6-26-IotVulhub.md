@@ -163,7 +163,7 @@ TOTOLINK是一家主要生产网络通信产品的企业。其产品线包括无
 ## 总结<br>
 其实对于挖洞的过程还是没什么了解，总而言之
 1. 学了些`docker`的使用方式<br>
-2. linux下shell运用例如`grep -r "xxx" .`<br>
+2. linux下shell运用例如`grep -r "xxx" .``ssh -D 2345 root@127.0.0.1 -p 1234`<br>
 3. 常见的路由器漏洞类型<br>
 4. 学习到了诸如`diaphora`工具新姿势
 5. 一下定位漏洞的小tips例如`Referer`<br>
