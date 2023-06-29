@@ -9,16 +9,22 @@ comments: true
 
 - [写在前面](#写在前面)
 - [install](#install)
-- [1. Vivotek CC8160 栈溢出漏洞](#1-vivotek-cc8160-栈溢出漏洞)
-  - [install](#install-1)
-  - [触发漏洞](#触发漏洞)
-- [2. 华为 HG532 远程代码执行漏洞（CVE-2017-17215）](#2-华为-hg532-远程代码执行漏洞cve-2017-17215)
+- [1. Vivotek](#1-vivotek)
+  - [Vivotek CC8160 栈溢出漏洞](#vivotek-cc8160-栈溢出漏洞)
+- [2. 华为](#2-华为)
+  - [华为 HG532 远程代码执行漏洞（CVE-2017-17215）](#华为-hg532-远程代码执行漏洞cve-2017-17215)
 - [3. TP-Link](#3-tp-link)
   - [SR20 本地代码执行漏洞](#sr20-本地代码执行漏洞)
   - [WR841N 栈溢出漏洞（CVE-2020-8423）](#wr841n-栈溢出漏洞cve-2020-8423)
 - [4. Netgear](#4-netgear)
   - [Netgear R8300 upnpd 远程代码执行漏洞(PSV-2020-0211)](#netgear-r8300-upnpd-远程代码执行漏洞psv-2020-0211)
   - [Netgear R9000 命令注入漏洞（CVE-2019-20760）](#netgear-r9000-命令注入漏洞cve-2019-20760)
+- [5. Tenda](#5-tenda)
+  - [Tenda AC15 远程代码执行漏洞（CVE-2018-5767）](#tenda-ac15-远程代码执行漏洞cve-2018-5767)
+  - [Tenda AC15 栈溢出漏洞（CVE-2018-16333）](#tenda-ac15-栈溢出漏洞cve-2018-16333)
+  - [Tenda AC15 命令注入漏洞（CVE-2020-10987）](#tenda-ac15-命令注入漏洞cve-2020-10987)
+- [6. TOTOLINK](#6-totolink)
+  - [TOTOLINK NR1800X (CVE-2022-41518)](#totolink-nr1800x-cve-2022-41518)
 - [总结](#总结)
 
 
@@ -47,21 +53,20 @@ python3 -m pip install docker-compose
 值得注意的是，缺什么就安装什么，所有报错均可以百度搜索到~<br>
 安装完环境后，即可开始漏洞复现工作。<br>
 
-## 1. Vivotek CC8160 栈溢出漏洞<br>
+## 1. Vivotek<br>
 Vivotek是一家知名的家庭摄像头企业<br>
-### install<br>
+### Vivotek CC8160 栈溢出漏洞<br>
 跟随[https://github.com/VulnTotal-Team/IoT-vulhub/tree/master/VIVOTEK/remote_stack_overflow](https://github.com/VulnTotal-Team/IoT-vulhub/tree/master/VIVOTEK/remote_stack_overflow)搭建环境即可~我才用的是系统模拟的方法<br>
 顺道一提，在根据步骤操作到`构建镜像`时会出现问题，具体原因是`docker.io`提供的网站并没有`firmianay/qemu-system:armel`这个镜像，因此你需要自己在本地安装。<br>
 **IoT-vulhub-master/baseImage/qemu-system/armel/images目录下，有一个download.sh文件，把其中的下载链接全都改成https://file.erlkonig.tech/debian-armel/xxxx 即可**<br>
 随后在上一级目录下使用 `docker build -t firmianay/qemu-system:armel .`在本地构建镜像即可。<br>
 还是在`构建镜像`步骤，在新版本docker中，执行`system-emu`目录下的`dockerfile`时会出现问题。`COPY ./firmware/_*/_31* /root/firmware`会执行失败。**因为在新版docker中，会对文件名做检测，所以，建议在文件中找到你提取的带有_31的目录到本地下，同时将命令改成`COPY ./firmware/_31.extracted /root/firmware`即可。**<br>
-
-### 触发漏洞<br>
 **用docker起了一个ubuntu16虚拟机，在其中运行qemu-system-arm运行目标程序**<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/20230627113059.png)
 
 
-## 2. 华为 HG532 远程代码执行漏洞（CVE-2017-17215）<br>
+## 2. 华为<br>
+### 华为 HG532 远程代码执行漏洞（CVE-2017-17215）<br>
 首先还是搭配环境，步骤和第一个漏洞复现类似，不过多赘述<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/20230627162113.png)
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/20230627162136.png)
@@ -129,7 +134,37 @@ Netgear还在网络安全方面提供一些产品和服务，包括VPN解决方�
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/20230629112753.png)
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/20230629112853.png)
 
+## 5. Tenda<br>
+Tenda（全名为深圳市腾达科技股份有限公司）是一家位于中国深圳的网络设备制造商。该公司成立于1999年，主要从事家庭和商用网络产品的研发、生产和销售。<br>
+Tenda的产品线包括各种无线路由器、交换机、无线网卡、以及其他网络相关的设备和配件。这些产品通常以性价比高和易用性著称，因此在家庭和小型企业用户中非常受欢迎。<br>
+Tenda还制造智能家居产品，包括智能插座和智能灯泡等。<br>
+### Tenda AC15 远程代码执行漏洞（CVE-2018-5767）<br>
+是一个栈溢出导致的远程代码执行漏洞。<br>
+在模拟时，需要根据给出的`libc基址`修改相应的`exp.py`中的代码<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/20230629153117.png)
 
+### Tenda AC15 栈溢出漏洞（CVE-2018-16333）<br>
+同样是栈溢出漏洞，修改基址<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/20230629153942.png)
+
+### Tenda AC15 命令注入漏洞（CVE-2020-10987）<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/20230629154910.png)
+
+## 6. TOTOLINK<br>
+TOTOLINK是一家主要生产网络通信产品的企业。其产品线包括无线路由器、网络交换机、网络适配器以及其他网络相关设备。TOTOLINK旨在为家庭和小型企业提供高质量的网络解决方案。TOTOLINK的产品通常以其性价比而闻名，提供了一个相对经济的方式来设置和扩展网络。这家公司有时可能不像Linksys、Netgear或D-Link这样的品牌那么知名，但它在一些市场上具有竞争力，尤其是在对价格敏感的市场。<br>
+**这玩意在韩国貌似很牛逼**<br>
+### TOTOLINK NR1800X (CVE-2022-41518)<br>
+是个**命令注入**的漏洞<br>
+复现后，可以启动环境<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/20230629160120.png)
+运行脚本后，发现<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/20230629160234.png)
 
 ## 总结<br>
-其实对于挖洞的过程还是没什么了解，总而言之还是学了些`docker`的使用方式、linux下shell运用以及常见的路由器漏洞，也不算太亏~<br>
+其实对于挖洞的过程还是没什么了解，总而言之
+1. 学了些`docker`的使用方式<br>
+2. linux下shell运用例如`grep -r "xxx" .`<br>
+3. 常见的路由器漏洞类型<br>
+4. 学习到了诸如`diaphora`工具新姿势
+5. 一下定位漏洞的小tips例如`Referer`<br>
+总的来说不算太亏<br>
