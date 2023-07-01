@@ -38,7 +38,7 @@ comments: true
 第一步是确定模型<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/20230701152944.png)
 假定一个模型<br>
-$$y = b + w*x_{cp}$$
+$y = b + w*x_{cp}$
 
 ### 2. Goodness of Function<br>
 第二步是判断函数的好坏<br>
