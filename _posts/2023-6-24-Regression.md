@@ -23,6 +23,13 @@ comments: true
   - [3. Best Function](#3-best-function-1)
   - [Probability Distribution](#probability-distribution)
 - [三、Logistic Regression](#三logistic-regression)
+  - [1. Function Set](#1-function-set)
+  - [2. Goodness of Function](#2-goodness-of-function-1)
+  - [3. Find the best Function](#3-find-the-best-function)
+  - [Logistic Regression VS Linear Regression](#logistic-regression-vs-linear-regression)
+  - [Multi-classification](#multi-classification)
+  - [Limitation Of Logistic Regression](#limitation-of-logistic-regression)
+  - [Deep Learning诞生！](#deep-learning诞生)
 
 <head>
     <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
@@ -159,7 +166,7 @@ $y = b + w*x_{cp}$
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/20230706113838.png)
 
 ### 2. Loss Function<br>
-这里的`Loss Function`可以是训练集上输出的错误次数，把不同的高斯分布的`Loss`都计算出来<br>
+这里的`Loss Function`其实就是`Likelihood`，**`Likelihood`就是`Loss Function`的一种**<br>
 ### 3. Best Function<br>
 从上述结果里挑选一个`Loss`最小的`Function`即为所求<br>
 
@@ -173,3 +180,61 @@ $y = b + w*x_{cp}$
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/20230706155417.png)
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/20230706155455.png)<br>
 大家发现其实好像没必要算啥`N1 N2 ...`<br>
+**于是乎，另一种计算概率的方法出现了！**<br>
+### 1. Function Set<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20230706211012.png)
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20230706211120.png)
+
+### 2. Goodness of Function<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20230706211306.png)
+可以看到同样是`Likelihood`的方法<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20230706211447.png)
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20230706214312.png)
+继续往下算<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20230706214425.png)
+可以发现其实结果是`Cross Entrophy(交叉熵)`
+
+### 3. Find the best Function<br>
+用`gradient descent`就可以算了<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20230706214913.png)
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20230706215040.png)
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20230706215352.png)
+
+### Logistic Regression VS Linear Regression<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20230706215554.png)<br>
+现在问题来了，我们可以用平方差来替代交叉熵吗<br>
+**答案是不可以**<br>
+如果用平方差的话，会出现如下问题<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20230706215949.png)
+就是在做`gradient descent`时，就算目标距离你很远，微分还是0，这就导致**无法逼近目标，导致训练无效**<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20230706221502.png)
+<br>
+
+其实`logistic regression`也被称为`Discriminative`<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20230706221557.png)
+这里，直接找w和b和通过`Generative`求各种参数计算出来的是不一样的<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20230706221826.png)
+可以看到，`Discriminative`通常情况下相比于`Generative`有更高的精确度。<br>
+**然而，并不是`Discriminative`就一定好，`Generative`其实相比于，是做了一些假设的**<br>
+举个例子<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20230706222136.png)
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20230706222651.png)
+
+### Multi-classification<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20230706222919.png)<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20230706223542.png)
+
+### Limitation Of Logistic Regression<br>
+我们发现无法做划出一道线，能够解决问题<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20230706223656.png)
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20230706223851.png)<br>
+我们使用`Transformation`<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20230706224047.png)
+但是，如果`Transformation`一直是人类来找的，就不是人工智能了，我们希望`Transformation`是机器自己找的<br>
+于是一个很神秘的方法出现了！<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20230706224411.png)
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20230706224615.png)
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20230706224647.png)
+
+### Deep Learning诞生！<br>
+这就是`Deep Learning`的诞生！<br>
