@@ -22,6 +22,7 @@ comments: true
   - [2. Loss Function](#2-loss-function)
   - [3. Best Function](#3-best-function-1)
   - [Probability Distribution](#probability-distribution)
+- [三、Logistic Regression](#三logistic-regression)
 
 <head>
     <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
@@ -166,3 +167,9 @@ $y = b + w*x_{cp}$
 为什么要用高斯分布模型？<br>
 其实这个是人的智慧，**你可以选择你想要的几率分布模型**<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/20230706115209.png)
+
+## 三、Logistic Regression<br>
+使用`Posterior Probability(后验概率)`进行衡量<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/20230706155417.png)
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/20230706155455.png)<br>
+大家发现其实好像没必要算啥`N1 N2 ...`<br>
