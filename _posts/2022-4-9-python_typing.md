@@ -1,6 +1,6 @@
 ---
 layout: post
-tags: [python]
+tags: [knowledge]
 title: "python type hints"
 date: 2022-4-9
 author: wsxk
