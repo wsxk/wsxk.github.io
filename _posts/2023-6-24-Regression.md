@@ -165,4 +165,4 @@ $y = b + w*x_{cp}$
 ### Probability Distribution<br>
 为什么要用高斯分布模型？<br>
 其实这个是人的智慧，**你可以选择你想要的几率分布模型**<br>
-![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/20230706115125.png)
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/20230706115209.png)
