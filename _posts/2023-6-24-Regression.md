@@ -238,3 +238,4 @@ $y = b + w*x_{cp}$
 
 ### Deep Learning诞生！<br>
 这就是`Deep Learning`的诞生！<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20230706224801.png)
