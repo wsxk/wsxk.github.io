@@ -2,7 +2,7 @@
 layout: post
 tags: [AI]
 title: "Deep Learning&Gradient Descent& Backpropagation"
-date: 2023-7-15
+date: 2023-7-10
 author: wsxk
 comments: true
 ---
