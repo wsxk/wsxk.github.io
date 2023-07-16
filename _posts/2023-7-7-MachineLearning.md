@@ -1,7 +1,7 @@
 ---
 layout: post
 tags : [AI]
-title: "机器学习基本原理"
+title: "Machine learning basic"
 date: 2023-7-7
 author: wsxk
 comments: true

@@ -2,7 +2,7 @@
 layout: post
 tags: [AI]
 title: "AI Regression&Classification&Logistic Regression"
-date: 2023-6-24
+date: 2023-6-29
 author: wsxk
 comments: true
 ---
