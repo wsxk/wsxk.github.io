@@ -12,6 +12,7 @@ comments: true
 - [2. DataSet](#2-dataset)
 - [3. Parameter/DataSet setting](#3-parameterdataset-setting)
 - [4. Other Optimization](#4-other-optimization)
+- [5. KNN LM](#5-knn-lm)
 
 ## 前言<br>
 话说回来,其实直觉上来说，对于一个大模型而言，参数越多，数据集越多，效果往往越好，如下图所示<br>
@@ -50,3 +51,9 @@ comments: true
 
 ## 4. Other Optimization<br>
 还有一些常用的优化方法，比如先前提到的`In-context learning、Instruction tuning、Human Teaching(supervised learning)、RL（Reinforcement learning)`等等，可以在占用资源较少（相比于训练大模型而言）的情况下，获得比较好的提升<br>
+
+## 5. KNN LM<br>
+KNN是另一种大模型的训练方法，它的做法如下图所示<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20230719113404.png)
+其实它训练的方法也很神奇啊，模型训练好后，它预测方法是，将训练数据中每个前缀后跟着的token和测试集计算距离，算出最近的那一个距离，得到结果。<br>
+这个训练方法的好处是，计算距离的数据可以比训练集大得多,坏处是，很慢（事实上chatgpt就不是用这个方法，你也知道了）<br>
