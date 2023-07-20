@@ -22,6 +22,7 @@ comments: true
   - [2. NAR（Non-autoregressive Model）](#2-narnon-autoregressive-model)
   - [3. AR vs NAR](#3-ar-vs-nar)
   - [4. AR/NAR 结合](#4-arnar-结合)
+- [Total Training Process](#total-training-process)
 
 
 ## 什么是机器学习<br>
@@ -92,3 +93,5 @@ comments: true
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20230711105250.png)
 
 
+## Total Training Process<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/MachineLearning.jpg)
