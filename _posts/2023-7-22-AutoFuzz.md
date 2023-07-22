@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [fuzz]
-date: "2023-7-20"
+date: "2023-7-22"
 title: "Auto Fuzzing"
 author: wsxk
 comments: true
