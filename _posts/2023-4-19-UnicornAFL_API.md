@@ -75,7 +75,8 @@ import os
 import signal
 import sys
 from unicornafl import *
-from unicornafl.x86_const import *
+from unicorn.x86_const import *
+
 
 DEBUG = 0
 if DEBUG:
@@ -86,8 +87,8 @@ else:
         with open("harness_output.txt", "a") as f:
             f.write(message + "\n")
 
-
-BINARY_FILE = "./malloc_test"
+pwd = os.path.dirname(os.path.realpath(__file__))
+BINARY_FILE = pwd+"/target"
 # Memory map for the code to be tested
 CODE_ADDRESS = 0x00000000  # Arbitrary address where code to test will be loaded
 CODE_SIZE_MAX = 0x00010000  # Max size for the code (64kb)
@@ -115,8 +116,8 @@ log_to_file("mmap code")
 uc.mem_map(CODE_ADDRESS,CODE_SIZE_MAX)
 uc.mem_write(CODE_ADDRESS,binary_code)
 #rip
-start_address = CODE_ADDRESS+0x73A
-end_address = CODE_ADDRESS + 0x792
+start_address = CODE_ADDRESS+0x11A9
+end_address = CODE_ADDRESS + 0x1205
 uc.reg_write(UC_X86_REG_RIP,start_address)
 #stack
 uc.mem_map(STACK_ADDRESS,STACK_SIZE)
@@ -135,19 +136,19 @@ def hook_malloc(uc, address, size, user_data):
     #log_to_file("set protect")
     #uc.mem_protect(heap_addr,heap_size,UC_PROT_READ|UC_PROT_WRITE)
     #uc.mem_protect(heap_addr+heap_size,0x1000,UC_PROT_NONE)
-uc.hook_add(UC_HOOK_CODE,hook_malloc,begin=CODE_ADDRESS+0x747,end=CODE_ADDRESS+0x747)
+uc.hook_add(UC_HOOK_CODE,hook_malloc,begin=CODE_ADDRESS+0x11BA,end=CODE_ADDRESS+0x11BA)
 
 def hook_scanf(uc, address, size, user_data):
     #log_to_file(">>> hook scanf at 0x%x, instruction size = 0x%x" % (address, size))
     uc.reg_write(UC_X86_REG_RIP,address+size)
     array = uc.mem_read(heap_addr,heap_size)
     #log_to_file("input content: {}".format(array))
-uc.hook_add(UC_HOOK_CODE,hook_scanf,begin=CODE_ADDRESS+0x77b,end=CODE_ADDRESS+0x77b)
+uc.hook_add(UC_HOOK_CODE,hook_scanf,begin=CODE_ADDRESS+0x11EE,end=CODE_ADDRESS+0x11EE)
 
 def hook_printf(uc, address, size, user_data):
     #log_to_file(">>> hook printf at 0x%x, instruction size = 0x%x" % (address, size))
     uc.reg_write(UC_X86_REG_RIP,address+size)
-uc.hook_add(UC_HOOK_CODE,hook_printf,begin=CODE_ADDRESS+0x763,end=CODE_ADDRESS+0x763)
+uc.hook_add(UC_HOOK_CODE,hook_printf,begin=CODE_ADDRESS+0x11D6,end=CODE_ADDRESS+0x11D6)
 
 def hook_puts(uc, address, size, user_data):
     #log_to_file(">>> hook puts at 0x%x, instruction size = 0x%x" % (address, size))
@@ -166,7 +167,7 @@ def hook_puts(uc, address, size, user_data):
     if length>20:
         os.abort()
         
-uc.hook_add(UC_HOOK_CODE,hook_puts,begin=CODE_ADDRESS+0x787,end=CODE_ADDRESS+0x787)
+uc.hook_add(UC_HOOK_CODE,hook_puts,begin=CODE_ADDRESS+0x11FA,end=CODE_ADDRESS+0x11FA)
 
 # execute
 log_to_file("start execute")
@@ -179,8 +180,9 @@ def place_input_callback(uc, input, persistent_round, data):
     #log_to_file("input len: {}".format(len(input)))
     uc.mem_write(DATA_ADDRESS, input)
 
-uc.afl_fuzz(BINARY_FILE, place_input_callback, [end_address])
-# sudo ../AFLplusplus/afl-fuzz -U -m none -i ./sample_inputs -o ./output -- python3 harness_malloc_test.py @@ 
+uc_afl_fuzz(uc,BINARY_FILE,place_input_callback,[end_address])
+#uc.afl_fuzz(BINARY_FILE, place_input_callback, [end_address])
+# sudo afl-fuzz -U -m none -i ./sample_inputs -o ./output -- python3 harness.py @@ 
 ```
 
 ### 为unicorn AFL添加 heap allocator<br>
