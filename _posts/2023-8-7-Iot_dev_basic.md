@@ -9,6 +9,7 @@ comments: true
 
 - [1. project arch](#1-project-arch)
 - [2. 嵌入式系统概论与开发流程](#2-嵌入式系统概论与开发流程)
+  - [一、概论](#一概论)
 - [3. 项目管理与软件工程](#3-项目管理与软件工程)
 - [4. 嵌入式系统开发技术](#4-嵌入式系统开发技术)
 
@@ -17,7 +18,24 @@ comments: true
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20230808155202.png)
 
 ## 2. 嵌入式系统概论与开发流程<br>
-第1章：系统·嵌入·硬件■　
+### 一、概论<br>
+嵌入式系统的定义一般如下:**Embedded System use general or specialized purpose CPUsrunning custom softwarealong with specialized hardwareto perform applica-tion-specificfunctions.**<br>
+
+在设计一个嵌入式应用项目时，通常需要考虑以下几点：<br>
+1. 成本 
+2. 外观　
+3. 预计销售市场与消费群体
+4. CPU计算能力
+5. 内存大小
+6. 省电需求
+7. 稳定度
+8. 反应实时性（Real-Time）
+9. 软件复杂度
+10. 测试复杂度
+
+**其实某项产品是否符合嵌入式系统的定义并不重要，重要的是开发者必须完全了解嵌入式系统的本质，以避免在设计开发阶段做出错误的判断与决定**<br>
+
+
 第3章：嵌入式系统开发项目生命周期：项目启动与规划■　
 第4章：嵌入式系统开发项目生命周期：设计、执行与结项■　
 第17章：系统整合■　
