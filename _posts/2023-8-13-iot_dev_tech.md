@@ -1,6 +1,6 @@
 ---
 layout: post
-tags: [iot]
+tags: [iot_dev]
 date: 2023-8-13
 author: wsxk
 comments: true
