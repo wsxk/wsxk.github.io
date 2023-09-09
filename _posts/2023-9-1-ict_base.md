@@ -154,3 +154,6 @@ BBU有四个主要模块:`MPT（主控版）、BBI/BBP（基带板）、TRP（�
 ## 7. 基站系统架构展示图<br>
 4G基站:<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/base_station.drawio.png)
+
+5G基站:<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/5G_base_station.drawio.png)
