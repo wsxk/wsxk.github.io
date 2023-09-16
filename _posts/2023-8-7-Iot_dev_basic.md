@@ -20,7 +20,7 @@ comments: true
 
 ## 2. 嵌入式系统概论与开发流程<br>
 ### 一、概论<br>
-嵌入式系统的定义一般如下:**Embedded System use general or specialized purpose CPUsrunning custom softwarealong with specialized hardwareto perform applica-tion-specificfunctions.**<br>
+嵌入式系统的定义一般如下:**Embedded System use general or specialized purpose CPUsrunning custom software along with specialized hardware to perform application-specificfunctions.**<br>
 
 在设计一个嵌入式应用项目时，通常需要考虑以下几点：<br>
 1. 成本 
