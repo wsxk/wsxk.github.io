@@ -3,7 +3,7 @@ layout: post
 tags: [无线网络安全]
 title: "ICT basic"
 author: wsxk
-date: 2023-9-1
+date: 2023-8-1
 comments: true
 ---
 
@@ -31,6 +31,11 @@ comments: true
 - [5. 微波产品基础](#5-微波产品基础)
 - [6. 能源产品基础](#6-能源产品基础)
 - [7. 基站系统架构展示图](#7-基站系统架构展示图)
+- [ICT网络架构](#ict网络架构)
+  - [一. 移动回传网](#一-移动回传网)
+  - [二. IP承载网](#二-ip承载网)
+  - [三. IP骨干网](#三-ip骨干网)
+  - [四. 传送网](#四-传送网)
 
 
 ## 1. ICT introduction<br>
@@ -157,3 +162,21 @@ BBU有四个主要模块:`MPT（主控版）、BBI/BBP（基带板）、TRP（�
 
 5G基站:<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/5G_base_station.drawio_1.png)
+
+
+## ICT网络架构<br>
+先前提到，`ICT网络架构可以分为`：**基础设施层、终端、接入层、承载层、核心层、业务层**<br>
+现在以一个手机，连接上网为例，描述一下手机需要穿过什么网络才能和Internet平台进行交互。<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/ICT_Net.drawio.png)
+
+### 一. 移动回传网<br>
+移动回传网分为三个部分：`接入层(CSG,ceil site gateway)` `汇聚层(ASG,aggregation site gateway)` `核心层(RSG,radio service gateway)`<br>
+
+### 二. IP承载网<br>
+本质上是起路由功能<br>
+
+### 三. IP骨干网<br>
+如果需要访问IT服务，就会经过此网。<br>
+
+### 四. 传送网<br>
+先前说过，用于同一网内的设备通信，或者是地市间IP承载网的通信。<br>
