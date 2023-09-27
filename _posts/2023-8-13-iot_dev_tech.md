@@ -62,6 +62,8 @@ OS与API
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20230927000532.png)
 
 嵌入式系统平台指的就是让电子产品的‘应用程序’得以顺利开发的环境，所以系统平台不只是软件或硬件的概念而已，它是一个稳定的环境。所以**嵌入式平台可以是boot-loader与驱动程序，OS与API，子系统与库函数的组合**<br>
+但是上述的对应图只能描述更层级的关系，不能描述数据传输的过程，数据传输过程如下：<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20230927221905.png)
 
 
 第7章：构建良好的嵌入式系统开发环境■　
