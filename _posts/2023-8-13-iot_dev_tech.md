@@ -13,7 +13,7 @@ title: "iot dev technology"
 - [3. 构建良好的嵌入式系统开发环境](#3-构建良好的嵌入式系统开发环境)
 
 
-`PS: 更新于2023-10-04`<br>
+`PS: 更新于2023-10-16`<br>
 
 ## 1. 第一个嵌入式系统<br>
 入门嵌入式系统开发，需要了解嵌入式开发和传统PC程序开发的差别和联系。<br>
@@ -86,7 +86,7 @@ ISR（以下就用中断方式来说明）只会马上判断硬件状态发生�
 makefile其实可以编写出很恶心，让人看不懂的规则，但是其实没必要，**编写makefile的重点不在于使用了多晦涩难懂的语法，而是make工具处理target间依存关系的能力，这才是用来管理软件编译、制作可执行文件的主要功能**<br><br>
 `Link Script`是用来描述项目中的各个程序文件，分别要被定位到哪个地址的<br>
 要想了解`Link Script`的作用，还要先了解一下程序文件的组成，程序文件的组成如下：<br>
-```c
+```
 ■　text段：就是所谓的程序部分，基本上，执行时期text段的内容不会改变，除非有特别的需求（例如，为了加速），否则text段可以直接在ROM里执行，无须载入到RAM。
 
 ■　Read-only-data（rodata）段：程序中定义为 ‘const’的变量，以及诸如‘Hello World’这样的字符串，都会被归类到rodata段（请见以下例子）。程序段还有载到RAM中执行的可能，但rodata段没有加速或改变内容的需求，所以应该‘待’在ROM里即可。
@@ -99,7 +99,7 @@ data段会被加入ROM，但却要寻址到RAM的地址。
 总的来说，在嵌入式设备中，程序的结构分布如下图所示<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20231016222557.png)
 图中可以引出2个概念：`LMA (Load Memory Address)`：某程序区段被‘放置’的地址。**其实就是一开始程序烧录在ROM上的地址**<br>
-VMA (Virtual Memory Address)：程序区段在执行时期的地址。<br>
+`VMA (Virtual Memory Address)`：程序区段在执行时期的地址。<br>
 **例如：数据会被放置在ROM，但执行时必须载入到RAM，则在ROM中的地址就称为LMA，而在RAM中的地址就是VMA**<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20231016222920.png)
 
