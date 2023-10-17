@@ -11,6 +11,10 @@ title: "iot dev technology"
   - [boot的作用](#boot的作用)
 - [2. 实作嵌入式系统平台](#2-实作嵌入式系统平台)
 - [3. 构建良好的嵌入式系统开发环境](#3-构建良好的嵌入式系统开发环境)
+  - [3.1集成开发工具](#31集成开发工具)
+  - [3.2 批处理文件\&makefile](#32-批处理文件makefile)
+  - [3.3 Link Script](#33-link-script)
+  - [3.4 RoM Maker](#34-rom-maker)
 
 
 `PS: 更新于2023-10-16`<br>
@@ -80,10 +84,14 @@ ISR（以下就用中断方式来说明）只会马上判断硬件状态发生�
 ## 3. 构建良好的嵌入式系统开发环境<br>
 嵌入式系统开发环境包含以下几个方面`集成开发工具、 Cross compiler 、制作可执行文件的批处理文件（build.bat) 、makefile 、Link Script、 调试工具、下载工具、 其他工具（Offline Tools)、 模拟器、 版本控制工具`<br><br>
 虽然对于绝大部分开发员工来说，没有必要熟悉开发环境的构建步骤，但是熟悉一下也没什么坏处不是嘛（<br>
+### 3.1集成开发工具<br>
 `集成开发工具`没啥好说的，就是`IDE`,只不过嵌入式服务产商中，很多都有自己的开发环境IDE，很少用到像`Eclipse`这样的开源IDE<br>
 `Cross compiler`指的是交叉编译工具集合，正常的编译器只能编译在本地机器上运行的程序，交叉编译器用于在本地机器上编译出在目标机器上运行的程序<br>
+### 3.2 批处理文件&makefile<br>
 `批处理文件其实就是执行系统已有的可执行文件的程序语言.makefile和批处理文件最大的不同，就是make会比较文件之间的依存关系与日期，以决定某个文件是否为新版。`<br>
 makefile其实可以编写出很恶心，让人看不懂的规则，但是其实没必要，**编写makefile的重点不在于使用了多晦涩难懂的语法，而是make工具处理target间依存关系的能力，这才是用来管理软件编译、制作可执行文件的主要功能**<br><br>
+
+### 3.3 Link Script<br>
 `Link Script`是用来描述项目中的各个程序文件，分别要被定位到哪个地址的<br>
 要想了解`Link Script`的作用，还要先了解一下程序文件的组成，程序文件的组成如下：<br>
 ```
@@ -102,6 +110,11 @@ data段会被加入ROM，但却要寻址到RAM的地址。
 `VMA (Virtual Memory Address)`：程序区段在执行时期的地址。<br>
 **例如：数据会被放置在ROM，但执行时必须载入到RAM，则在ROM中的地址就称为LMA，而在RAM中的地址就是VMA**<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20231016222920.png)
+
+### 3.4 RoM Maker<br>
+在编译完成可执行文件后，还需要对其格式进行转换。<br>
+可执行文件格式很多，如ELF、COFF、HEX、S-Record及Windows用的EXE等.但是在`ROM`中执行的二进制文件，内容应该就是一个个机器指令，CPU可以直接找指令出来执行<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20231017212924.png)
 
 第8章：上电之后：Boot Loader■　
 第9章：驱动程序■　
