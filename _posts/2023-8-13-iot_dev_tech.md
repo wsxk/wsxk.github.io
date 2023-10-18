@@ -15,6 +15,8 @@ title: "iot dev technology"
   - [3.2 批处理文件\&makefile](#32-批处理文件makefile)
   - [3.3 Link Script](#33-link-script)
   - [3.4 RoM Maker](#34-rom-maker)
+  - [3.5 offline tools](#35-offline-tools)
+  - [3.6 下载与执行](#36-下载与执行)
 
 
 `PS: 更新于2023-10-16`<br>
@@ -115,6 +117,18 @@ data段会被加入ROM，但却要寻址到RAM的地址。
 在编译完成可执行文件后，还需要对其格式进行转换。<br>
 可执行文件格式很多，如ELF、COFF、HEX、S-Record及Windows用的EXE等.但是在`ROM`中执行的二进制文件，内容应该就是一个个机器指令，CPU可以直接找指令出来执行<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20231017212924.png)
+
+### 3.5 offline tools<br>
+**通常我们称这种用于开发阶段必须自行开发，并且执行于PC上的工具叫做Offline-Tools。**我把Offline-Tools归纳为六大类：<br>
+■　Program Generator（程序产生器） ：系统配置工具（比如make config） resource manager。<br>
+■　Data Maker：我们希望系统在执行时期能够以比较有效率的方式来存取多批数据。在某些应用中，数据量可能非常大，此时就不能再使用简单的索引表格，而必须将这些数据文件整合为数据库。当然，一般嵌入式系统无法使用诸如mySQL这种数据库系统，必须根据应用的特性自行设计。以下列举一些较具代表性的DatabaseMaker应用：`file system` 和`Database`<br>
+■ Image Maker： Image Maker的主要功能就是要制作最后要烧入存储器中的image。通常这个image中不只包含程序，可能还包含了我们上述所说的产品资信、File System image、Database等。<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20231018225052.png)
+■　下载工具：当Image Maker产生image后，除了可以用烧录器写入存储器外，系统团队还必须提供所有工程人员另一个较方便的下载工具，通常这个工具必须具有局部下载的功能，因为有时工程师只编辑了部分程序，或只更新了文件系统里的某些文件，此时，若仍需要全部更新整个image，势必相当费时，影响开发效率。<br>
+■　量产工具：举例来说，厂商希望每批机器出厂后都有不同的序号（可能包含厂商、日期、保密用途等信息），但这些信息在量产阶段，进行存储器前烧录才可决定，此时研发单位必须提供一个PC工具给工厂，先将工厂人员输入的出厂信息写入image的特定位置中，然后才进行存储器烧录。诸如此类的应用不少，只要研发单位把能最终用以烧录之image的格式定义清楚，就不会有问题了。<br>
+■　模拟器: 就是在pc上模拟固件运行的程序<br>
+
+### 3.6 下载与执行<br>
 
 第8章：上电之后：Boot Loader■　
 第9章：驱动程序■　
