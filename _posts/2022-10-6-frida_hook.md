@@ -1,15 +1,15 @@
 ---
 layout: post
-tags: [re]
+tags: [Android]
 title: "frida hook"
 author: wsxk
 date: 2022-10-6
 comments: true
 ---
 
-- [前置条件<br>](#前置条件)
-- [安装frida<br>](#安装frida)
-- [firda使用<br>](#firda使用)
+- [前置条件](#前置条件)
+- [安装frida](#安装frida)
+- [firda使用](#firda使用)
 
 ## 前置条件<br>
 有root权限的android手机: [https://wsxk.github.io/pixel2xl%E5%88%B7%E6%9C%BA/](https://wsxk.github.io/pixel2xl%E5%88%B7%E6%9C%BA/)<br>

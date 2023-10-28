@@ -1,6 +1,6 @@
 ---
 layput: post
-tags: [re]
+tags: [Android]
 title: "java misc knowledge"
 date: 2022-7-5
 author: wsxk
@@ -9,11 +9,11 @@ comments: true
 
 记录一下java逆向时学到的一些东西。<br>
 
-- [jdk 源码<br>](#jdk-源码)
-- [@override<br>](#override)
-- [AWT和Swing<br>](#awt和swing)
-  - [控件绑定<br>](#控件绑定)
-- [reference<br>](#reference)
+- [jdk 源码](#jdk-源码)
+- [@override](#override)
+- [AWT和Swing](#awt和swing)
+	- [控件绑定](#控件绑定)
+- [reference](#reference)
 
 # jdk 源码<br>
 记录一下jdk源码的位置<br>
