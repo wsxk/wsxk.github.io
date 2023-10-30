@@ -4,7 +4,7 @@ tags: [iot_dev]
 title: "iot dev technology 2"
 author: wsxk
 comments: true
-date: 2023-10-20
+date: 2023-10-8
 ---
 
 - [4. 上电之后：Boot Loader](#4-上电之后boot-loader)
@@ -19,6 +19,7 @@ date: 2023-10-20
     - [5.3.1 控制CPU寄存器](#531-控制cpu寄存器)
     - [5.3.2 控制中断处理器](#532-控制中断处理器)
     - [5.3.4 Clock](#534-clock)
+    - [5.3.5 Bus \& Chip Select](#535-bus--chip-select)
 - [6. 设计硬件抽象层](#6-设计硬件抽象层)
 - [7. 菜鸟当自强：软件工程师硬起来](#7-菜鸟当自强软件工程师硬起来)
 
@@ -156,6 +157,19 @@ Windows或Linux的开发环境都已经有稳定的操作系统，要增加对�
 **这就是所谓CPU‘超频’的原理！同一颗CPU使用不同的时序就会有运算速度不同的效果。**<br>
 **CPU的Clock是由外部的Clock Generator提供的，例如振荡器IC（之所以用振荡器IC是为了获取稳定的时序）**<br>
 
+#### 5.3.5 Bus & Chip Select<br>
+**所谓的Bus应该包含Address Bus与Data Bus两种，CPU以及可用地址操作的芯片（以存储器居多）都会有类似称为A0、A1……A15……或D0、D1……D15……的PIN脚，前者就是Address Bus，后者则是Data Bus。CPU与所有的外部存储器主要就是用这些PIN脚串接起来**<br>
+下图可以清晰的描述这个过程<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20231030211107.png)
+刚刚我们看的那张时序图里就包含Data Bus与Address Bus的状态变化。首先，CPU通过Address Bus送出要操作的地址，如果是写入存储器的动作，CPU接着会送出要写入的数据到Data Bus上，存储器可从Bus上分别取得地址与要写入的值，并执行CPU要求的动作。反之，存储器从Address Bus上取得地址后，会把地址上的值放到Data Bus上，CPU则会自Data Bus上把值读入，从而完成从存储器上取值的操作。简单地说，CPU必须通过Data Bus、Address Bus与存储器连接，才能用指定地址的方式来存取存储器<br><br>
+问题来了，CPU和多个存储器连在一起，存储器怎么知道CPU要获取的地址是哪一个存储器里的呢？<br>
+CPU要使用某个芯片之前，通常要明确的指定或‘告知’。所谓‘告知’的方法就是改变存储器芯片上**CS PIN（Chip Select）**的状态，一般都是由High拉到Low，当芯片的CS PIN状态被改变时，即表示通知其准备开始工作。当CPU不再使用该芯片时，就把该存储器芯片的CS PIN状态设为High。这就是为什么即使Bus上串了许多存储器芯片，但同时只有一个芯片会动作的原因。<br><br>
+在系统有多个存储器芯片的状况下，CPU与所有存储器芯片当然是通过同一组Address与Data Bus串接，但是CPU会用不同的PIN脚去控制不同存储器芯片的CS PIN。例如，用名为CS#1的PIN脚控制SRAM,用CS #2控制ROM。当然，`是由CPU负责控制存储器芯片的CS PIN`，否则，编译器怎么可能预先知道产品的硬件设计会选用哪一根PIN脚来控制某个存储器，怎么有办法为诸如‘操作变量’的C语言程序代码产生汇编语言代码？你可以想象CPU内有一个对应关系的表格（如下图所示）
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20231030211622.png)
+CPU会根据要操作的地址，换算接在这个范围内的存储器芯片，是用哪个PIN脚控制其CS PIN。在送出地址之前或同时，CPU就会把该PIN脚拉Low（设为低电位）。如上图所示：一个area对应一段地址空间，你可以想象每个Area对应一个CPU的chip select PIN，一个chip select PIN可以接一颗存储器IC，所以，当你的程序要存取某个地址时，CPU会根据地址判断是哪个Area，再把相应的chip select PIN拉Low，就可以存取到正确的存储器IC了<br><br>
+因为系统中的每一个存储器芯片会有不同的特性，例如，存取速度、基本的数据宽度（8bit、16bit或32bit）等，所以CPU在操作不同存储器芯片时应该会有不同的行为模式。如ROM和CPU比起来算是较为慢速的设备，假设CPU要到ROM读一笔数据，当CPU将地址通过Address Bus送出后，可能要多等待几个Clock，该存储器才来得及将数据放上Data Bus。其中等待的Clock数就称为waiting cycle，这也就是上面所说得行为模式之一。<br>
+理论上，CPU操作某存储器要插入几个waiting cycle是可以计算的，CPU的data sheet内都会有此信息，通常是一个公式，输入CPU的时序（如24 MHz）以及存储器芯片的执行速度（如90 ns），就可以得出理论的waiting cycle数。实际上，我们开始会把这个值设大一点，即CPU存取该存储器的速度会慢一点，等系统可以稳定的执行之后，再来慢慢调整系统各部门的timing。<br><br>
+**最后，值得注意的是，并非串在Bus上的存储器芯片才有Chip-Select PIN，许多非存储器的芯片在控制之前都必须改变其Chip-Select PIN的状态。**<br>
 
 
 ## 6. 设计硬件抽象层<br>
