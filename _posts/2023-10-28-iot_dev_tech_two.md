@@ -4,7 +4,7 @@ tags: [iot_dev]
 title: "iot dev technology 2"
 author: wsxk
 comments: true
-date: 2023-10-8
+date: 2023-10-28
 ---
 
 - [4. 上电之后：Boot Loader](#4-上电之后boot-loader)
