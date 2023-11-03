@@ -25,8 +25,8 @@ date: 2023-10-28
     - [5.3.8 Power Management \& Low Power](#538-power-management--low-power)
     - [5.3.9 断电前处理](#539-断电前处理)
     - [5.3.10 充电（Charger）控制](#5310-充电charger控制)
-- [6. 设计硬件抽象层](#6-设计硬件抽象层)
-- [7. 菜鸟当自强：软件工程师硬起来](#7-菜鸟当自强软件工程师硬起来)
+    - [5.3.11 ADC \& DAC](#5311-adc--dac)
+    - [5.3.12 Watch-Dog](#5312-watch-dog)
 
 ## 4. 上电之后：Boot Loader<br>
 ### 4.1 排查硬件是否正常执行<br>
@@ -302,9 +302,27 @@ Step03：立即从P#1读出状态。
 下图是一张电压和电流在一个充电周期内的变化图<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20231102223849.png)
 
-## 6. 设计硬件抽象层<br>
+#### 5.3.11 ADC & DAC<br>
+在实现charger算法时，必须随时可以判断电池的电压值，才知道什么时候该停止充电。但电压值是连续的，或是模拟的值，而CPU只能处理0、1组成的数字数据，我们的驱动程序需要通过模拟/数字转换器——ADC（Analog To Digital Converter），做模拟/数字信号的转换。<br>
+同样的，CPU想要把信息输出到外界，也需要通过DAC，将计算的数字结果转换为模拟信号。<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20231103184827.png)
+先说明ADC。ADC的运行原理相当简单，就以测量电池电压为例，输入AD Port的电压范围是0V～3V，如果该AD Port的精度是10bit，即模拟转为数字后的值为0〜1023之间（210=1024）。举例来说，当电压值为0时，转换后的AD值为0，当电压值为最大值3V时，则转换后的AD值是1023。至于在0V〜3V之间的输入，则会以线性的方式作转换。例如，输入电压为2.2V，则取得的AD值为：（2.2/3.0）×1024 =751<br><br>
+对驱动程序而言，自AD port取得的值（通常是通过Memory Mapping Register取得），反算可得真正的电压值。同上例的状况（电压值范围0V〜3V、AD port精度10bit），假设得到的AD值是620，则反算可得输入的电压值为：（620/1024）×3V=1.82V<br><br>
+**外部芯片只要能将模拟的输入（如温度、音量等级、震动程度等）转换为不同的电压输出，再连接到CPU的AD Port，则程序就可以在控制的精度之下算得外界模拟的输入。**<br>
+其实一般DAC IC的功能比你想象得高端，根据其定义的应用领域，CPU只要将数字数据传给DAC IC，它就会帮忙做完所有的事。举例来说，有一颗称为“Ultralow Noise20-Bit Audio DAC”的IC，系统只要把PCM音频数据传给它，它会执行译码，并将结果转换为模拟数据输出，有的Audio DACIC甚至可以直接处理MP3的数据。再例如，一颗名为“Voltage Output 10-Bit DAC”的IC，系统甚至只要传给它诸如1.8、3.3等数字，就会转出1.8V或3.3V的电压。<br><br>
+所以系统在使用DAC IC时，只需要注意DAC IC与CPU之间的接口（例如Audio DAC都是用I2C或I2S与CPU沟通），以及数据传递的protocol即可。
+但有些比较简单的应用，例如，控制马达转速、调整LED亮度、输出较低质量的声音（如语音或特效音），若还要通过另一颗DAC IC来做，难免有点杀鸡用牛刀之嫌，而且还增加成本与系统复杂度。我们还是需要让CPU模拟信号的方法，最常用的就是`PWM（Pulse Width Modulation）`,原理如下图所示：<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20231103185227.png)
+PWM的原理很简单，固定时间段内高电压所占的比例称为Duty Cycle，而不同的Duty Cycle代表不同模拟输出的值。简单地说，就是对欲输出的模拟信号进行编码。许多SoC本身就提供PWM输出的功能，就算主控IC没提供PWM输出，驱动程序也能够通过一个Timer计时，控制某根IO脚的Duty Cycle。<br>
+#### 5.3.12 Watch-Dog<br>
+电子产品在运行时常常会受到来自外界电磁场的干扰，造成程序‘乱跑’或陷入死循环，使得系统无法继续工作，并造成整个系统的陷入停滞状态.Watchdog Timer的主要功能就是**当程序发生不可预期的错误（程序本身的漏洞、程序跑进无穷循环，或外部信号干扰，导致产生错误动作）时，会自动重置系统，以确保系统稳定。**<br>
+顾名思义，Watchdog的意思是看门狗，而Watchdog Timer当然也是一种Timer。当系统enable了Watchdog Timer后，它就会从某个已设定好的值开始倒数，数到0时，就会做产生一个最高优先级的中断或直接让CPU reset。<br>
+当Watchdog Timer开始倒数时，为避免timeout后Watchdog去reset CPU，系统必须及时重新设定Watchdog的counter，我们称之为‘喂狗’，以此表示系统还活着。若某个程序（任何程序，可能是驱动程序、系统程序或应用成程序）在循环内运行了太久的时间，又没有及时重新设定Watchdog的counter，则Watchdog会以为系统死机了，自然会去reset CPU。<br>
 
-## 7. 菜鸟当自强：软件工程师硬起来<br>
+
+
+
+第10章：设计硬件抽象层<br>
 第11章：菜鸟当自强：软件工程师硬起来■　
 第12章：做好存储器管理■　
 第13章：存储器管理（II）：NAND Flash概论■　
