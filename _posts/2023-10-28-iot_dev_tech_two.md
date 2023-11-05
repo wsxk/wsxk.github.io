@@ -29,6 +29,7 @@ date: 2023-10-28
     - [5.3.12 Watch-Dog](#5312-watch-dog)
     - [5.3.13 CPU初始化](#5313-cpu初始化)
     - [5.3.14 CPU内部还有什么？](#5314-cpu内部还有什么)
+  - [5.4 存储器](#54-存储器)
 
 ## 4. 上电之后：Boot Loader<br>
 ### 4.1 排查硬件是否正常执行<br>
@@ -362,4 +363,20 @@ RTC也是一种Timer，但是它的精度比较粗，通常是百分之一秒的
 ■　其他内置IP：目前业界CPU内部功能整合度之高已超乎想象，有些几乎是为特定产品量身定做，例如，手持式设备、手机、MP3随身听等都有整合型的CPU可选用。图9-29所示是一个用于MP3 Player整合型CPU的实例，图中大方框内的方块就是整合在CPU内部的芯片，你能想到MP3 Player该有的功能都包含在里面了，包含MP3译码器、LCDController、NAND Flash Controller、USB Controller等。产品开发商用了这种CPU，软、硬件都不需要太大的effort，就能整合出完整的产品。如此一来，不但缩短研发时间与经费，还可加速产品上市的进度。
 
 ■　MMU（Memory Management Unit）:MMU系统可用来实现虚拟存储器、虚拟地址空间、page on demand等大型操作系统的存储器管理功能，一般只在WinCE或Embedded Linux专用
+```
+
+### 5.4 存储器<br>
+一般情况下，iot的存储器分为以下几种类型：<br>
+```
+■　可用地址读取的只读存储器：如EEPROM与Mask ROM等，通常用来存放程序与执行时期不会更动的数据，程序可以直接在ROM里面执行，除非有性能的需求，否则没有载入到RAM的必要。CPU或驱动程序可以通过地址或指针直接读取ROM里面的数据，但执行时期无法将数据写入ROM里。CPU是通过Address Bus与Chip select寻址，利用Data Bus取得ROM里的数据。
+
+■　可用地址读取写入的RAM：和ROM一样，CPU通过Address Bus与Chip Select寻址，利用Data Bus存取（读写）RAM里的数据，但是RAM的内容是可以在执行时被改变的。
+  □　Static RAM：顾名思义，只要持续供应电源，SRAM里的数据就得以保存；SRAM耗电流比DRAM低，价格比DRAM贵。对固件工程师而言，SRAM的控制很简单（只要设定CPU与SRAM之间的timing即可，几乎不需要其他的控制就可以存取SRAM了）。对硬件工程师来说，SRAM的线路设计非常简单。虽然SRAM的好处多多，但为了成本考虑，通常在系统中，不会使用size太大的SRAM。
+  
+  □　Dynamic RAM： DRAM有个要命的特性，是必须持续refresh才能维持数据的正确性，所以需要一个额外的DRAM控制器。驱动程序必须通过设定DRAM控制器，需要设定的数据包含DRAM的size、存取的时序、refresh的特性等，DRAM才可以正常的运行。在嵌入式系统中，我们通常使用的是SDRAM（Synchronous DRAM），详细原理在此就不详述了，最大的不同点是CPU必须提供持续而稳定的Clock给SDRAM。SDRAM的好处是较SRAM便宜很多，如果系统需要较大的缓冲区，通常都会选择使用SDRAM。
+  
+■　可用地址读取，但必须下命令写入的Flash（快闪存储器）：这就是我们之前提到过的NOR Flash，驱动程序可以把它当作ROM使用，CPU通过Address Bus与Chip select寻址，利用Data Bus取得ROM里的数据。NOR Flash的内容是可以更改的，但不像写入RAM那么容易，即不是通过address与Data Bus，必须对NOR Flash IC下命令才行。此外，NOR Flash有个特性，写入时必须以block为单位（一个block可能是16K或8K Byte），而且写入前必须先做擦除（Erase）的动作。这个特性使得NOR Flash的写入很麻烦，且性能很差
+所以一般NOR Flash的用途为：一个是当作ROM的代替品，如果程序有问题可以重复烧录，免除开Mask以及ROM的内容无法修改的风险；因为NOR Flash有断电后内容不会丢失的特性，所以NOR Flash的第二个用途就是用来存储或备份执行时期的数据，例如，使用者私人的设定或录音数据等（除了NAND Flash外，使用SPI或I2C控制的NOR Flash、EEPROM也可算入此种存储器分类，但其单位价格比NAND Flash贵上许多）。
+
+■　只能用命令读取和写入的Flash：MP3 Player与随身碟就是用这种NAND Flash当作大量存储介质。对固件工程师而言，它不能直接用地址存取，不论读写都要下命令，读取是以page为单位（512 Byte或2048 Byte），写入和擦除则是以block为单位（block是多个page的集合）。此外，NAND Flash有个比较麻烦的特性，它和硬盘一样会产生坏道（Bad Block），所以通常我们可以把NAND Flash当做比较小的硬盘使用，例如，MP3 Player或随身碟就会把NAND Flash格式化成FAT的格式。
 ```
