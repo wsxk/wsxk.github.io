@@ -2,7 +2,7 @@
 layout: post
 tags: [iot_dev]
 title: "iot dev technology 3"
-date: 2023-11-4
+date: 2023-11-6
 author: wsxk
 comments: true
 ---
