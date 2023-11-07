@@ -13,6 +13,11 @@ comments: true
   - [6.2 HAL vs. BSP](#62-hal-vs-bsp)
   - [6.3 为什么会需要HAL?](#63-为什么会需要hal)
   - [6.4 HAL是否会增加开发难度?](#64-hal是否会增加开发难度)
+  - [6.5 HAL实例](#65-hal实例)
+    - [6.5.1 HAL基本设计原则](#651-hal基本设计原则)
+    - [6.5.2 HAL的系统架构](#652-hal的系统架构)
+    - [6.5.3 驱动程序与系统的沟通机制](#653-驱动程序与系统的沟通机制)
+    - [6.5.4 难以抽象化的设备](#654-难以抽象化的设备)
 - [7. 菜鸟当自强：软件工程师硬起来　](#7-菜鸟当自强软件工程师硬起来)
 - [8. 做好存储器管理](#8-做好存储器管理)
 - [9. 存储器管理（II）：NAND Flash概论　](#9-存储器管理iinand-flash概论)
@@ -64,6 +69,55 @@ Step04：固件工程师release第一版HAL library，由系统工程师负责�
 HAL的设计立项后，固件工程师就是照着文件去implement，而系统工程师就被规范只能用HAL API来控制硬件，并不会增加工程师们在实作阶段的工作量。就算系统架构中没有HAL，一般driver的开发流程和上述步骤也差异不大吧.<br>
 **没有人能够一开始就预知未来，所以不可能直接开发出完善的HAL，只要后续能继续补上就可以了**<br>
 
+### 6.5 HAL实例<br>
+#### 6.5.1 HAL基本设计原则<br>
+```
+■　往前兼容（新版HAL的API可以变多，但不能变少）。
+
+■　HAL旨在对硬件做抽象化，不应与任何系统有直接关系。若OS对driver有特殊的需求（如Linux有制式的driver写法），应由系统团队根据需求自行在HAL之上，再往上包一层high level driver。
+
+■　Driver模块化，尽量降低driver之间的耦合程度。这个原则相当重要，因为我们设计HAL的主要目的之一，就是未来项目的硬件配置可能改变，而我们只要切换驱动程序即可。若driver间耦合度过高，则系统的可移植性与HAL的优势将大打折扣。
+
+■　每个driver分别设计，但章节内的结构必须保持一致，应该包含以下信息。
+    □　数据结构
+    □　API
+    □　控制流程或状态机
+    □　会产生的硬件事件，以及事件传递流程
+    
+■　每个driver模块应该尽量包装出以下的API，以保持所有driver模块的API风格一致，使得系统在使用HAL API时，比较不会发生误用的状况。  
+    □　Open（）：执行该设备的初始化工作（包含硬件初始化、取得driver所需之buffer、数据结构或配置的设定）。
+    □　Enable（）：driver开始运行。
+    □　Disable（）：driver暂停运行。
+    □　Close（）：关掉硬件设备，还回已配置的buffer，重设（Reset）driver的数据结构或配置。
+    □　Set_Power_mode（）：设定该设备的power mode（如full run、idle、sleep mode），即便有些设备无法实现这么多种的power mode，甚至有些设备根本不需做电源管理，HAL设计者还是可以考虑为此设备包出空的Set_Power_mode（）函数，以保持所有driver API的一致性。
+    
+■　driver与power manager的配合：driver仅提供电源管理的mechanism，而电源管理的policy由系统的power manager统一管控，即HAL中的每个driver模块都必须配合power manager的需求，例如都必须实现Set_Power_mode（）这样的API。
+
+■　HAL的每个driver模块都必须遵守共同命名规则与API style。
+
+■　统一定义HAL的系统配置（Configuration）：这些配置必须开放给系统使用，使得本项目不需要的driver模块或功能不会被link进来.
+```
+
+#### 6.5.2 HAL的系统架构<br>
+刚刚提到driver之间的耦合程度越低越好，但driver间难免也是会有阶层关系，例如I2C driver与FM Module Driver（可播放FM广播的芯片，与其他必备零件整合在一个比拇指小的板子里），主控IC通过I2C对其FM Module下命令，FM Module就会根据设定开始接收与播放FM频道。以HAL设计的角度来看，虽然I2C在这个项目只用来控制FM Module，但其他项目可能会用I2C来控制其他芯片，所以I2C必须是独立的driver，而FM Module Driver则通过调用I2C的API来运行。<br>
+就如同系统设计会做出各个模块之间的关系图，包含模块间的调用关系、参数传递的规范、共享全局变量的规则、模块间运行的流程与顺序等，我们可以把HAL当作一个独立的子系统，所以在进入个别driver的设计阶段前，HAL设计文件必须比照系统设计文件，事先定义出所有driver间的关系，作为设计个别driver时的规范。<br>
+
+#### 6.5.3 驱动程序与系统的沟通机制<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20231107211512.png)
+```
+■　HAL API：系统可以直接调用HAL开放的API。
+
+■　ISR & Hardware Event：当硬件产生中断时，相应的ISR会被执行；当ISR处理完毕后，可将硬件事件抽象化，包装成硬件事件，往上层系统传递。以低电压事件为例，驱动程序自硬件读取的是AD值，必须将其换算为电压值（此举即为抽象化），并对上层传递此硬件事件。
+    □　驱动程序可以把一个全局变量当作flag，当上层程序发现此flag的值改变了，即表示发生了某硬件事件。这种做法的时效性较差，且必须注意Critical Section的保护。
+    □　在ISR内调用系统的功能，如send_message（）、wakeup_task（）等，这种做法是比较普遍的做法，但此举破坏了HAL必须与上层系统无关的规范。
+    □　较好的做法是HAL不决定传递硬件事件的机制，改为提供API，让系统可‘注册’用以传递硬件事件的函数（称为callback function），ISR会在适当时机调用这些callback function，至于系统如何处理硬件事件，ISR并不会知道。
+
+■　Callback：HAL提供注册callback function的API，并明确说明调用此callback function的时机。系统只要传入function pointer，HAL即会在上述时机调用这些callback function。例如上面所说的实时处理硬件事件，或是当HAL准备关机时，会去调用系统预先注册的callback fimction，让系统有机会做一些处理（如存储重要信息或目前的执行状态）。
+```
+#### 6.5.4 难以抽象化的设备<br>
+例如某颗CPU的clock可以调整为3.768 K、12 MHz、24 MHz、48MHz4 个选项，那我们的 HAL API——hal_set_CPU—clock()的参数要如何设计？若下个项目换了较快的CPU，它的clock的设定值根本不一样，假设是3.768 K、16 MHz、32 MHz、64 MHz，这时候HAL API不就非改不可了吗？<br>
+**为了解决这个问题，需要再往高端抽象化一层，如下图所示：**<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20231107212201.png)
 
 ## 7. 菜鸟当自强：软件工程师硬起来<br>　
 ## 8. 做好存储器管理<br>
