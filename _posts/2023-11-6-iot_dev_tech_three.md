@@ -22,6 +22,7 @@ comments: true
   - [7.1 硬件开发流程](#71-硬件开发流程)
   - [7.2 嵌入式软件开发工程师的基本艺能](#72-嵌入式软件开发工程师的基本艺能)
 - [8. 做好存储器管理](#8-做好存储器管理)
+  - [8.1 动态存储器空间配置](#81-动态存储器空间配置)
 - [9. 存储器管理（II）：NAND Flash概论　](#9-存储器管理iinand-flash概论)
 - [10. 模拟器](#10-模拟器)
 - [11. Callback Function](#11-callback-function)
@@ -148,6 +149,30 @@ trigger（触发）功能是使用示波器一定要会用的技巧，示波器�
 ```
 
 ## 8. 做好存储器管理<br>
+### 8.1 动态存储器空间配置<br>
+一般的嵌入式设备存储器由如下几个部分组成：<br>
+```
+■　CPU Internal SRAM——CPU 内部有两块 RAM，分别是 40K Bytes 与 16K Bytes。作为LCD控制器的Video RAM，或用来加速程序模块的执行性能。
+
+■　外部NOR Flash——1M Bytes。用来放置程序与data，且程序可以在NOR Flash中直接执行，这块存储器也可以用Mask ROM取代。
+
+■　外部SRAM——512K Bytes。执行时期放置程序的所有变量（data段与bss段）、程序执行时所需的Stack Memory、以及动态配置存储器（Dynamic Allocation Memory）或缓冲区（Buffer）。
+
+■　SD Card。我们的系统可支持SD Card，额外的大批数据可以存储在SD Card中。
+```
+但是应用开发工程师不需要知道这些细节,他们只需要知道地址范围即可：<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20231109211334.png)
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20231109211411.png)
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20231109211423.png)
+此时，对于一个`100k大小的空间`，可以放置的位置如下：
+```
+■　放置在rodata区（Read-Only Data Section）,程序中只要用数组的名称即可操作这批数据。
+
+■　如果上述数组不定义为const，则这批数据会被连接到data区（有初值的全局变量）。data区的数据也会占据可执行文件的空间，在执行时期会被复制到RAM中，所以程序可以改变这个数组的值。这个方法会加快操作这批数据的性能（RAM速度一定比Flash快），缺点是执行时期时同一批数据分别在RAM与Flash占据一份空间。如果没有改变内容与加速的需求，这么做实在是浪费空间。
+
+■　当NOR Flash或Mask ROM空间所剩不多，但RAM的空间还充裕时，有时候我们会考虑将这批数据压缩。
+
+```
 ## 9. 存储器管理（II）：NAND Flash概论<br>　
 ## 10. 模拟器<br>
 ## 11. Callback Function<br>
