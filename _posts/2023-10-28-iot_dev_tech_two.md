@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [iot_dev]
-title: "iot dev technology 2"
+title: "iot dev technology 2：Boot loader & 驱动程序"
 author: wsxk
 comments: true
 date: 2023-10-28

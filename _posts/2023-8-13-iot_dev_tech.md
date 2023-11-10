@@ -4,7 +4,7 @@ tags: [iot_dev]
 date: 2023-8-13
 author: wsxk
 comments: true
-title: "iot dev technology"
+title: "iot dev technology: 概论"
 ---
 
 - [1. 第一个嵌入式系统](#1-第一个嵌入式系统)

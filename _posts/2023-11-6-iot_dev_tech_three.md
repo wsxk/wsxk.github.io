@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [iot_dev]
-title: "iot dev technology 3"
+title: "iot dev technology 3：HAL & 基本测量工具 & 存储器管理"
 date: 2023-11-6
 author: wsxk
 comments: true
