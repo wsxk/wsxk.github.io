@@ -23,6 +23,10 @@ comments: true
   - [7.2 嵌入式软件开发工程师的基本艺能](#72-嵌入式软件开发工程师的基本艺能)
 - [8. 做好存储器管理](#8-做好存储器管理)
   - [8.1 动态存储器空间配置](#81-动态存储器空间配置)
+  - [8.2 Stack](#82-stack)
+    - [8.2.1 Stack 的用途](#821-stack-的用途)
+    - [8.2.2 Stack Overflow](#822-stack-overflow)
+    - [8.2.3 Stack \& RTOS](#823-stack--rtos)
 - [9. 存储器管理（II）：NAND Flash概论　](#9-存储器管理iinand-flash概论)
 - [10. 模拟器](#10-模拟器)
 - [11. Callback Function](#11-callback-function)
@@ -171,8 +175,50 @@ trigger（触发）功能是使用示波器一定要会用的技巧，示波器�
 ■　如果上述数组不定义为const，则这批数据会被连接到data区（有初值的全局变量）。data区的数据也会占据可执行文件的空间，在执行时期会被复制到RAM中，所以程序可以改变这个数组的值。这个方法会加快操作这批数据的性能（RAM速度一定比Flash快），缺点是执行时期时同一批数据分别在RAM与Flash占据一份空间。如果没有改变内容与加速的需求，这么做实在是浪费空间。
 
 ■　当NOR Flash或Mask ROM空间所剩不多，但RAM的空间还充裕时，有时候我们会考虑将这批数据压缩。
-
 ```
+
+### 8.2 Stack<br>
+以前说过，一个程序的分布应该是如下:
+```
+■　程序段（text段与rodata段）：可直接在ROM或Flash中执行，也可将某个模块传输到速度较快的RAM里执行。
+
+■　有初始值的全局变量（data段）：会占据可执行文件空间，执行时期必须将其从ROM或Flash传输到RAM。
+
+■　没有初始值的全局变量（bss段）：不会占据可执行文件空间，执行时期必须将该区段的内容全部设为0。
+
+■　Stack（堆栈）。
+```
+#### 8.2.1 Stack 的用途<br>
+```
+■　在执行“call”指令时，会将返回地址存储（Push）到目前SP寄存器指到的位置（SP始终指到Stack的顶端）。
+
+■　当执行“ret”（Return）指令时，会自目前Stack的顶端取回（Pop）返回地址。
+
+■　当中断产生时，中断控制器会将发生中断的地址（返回地址）以及PSR（状态寄存器）存储（Push）到Stack里。
+
+■　当ISR执行“iret”（Interrupt Return）指令时，CPU会从目前Stack顶端Pop出PSR与被中断的地址。
+
+■　我们都知道Stack这个数据结构特性就是先进后出，CPU提供“push”与“pop”指令供程序员操作Stack，最常见的用途就是暂时将某些存储寄存器的值存在Stack中，在某些动作后，再‘依次’取回这些寄存器的值。此外，“push”与“pop”的动作必须是对称的，push多少东西到Stack，就必须记得依次pop多少东西出来，否则下次存取Stack时就数据就会乱掉。
+
+■　Local变量会存储在Stack中，如果应用程序工程师不知道可以用的Stack有多大，一不小心就会把Stack用爆了。此外还要注意的是，用于嵌入式系统的编译器通常不会产生‘将局部变量的值设为0’的code，也就是说，一旦程序员没有明确指定局部变量初值的话，局部变量的初值可能是任何的值。如果程序员疏忽将没给初值的局部变量拿来使用，则结果自然是无法预测的.
+
+■　函数调用时，返回地址当然会根据目前SP寄存器，存储在Stack中，这是CPU的机制，C语言的函数自然也是如此运行。
+
+■　函数调用时参数的传递可以通过寄存器，也可以通过Stack，端视编译器的策略而定。通常如果参数个数不多的话，编译器会倾向用寄存器来传递参数，反之，则把参数存在Stack 中。
+```
+
+#### 8.2.2 Stack Overflow<br>
+老生常谈了。<br>
+
+#### 8.2.3 Stack & RTOS<br>
+我们从RTOS的角度来看Stack Memory的用途，一般用于嵌入式系统的CPU都不会具备虚拟存储器的功能，也就是说系统无法像Windows或Linux 一样为每个程序配置独立的虚拟地址空间，在这样的硬件限制下，RTOS要想实现多任务，其实靠的是`Multiple-Task`<br><br>
+在Windows或Linux上的多任务可分为两种，一种是`Multiple-Process`，另一种是`Multiple-Thread`。每一个Process有自己独立的地址空间，而且每一个Process内可以建立多个Thread，所以process内的所有Thread则位于同一个地址空间。<br>
+举个简单的例子来说明地址空间的概念。可以把process想象成不同的可执行文件（.exe），因为不同的process有独立的地址空间，假设不同的process都去存取同样的地址（如0×100000），实际上，操作系统会将其mapping到不同的物理地址，所以绝对不会互相冲突。至于同一个process内的不同Thread，因为共享地址空间，所以不同Thread存取同样的地址时就可能会引发冲突。因为Thread没有自己的地址空间，所以Thread之间切换的复杂度远比process间的切换低很多，而且由于多个Thread共享地址空间，所以Thread之间的通信相对简单。总之，只要做好`critical section`保护，Thread的性能较好、程序编写较简单，却同样可以达到多任务的效果，这也是目前`Multiple-Threading`程序设计方法广泛流行的主要原因。<br>
+**用于嵌入式系统的RTOS的多任务功能就是上述的Multiple-Thread，通常嵌入式操作系统的书或RTOS的网站会把这个功能称为Multiple-Task，其实是相同的东西，只是名词差异而已。**总之，就是所有的执行单位不论称之为Thread或task，都共享同一个地址空间<br>
+可以看看多任务的代码：<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20231110203150.png)
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20231110203216.png)
+
 ## 9. 存储器管理（II）：NAND Flash概论<br>　
 ## 10. 模拟器<br>
 ## 11. Callback Function<br>
