@@ -27,6 +27,8 @@ comments: true
     - [8.2.1 Stack 的用途](#821-stack-的用途)
     - [8.2.2 Stack Overflow](#822-stack-overflow)
     - [8.2.3 Stack \& RTOS](#823-stack--rtos)
+    - [8.2.4 Context Switch](#824-context-switch)
+    - [8.2.5 没有足够RAM供Stack使用的平台](#825-没有足够ram供stack使用的平台)
 - [9. 存储器管理（II）：NAND Flash概论　](#9-存储器管理iinand-flash概论)
 - [10. 模拟器](#10-模拟器)
 - [11. Callback Function](#11-callback-function)
@@ -218,6 +220,25 @@ trigger（触发）功能是使用示波器一定要会用的技巧，示波器�
 可以看看多任务的代码：<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20231110203150.png)
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20231110203216.png)
+
+#### 8.2.4 Context Switch<br>
+对于`RTOS的Multiple-Thread`的执行原理**基本上可以想象成多个Thread轮流在CPU上执行，但无论如何，CPU只有一个，一段时间中只能有一个Thread获准取得CPU的使用权，同时RTOS必须妥善保存其他被搁置的Thread的执行状态，当换成另一个Thread执行时，它才可以顺利地从上次被Task-Switch的位置继续执行。RTOS用一个数据结构记录各个Thread的执行状态，我们称这个状态为Context（task之间的切换也称为Context-Switch）。每个Thread的Context中包含了该Thread上次被切换出去时所有寄存器的值以及一些系统信息，而Thread的Context会存储在自己的Stack中，Context Switch也是通过操作Stack完成。**<br>
+`Context Switch通常是通过一个可重入（Reentry）的函数完成，每一个task被切换出去的地址正是这个函数的最后一行（return）`<br>
+可以看一下代码：<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20231111091310.png)
+
+#### 8.2.5 没有足够RAM供Stack使用的平台<br>
+对于没有足够RAM的CPU平台，比如8051系列(**RAM只有256bytes**)，通常使用`Keil C`进行开发。<br>
+`Keil C`提供了以下3个办法：<br>
+```
+1. Keil C compiler 会分析每个函数之间的调用关系，使用stack的大小等等，，在编译完成后会生成*.M51文件，里面会告诉你stack还剩下多少空间
+
+2. 将函数的局部变量配置到外部固定RAM中（通过外接一个RAM解决）。
+甚至会把没有调用关系的函数的局部变量，配置到同一处空间中，这个方法叫做**data overlaying**
+
+3. 高级的Keil C版本会把没有被调用的函数自动省略掉
+```
+
 
 ## 9. 存储器管理（II）：NAND Flash概论<br>　
 ## 10. 模拟器<br>
