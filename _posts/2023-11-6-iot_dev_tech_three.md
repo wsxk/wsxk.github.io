@@ -36,6 +36,7 @@ comments: true
   - [8.4 烧录器](#84-烧录器)
   - [8.5 突破物理存储器大小的限制](#85-突破物理存储器大小的限制)
     - [8.5.1 虚拟存储器](#851-虚拟存储器)
+    - [8.5.2 动态载入](#852-动态载入)
 - [9. 存储器管理（II）：NAND Flash概论　](#9-存储器管理iinand-flash概论)
 - [10. 模拟器](#10-模拟器)
 - [11. Callback Function](#11-callback-function)
@@ -329,6 +330,18 @@ Step05：自烧录完毕的存储器芯片中读出内容与原始数据比较�
 ```
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20231113212204.png)
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20231113212220.png)
+
+#### 8.5.2 动态载入<br>
+RTOS是Single Address Space/Multiple-Tasking的系统，通常应用于没有MMU的平台，所以要应用Secondary Storage来存储程序或数据段，只能由系统自己来实作类似Windows DLL（动态载入函数库）的功能。简单地说，程序里用到的某些函数并未真正被连接到可执行文件里，直到runtime该函数被调用时，系统才会将其载入存储器并执行之。<br>
+```
+在存储器的特定地址中保留空间给动态载入模块使用，则这些模块在编译/连接阶段都可以连接到这个已知地址，从而避开了动态连接的麻烦。
+
+解决了动态载入模块的寻址问题后，另一个麻烦是因为要被动态载入的程序段并未与系统程序连接，所以无法直接调用系统功能。有几种做法可以解决这个问题，一种是用Software Interrupt指令，利用寄存器或Share Memory传送系统功能编号与参数（例如，规定系统功能os_draw_pixel（x, y）为第5号功能），而系统可以从Software Interrupt ISR启动动态载入模块所需的系统服务。举例来说，嵌入式系统操作系统free-DOS就是利用硬件中断（Software Interrupt）来提供系统服务。
+并不是所有的CPU都有提供Software Interrupt指令，此时，系统必须设法让动态载入模块可以取得每个open API的实际地址，最简单的方式就是建一个表格，并放置在存储器的特定地址。图12-18所示是一种实现方法的流程。
+这个范例的系统配置为：系统与内部API烧在NOR Flash内，动态载入的模块则存储在SD card内，这些程序段都被寻址到SRAM中固定的地址。当动态载入的模块调用了system_call1()这个系统函数，其实是执行了下图所示的步骤3、4，而这些动作对该模块而言都是透明的。
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20231114233429.png)
+
 
 ## 9. 存储器管理（II）：NAND Flash概论<br>　
 ## 10. 模拟器<br>
