@@ -37,10 +37,7 @@ comments: true
   - [8.5 突破物理存储器大小的限制](#85-突破物理存储器大小的限制)
     - [8.5.1 虚拟存储器](#851-虚拟存储器)
     - [8.5.2 动态载入](#852-动态载入)
-- [9. 存储器管理（II）：NAND Flash概论　](#9-存储器管理iinand-flash概论)
-- [10. 模拟器](#10-模拟器)
-- [11. Callback Function](#11-callback-function)
-- [12. 用C来实作面向对象的概念 　](#12-用c来实作面向对象的概念-)
+    - [8.5.3 Banking](#853-banking)
 
 
 ## 6. 设计硬件抽象层<br>
@@ -342,11 +339,22 @@ RTOS是Single Address Space/Multiple-Tasking的系统，通常应用于没有MMU
 ```
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20231114233429.png)
 
-
-## 9. 存储器管理（II）：NAND Flash概论<br>　
-## 10. 模拟器<br>
-## 11. Callback Function<br>
-附录B
-
-## 12. 用C来实作面向对象的概念<br> 　
-附录C
+#### 8.5.3 Banking<br>
+最后，我们来说说如何突破8 bit MCU地址空间太小的限制。诸如8051这种MCU的Data Bus只有8条，所以称为8 bit MCU。但其地址线有16条，其可寻址的最大空间为2^16，也就是64 KB<br>
+这已不是增加成本、加大存储器就能解决的问题，问题症结在于MCU的地址线只有16根。<br>
+`虽然最直接的办法是通过增加地址线，但是增加了地址线，CPU提供的指令只能处理16位，增加地址线，就意味着也要修改CPU指令集，成本太高`<br>
+有个简单的方法，就是利用GPIO来模拟地址线，这个方法称为Banking，其原理如下：<br>
+```
+■　有两块64 KB的ROM。
+■　当GPIO #1为High时，CPU的地址线与chip select都接到第一块ROM。
+■　当GPIO #1为Low时，CPU的地址线与chip select都接到第二块ROM。
+```
+这个方法也有问题，就是程序员需要自己配置函数的地址到各个ROM中；好在编译器能够帮我们解决这个问题：<br>
+```
+■　函数与变量位置配置优化。
+■　应用程序只管直接做函数调用，不需要处理Bank-Switch相关工作。
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20231115232600.png)
+左半部是物理存储器的配置，其中Common bank是永远不会被置换的区域。通过硬件设计，bank#l、#2、#3的起始地址都是B，可以利用GPIO来做bank切换；对MCU而言，同一时间可以操作的就是Common bank与bank #1、#2、#3三个其中之一。系统中有3个函数fl()、f2()、f3()，Compiler分别将其配置到bank #1、#2、#3<br>
+工程师并不会知道f1()、f2()、 f3()分别被配置到哪一个bank，他只知道如图所示的右半部程序里的main()，直接调用函数名称。举例来说，当main()调用了 f2()时，Compiler会产生一些额外的code，如图所示程序中的f2()。只有Compiler才知道这个函数被配置到了哪个bank，所以f2()会先执行Bank-Switch，然后才真正去调用这个函数的程序（如图所示程序的real_f2()）。<br>
+要注意的是，Compiler并不知道我们会用哪些GPIO脚来模拟Address Bus，所以上述bank_switch()是由我们系统设计者根据Compiler的规范来编写，并指定这个函数让Compiler知道即可。<br>
