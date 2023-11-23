@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [iot_dev]
-title: "iot dev technology 4：NAND Flash & 模拟器 & call back"
+title: "iot dev technology 4：NAND Flash & 模拟器"
 date: 2023-11-15
 author: wsxk
 comments: true
@@ -29,8 +29,6 @@ comments: true
     - [10.3.2 测试（Cross-Test）](#1032-测试cross-test)
   - [10.4 实战](#104-实战)
     - [10.4.1 模拟器与系统配置](#1041-模拟器与系统配置)
-- [11. Callback Function](#11-callback-function)
-- [12. 用C来实作面向对象的概念 　](#12-用c来实作面向对象的概念-)
 
 
 ## 9. 存储器管理（II）：NAND Flash概论<br>　
@@ -249,9 +247,3 @@ FAT已普遍应用在PC+Windows平台上的硬盘，硬盘和NAND Flash有许多
 
 
 
-
-## 11. Callback Function<br>
-附录B
-
-## 12. 用C来实作面向对象的概念<br> 　
-附录C
