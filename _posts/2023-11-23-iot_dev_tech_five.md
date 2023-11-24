@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [iot_dev]
-title: "iot dev technology 5：系统整台 & & "
+title: "iot dev technology 5：系统整台 & 测试调试微调 & "
 date: 2023-11-23
 author: wsxk
 comments: true
@@ -14,7 +14,7 @@ comments: true
 - [12. Testing、Debugging与Tuning](#12-testingdebugging与tuning)
   - [12.1 测试](#121-测试)
     - [12.1.1 测试vs.质量系统](#1211-测试vs质量系统)
-  - [12.1.2 嵌入式系统”测试：Cross-Test](#1212-嵌入式系统测试cross-test)
+    - [12.1.2 嵌入式系统”测试：Cross-Test](#1212-嵌入式系统测试cross-test)
 
 
 ## 11. 系统整台<br>
@@ -170,7 +170,7 @@ Bug控制系统除了可以追踪bug外，也是项目团队所有成员（包�
 ■　可维护性：如有必要，应能对应用作修改，如软件功能更新和修正patch等。
 ```
 
-### 12.1.2 嵌入式系统”测试：Cross-Test<br>
+#### 12.1.2 嵌入式系统”测试：Cross-Test<br>
 嵌入式系统测试最大的特点就是，测试人员可能会在不是最终产品的平台上测试，这些平台包含：<br>
 ```
 ■　模拟器。
