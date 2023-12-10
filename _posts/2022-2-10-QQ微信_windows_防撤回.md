@@ -7,7 +7,7 @@ comments: true
 author: wsxk
 ---
 
-`PS:更新于2023-6-23日`<br>
+`PS:更新于2023-12-10日`<br>
 
 - [相关环境](#相关环境)
 - [QQ](#qq)
@@ -86,7 +86,12 @@ ida打开IM.dll
 微信的撤回功能在WeChatWin.dll里<br>
 ~~ida打开，搜索字符串"revokemsg"~~<br>
 ~~重点是revokemsg前一个jz跳转指令改为jnz~~<br>
-最新版本的微信是`3.9.5.81`，我发现他们版本出现了更替。<br>
-修改的位置不再是`revokemsg`，而是`L'datastatus'`，注意，是`UTF-16格式下的datastatus`
-![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/20230624112930.png)
+最新版本的微信是`3.9.8.15`，我发现他们版本出现了更替。<br>
+修改的位置不再是`revokemsg`，而是`L'datastatus'`，注意，是`UTF-16格式下的datastatus`,搜索方法：<br>
+**在ida 的string界面中右键，选择setup**<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20231210201318.png)
+选中**Unicode C-Style (16bits)**<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20231210201339.png)
+**这样可以在string中搜索到unicode-16的字符串**<br><br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20231210201900.png)
 把这个字符串下面的`jz`指令改为`jnz`即可完成防撤回功能<br>
