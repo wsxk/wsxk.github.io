@@ -269,11 +269,6 @@ img {
   border-radius: 5px;
 }
 
-img:hover {
-  transform: scale(1.5); /* 或者你希望的放大比例 */
-  transition: transform 0.5s ease;
-}
-
 // Fixes images in popup boxes from Google Translate
 .gmnoprint img {
   max-width: none;
