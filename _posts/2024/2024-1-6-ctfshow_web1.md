@@ -19,9 +19,8 @@ comments: true
 PS: 不知道为什么，攻防世界的题目老是跳容器过期，请重新创建，太tm烦了。<br>
 
 ## 1. view-source协议<br>
-`view-source协议是一种可以查看网页源代码的协议，可以通过在浏览器地址栏中输入view-source:网址来查看网页源代码，或者按下快捷键Ctrl+U来查看网页源代码。`
+`view-source协议是一种可以查看网页源代码的协议，可以通过在浏览器地址栏中输入view-source:网址来查看网页源代码，或者按下快捷键Ctrl+U来查看网页源代码。`<br>
 
-<br>
 ### 1.1 ctfshow.web入门.web1<br>
 进入靶场做题时，确实无法看到源码，右键点击或者F12都不行。<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-12-30/20240106143223.png)<br>
