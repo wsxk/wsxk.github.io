@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [ctf_wp]
-title: "viwe-source"
+title: "viwe-source&phps&.git泄露"
 date: 2024-1-6
 author: wsxk
 comments: true
