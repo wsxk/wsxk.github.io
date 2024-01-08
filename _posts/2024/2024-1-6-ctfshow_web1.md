@@ -13,6 +13,8 @@ comments: true
 	- [1.2 题目如何做到的？](#12-题目如何做到的)
 - [2. phps文件泄露](#2-phps文件泄露)
 	- [2.1 ctfshow.web入门.web5](#21-ctfshowweb入门web5)
+- [3. git泄露](#3-git泄露)
+	- [3.1 ctfshow.web入门.web7](#31-ctfshowweb入门web7)
 
 
 ## 前言<br>
@@ -51,3 +53,11 @@ PS: 不知道为什么，攻防世界的题目老是跳容器过期，请重新�
 `phps文件就是php文件的源代码文件，正常用户访问xxx.php直接显示页面，如果访问xxx.phps则显示源代码。`<br>
 ### 2.1 ctfshow.web入门.web5<br>
 直接访问`index.phps`即可获得flag<br>
+
+## 3. git泄露<br>
+有的人在写好代码并把代码上传至服务器上时，会把.git文件夹也上传上去，这样就会导致源代码泄露。<br>
+### 3.1 ctfshow.web入门.web7<br>
+通过`dirsearch`这个工具进行目录扫描，发现有一个.git文件夹。<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-12-30/20240108223128.png)
+浏览器访问即可。<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-12-30/20240108223212.png)
