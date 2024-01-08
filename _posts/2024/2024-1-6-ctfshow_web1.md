@@ -9,8 +9,10 @@ comments: true
 
 - [前言](#前言)
 - [1. view-source协议](#1-view-source协议)
-  - [1.1 ctfshow.web入门.web1](#11-ctfshowweb入门web1)
-  - [1.2 题目如何做到的？](#12-题目如何做到的)
+	- [1.1 ctfshow.web入门.web1](#11-ctfshowweb入门web1)
+	- [1.2 题目如何做到的？](#12-题目如何做到的)
+- [2. phps文件泄露](#2-phps文件泄露)
+	- [2.1 ctfshow.web入门.web5](#21-ctfshowweb入门web5)
 
 
 ## 前言<br>
@@ -44,3 +46,8 @@ PS: 不知道为什么，攻防世界的题目老是跳容器过期，请重新�
 **window.oncontextmenu = function(){return false};限制了上下文菜单的显示，即鼠标右键无法出现菜单**<br>
 **window.onselectstart = function(){return false};禁止用户选择网页文本，即无法通过鼠标点击和拖动来选择文本**<br>
 **window.onkeydown = function(){if (event.keyCode==123){event.keyCode=0;event.returnValue=false;}};禁止用户通过F12来打开开发者工具**<br>
+
+## 2. phps文件泄露<br>
+`phps文件就是php文件的源代码文件，正常用户访问xxx.php直接显示页面，如果访问xxx.phps则显示源代码。`<br>
+### 2.1 ctfshow.web入门.web5<br>
+直接访问`index.phps`即可获得flag<br>
