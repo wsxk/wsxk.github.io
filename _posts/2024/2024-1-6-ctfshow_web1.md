@@ -15,6 +15,7 @@ comments: true
 	- [2.1 ctfshow.web入门.web5](#21-ctfshowweb入门web5)
 - [3. git泄露](#3-git泄露)
 	- [3.1 ctfshow.web入门.web7](#31-ctfshowweb入门web7)
+	- [3.2 ctfshow.web入门.web8](#32-ctfshowweb入门web8)
 
 
 ## 前言<br>
@@ -61,3 +62,8 @@ PS: 不知道为什么，攻防世界的题目老是跳容器过期，请重新�
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-12-30/20240108223128.png)
 浏览器访问即可。<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-12-30/20240108223212.png)
+
+### 3.2 ctfshow.web入门.web8<br>
+同样用`dirsearch`进行目录扫描，这回发现的是`.svn`文件<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-12-30/20240109224639.png)
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-12-30/20240109224654.png)
