@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [web]
-title: "web security Note"
+title: "web security: 安全的本质&浏览器安全"
 date: 2024-1-10 
 author: wsxk
 comments: true
@@ -22,6 +22,7 @@ comments: true
     - [1.3.4 数据与代码分离原则](#134-数据与代码分离原则)
     - [1.3.5 不可预测性原则](#135-不可预测性原则)
 - [2. 浏览器安全](#2-浏览器安全)
+  - [2.1 同源策略](#21-同源策略)
 
 
 ## 前言<br>
@@ -104,3 +105,4 @@ comments: true
 
 
 ## 2. 浏览器安全<br>
+### 2.1 同源策略<br>
