@@ -106,3 +106,23 @@ comments: true
 
 ## 2. 浏览器安全<br>
 ### 2.1 同源策略<br>
+同源策略（Same Origin Policy）是一种约定，它是浏览器最核心也最基
+本的安全功能<br>
+浏览器的同源策略，限制了来自不同源的“docu-ment”或脚本，对当
+前“document”读取或设置某些属性。<br>
+这一策略极其重要，试想如果没有同源策略，可能a.com的一段JavaScript脚本，在b.com未曾加载此脚本时，也可以随意涂改b.com的页面（在浏览器的显示中）。<br>
+同源其实指的是**相同的访问协议、相同的域名、相同的端口**<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-12-30/20240112024201.png)
+需要注意的是，对于当前页面来说，页面内存放JavaScript文件的域并不
+重要，重要的是加载JavaScript页面所在的域是什么<br>
+换言之，a.com通过以下代码：
+```javascript
+<script src=http://b.com/b.js ></script>
+```
+加载了b.com上的b.js，但是b.js是运行在a.com页面中的，因此对于当前
+打开的页面（a.com页面）来说，b.js的Origin就应该是a.com而非
+b.com。<br>
+在浏览器中，`<script>、<img>、<iframe>、<link>`等标签都可以
+跨域加载资源，而不受同源策略的限制。<br>
+这些带“src”属性的标签每次加载时，实际上是由浏览器发起了一次GET请求。不同于XMLHttpRequest的是，通过src属性加载的资源，浏览器限制了JavaScript的权限，使其不能读、写返回的内容(**这句话指的是：1.当你在自己网页通过`<script src=http://b.com/b.js></script>`时，自己网页的其他JavaScript代码不能读取这个脚本的内容；2.你不能修改通过src属性加载的外部资源的内容。例如，你不能更改一个通过`<script src="...">`加载的外部脚本文件的内容**)。<br>
+对于XMLHttpRequest而言，可以访问来自同源对象的内容，它需要通过目标域返回的HTTP头来授权是否允许跨域访问，因为HTTP头对于JavaScript来说一般是无法控制的，所以认为这个方案可以实施<br>
