@@ -124,5 +124,6 @@ comments: true
 b.com。<br>
 在浏览器中，`<script>、<img>、<iframe>、<link>`等标签都可以
 跨域加载资源，而不受同源策略的限制。<br>
-这些带“src”属性的标签每次加载时，实际上是由浏览器发起了一次GET请求。不同于XMLHttpRequest的是，通过src属性加载的资源，浏览器限制了JavaScript的权限，使其不能读、写返回的内容(**这句话指的是：1.当你在自己网页通过`<script src=http://b.com/b.js></script>`时，自己网页的其他JavaScript代码不能读取这个脚本的内容；2.你不能修改通过src属性加载的外部资源的内容。例如，你不能更改一个通过`<script src="...">`加载的外部脚本文件的内容**)。<br>
+这些带“src”属性的标签每次加载时，实际上是由浏览器发起了一次GET请求。不同于XMLHttpRequest的是， (**这句话指的是：当你在自己网页通过`<script src=http://b.com/b.js></script>`调用b.js时，不能读写b.js的内容**)。<br>
 对于XMLHttpRequest而言，可以访问来自同源对象的内容，它需要通过目标域返回的HTTP头来授权是否允许跨域访问，因为HTTP头对于JavaScript来说一般是无法控制的，所以认为这个方案可以实施<br>
+对于浏览器来说，除了DOM（document object model，一种js的API，可用于操作和访问页面内容）、Cookie、XMLHttpRequest（一种js api，负责）会受到同源策略的限制外，浏览器加载的一些第三方插件也有各自的同源策略。最常见的一些插件如Flash、Java Applet、Sil-verlight、Google Gears等都有自己的控制策略<br>
