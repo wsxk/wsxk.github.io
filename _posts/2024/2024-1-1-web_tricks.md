@@ -16,6 +16,7 @@ comments: true
 - [5. rotots协议](#5-rotots协议)
 - [6. 响应码](#6-响应码)
 - [7. php探针](#7-php探针)
+- [8. 爆破](#8-爆破)
 
 
 ## 前言<br>
@@ -61,3 +62,6 @@ https://www.cnblogs.com/liuhongfeng/p/5006341.html<br>
 PHP探针是用来探测空间、服务器运行状况和PHP信息的。探针可以实时查看服务器硬盘资源、内存占用、网卡流量、系统负载、服务器时间等信息。<br>
 **探针用法：将探针的 PHP 文件上传到服务器的网站目录下，通过浏览器访问此 PHP 文件即可。**<br>
 探针的默认名称为`tz.php`<br>
+
+## 8. 爆破<br>
+`Burpsuitepro`的`intruder`模块真的超级好用<br>
