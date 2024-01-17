@@ -2,7 +2,7 @@
 layout: post
 tags: [software_build]
 title: "Apache+PHP install on win11"
-date: 2024-1-10 
+date: 2024-1-15 
 author: wsxk
 comments: true
 ---
