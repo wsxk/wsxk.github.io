@@ -7,6 +7,8 @@ date: 2022-10-6
 comments: true
 ---
 
+PS:`修改于2024-1-19`<br>
+
 - [前置条件](#前置条件)
 - [安装frida](#安装frida)
 - [firda使用](#firda使用)
@@ -22,6 +24,7 @@ pip install frida-tools
 安装完后，进入frida官网[https://github.com/frida/frida/releases](https://github.com/frida/frida/releases)下载符合你frida版本的`firda server`<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2022-6-27-DNS/20221006193210.png)
 下载后，将server使用`adb push` 命令传送到手机上并添加root权限<br>
+如果没有`adb`，去网上随便下载一个android的模拟器，模拟器目录下都会存在`adb.exe`执行程序,把其所在目录加入到环境变量当中即可使用<br>
 
 ## firda使用<br>
 可以使用`am start -n com.droidlearn.activity_travel/com.droidlearn.activity_travel.FlagActivity`选择要运行的控件类<br>
