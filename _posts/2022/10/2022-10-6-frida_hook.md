@@ -106,3 +106,44 @@ Java.perform(function x() {
 ## 2. frida：模拟器调试<br>
 这里采用**夜神模拟器**对的模拟终端进行测试<br>
 使用步骤和`1.2节`开始后的步骤一样<br>
+```python
+import frida
+
+def on_message(message, data):
+    if message['type'] == 'send':
+        print("[*] {0}".format(message['payload']))
+    else:
+        print(message)
+
+device = frida.get_usb_device(timeout=10)
+print(device)
+session = device.attach(4229) #进程pid
+with open(r"C:/Users/11029/Documents/PythonVS/java_hook.js",encoding='UTF-8') as f:
+    script = session.create_script(f.read())
+script.on('message', on_message)
+script.load()
+# 脚本会持续运行等待输入
+input()
+```
+js文件编写:<br>
+```javascript
+console.log("Script loaded successfully ");
+Java.perform(() => {
+    // Function to hook is defined here
+    const MainActivity = Java.use('com.tencent.testvuln.MainActivity');
+  
+    // Whenever button is clicked
+    const onClick = MainActivity.onClick;
+    onClick.implementation = function (v) {
+      // Show a message to know that the function got called
+      send('onClick');
+  
+      // Call the original onClick handler
+      onClick.call(this, v);
+  
+  
+      // Log to the console that it's done, and we should have the flag!
+      console.log('Done:' + JSON.stringify(this.cnt));
+    };
+  });
+```
