@@ -17,6 +17,7 @@ comments: true
 - [6. 响应码](#6-响应码)
 - [7. php探针](#7-php探针)
 - [8. 爆破](#8-爆破)
+  - [8.1 mt\_rand()爆破](#81-mt_rand爆破)
 
 
 ## 前言<br>
@@ -65,3 +66,6 @@ PHP探针是用来探测空间、服务器运行状况和PHP信息的。探针�
 
 ## 8. 爆破<br>
 `Burpsuitepro`的`intruder`模块真的超级好用<br>
+### 8.1 mt_rand()爆破<br>
+[https://www.openwall.com/php_mt_seed/](https://www.openwall.com/php_mt_seed/)<br>
+**PHP mt_rand() seed cracker**，因为php代码中的mt_rand()函数一旦种子确定，变换就是确定的！<br>
