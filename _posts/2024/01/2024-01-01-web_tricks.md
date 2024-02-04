@@ -7,6 +7,8 @@ author: wsxk
 comments: true
 ---
 
+`PS: 更新于2024-2-4`<br>
+
 - [前言](#前言)
 - [0. web起手式三件套](#0-web起手式三件套)
 - [1. view-source协议](#1-view-source协议)
@@ -18,7 +20,8 @@ comments: true
 - [7. php探针](#7-php探针)
 - [8. 爆破](#8-爆破)
   - [8.1 mt\_rand()爆破](#81-mt_rand爆破)
-- [9. 命令执行](#9-命令执行)
+- [9. GET/POST](#9-getpost)
+- [10. 命令执行](#10-命令执行)
 
 
 ## 前言<br>
@@ -71,7 +74,16 @@ PHP探针是用来探测空间、服务器运行状况和PHP信息的。探针�
 [https://www.openwall.com/php_mt_seed/](https://www.openwall.com/php_mt_seed/)<br>
 **PHP mt_rand() seed cracker**，因为php代码中的mt_rand()函数一旦种子确定，变换就是确定的！<br>
 
-## 9. 命令执行<br>
+## 9. GET/POST<br>
+想要模拟`POST`请求，只需要在`burpsuite`上，对已有的`GET`请求修改如下内容：<br>
+```
+1. GET -> POST
+2. 末尾添加Content-Type: application/x-www-form-urlencoded
+3. 空行后，输入POST请求的参数
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-12-30/20240204191405.png)
+
+## 10. 命令执行<br>
 如果网页中有命令执行相关的函数，就可以想办法绕过前期的检测(比如`正则校验`)，然后执行它！<br>
 常见的`php`命令注入:<br>
 **这里是遇到了类似 eval($c)的绕过思路**<br>
