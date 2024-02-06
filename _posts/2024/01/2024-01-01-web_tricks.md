@@ -46,7 +46,7 @@ F12查看、burpsuite抓包、dirsearch扫目录<br>
 ```
 
 ## 3. url编解码<br>
-https://www.cnblogs.com/liuhongfeng/p/5006341.html<br>
+[https://www.cnblogs.com/liuhongfeng/p/5006341.html](https://www.cnblogs.com/liuhongfeng/p/5006341.html)<br>
 
 ## 4. 域名<br>
 查询域名解析地址 基本格式：nslookup host [server]<br>
