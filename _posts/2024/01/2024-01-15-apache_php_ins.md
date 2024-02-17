@@ -20,6 +20,7 @@ comments: true
 
 ## 前言<br>
 win11下安装Apache+PHP环境，以便于本地开发测试。以及做一些web题目<br>
+**注意：因为把php、apache安装在c盘中，每一次修改配置文件都需要admin权限，同时，启动网络服务也需要admin权限**<br>
 
 ## 1. Apache<br>
 ### 1.1 下载安装包<br>
