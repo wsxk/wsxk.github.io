@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [web]
-title: "web tricks"
+title: "web ctf tricks 1"
 date: 2024-1-1
 author: wsxk
 comments: true
