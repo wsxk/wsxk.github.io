@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [Android]
-title: "Android Reverse Engineering"
+title: "Android CTF"
 author: wsxk
 comments: true
 date: 2023-10-20
@@ -18,6 +18,8 @@ date: 2023-10-20
   - [5.1 办法1： ida findcrypt3](#51-办法1-ida-findcrypt3)
   - [5.2 办法2： 反混淆工具](#52-办法2-反混淆工具)
 - [6. 反调试机制](#6-反调试机制)
+- [7. 运行时解密](#7-运行时解密)
+  - [7.1 armariris so运行时解密](#71-armariris-so运行时解密)
 - [references](#references)
 
 
@@ -112,6 +114,97 @@ android的反编译工具没有findcrypt3,怎么办呢？其实`findcrypt`的原
 `frida`详情可参考[https://wsxk.github.io/frida_hook/](https://wsxk.github.io/frida_hook/)<br>
 这里列举一个文章，这篇文章教你如何绕过神秘的反调试：<br>
 [https://bbs.kanxue.com/thread-277034.htm](https://bbs.kanxue.com/thread-277034.htm)<br>
+
+
+## 7. 运行时解密<br>
+有一些ctf的逆向题目，默认情况下代码是加密过的，在运行时会执行**解密函数**来完成解密<br>
+### 7.1 armariris so运行时解密<br>
+so运行时解密，已经有了一站式的解决方案！**unicorn yyds!**<br>
+```python
+from elftools.elf.constants import P_FLAGS
+from elftools.elf.elffile import ELFFile
+from elftools.elf.sections import SymbolTableSection
+from unicorn import Uc, UC_ARCH_ARM, UC_MODE_LITTLE_ENDIAN, UC_PROT_WRITE, UC_PROT_READ, UC_PROT_EXEC
+from unicorn.arm_const import *
+from capstone import Cs, CS_ARCH_ARM, CS_MODE_THUMB, CsInsn
+from keystone import Ks, KS_MODE_THUMB, KS_ARCH_ARM, KS_MODE_ARM
+import struct
+
+filename = "./libcms.so"
+fd = open(filename, 'r+b')
+elf = ELFFile(fd)
+
+# 遍历符号表，找到.datadiv_decode开头的函数
+datadivs = []
+dynsym = elf.get_section_by_name(".dynsym")
+assert isinstance(dynsym, SymbolTableSection)
+for symbol in dynsym.iter_symbols():
+    if symbol.name.startswith('.datadiv_decode'):
+        datadivs.append(symbol.entry.st_value)
+
+
+# 加载 so 到内存中
+def align(addr, size, align):
+    fr_addr = addr // align * align
+    to_addr = (addr + size + align - 1) // align * align
+    return fr_addr, to_addr - fr_addr
+
+
+def pflags2prot(p_flags):
+    ret = 0
+    if p_flags & P_FLAGS.PF_R != 0:
+        ret |= UC_PROT_READ
+    if p_flags & P_FLAGS.PF_W != 0:
+        ret |= UC_PROT_WRITE
+    if p_flags & P_FLAGS.PF_X != 0:
+        ret |= UC_PROT_EXEC
+    return ret
+
+
+load_base = 0
+emu = Uc(UC_ARCH_ARM, UC_MODE_LITTLE_ENDIAN)
+load_segments = [x for x in elf.iter_segments() if x.header.p_type == 'PT_LOAD']
+for segment in load_segments:
+    fr_addr, size = align(load_base + segment.header.p_vaddr, segment.header.p_memsz, segment.header.p_align)
+    emu.mem_map(fr_addr, size, pflags2prot(segment.header.p_flags))
+    emu.mem_write(load_base + segment.header.p_vaddr, segment.data())
+
+STACK_ADDR = 0x7F000000
+STACK_SIZE = 1024 * 1024
+start_addr = None
+emu.mem_map(STACK_ADDR, STACK_SIZE, UC_PROT_READ | UC_PROT_WRITE)
+emu.reg_write(UC_ARM_REG_SP, STACK_ADDR + STACK_SIZE)
+
+# 调用datadiv
+for datadiv in datadivs:
+    print("Function invoke", hex(datadiv))
+    emu.reg_write(UC_ARM_REG_LR, 0)
+    emu.emu_start(datadiv, 0)
+    print("Function return")
+
+# Patch data
+print("Patch data")
+data_section_header = elf.get_section_by_name('.data').header
+new_data = emu.mem_read(data_section_header.sh_addr, data_section_header.sh_size)
+fd.seek(data_section_header.sh_offset)
+fd.write(new_data)
+
+# Patch datadiv 直接返回
+print("Patch datadiv")
+ks_thumb = Ks(KS_ARCH_ARM, KS_MODE_THUMB)
+ks_arm = Ks(KS_ARCH_ARM, KS_MODE_ARM)
+for datadiv in datadivs:
+    fd.seek(datadiv & 0xFFFFFFFE)
+    if datadiv & 0x1 == 0x1:
+        a = ks_thumb.asm('bx lr')[0]
+    else:
+        a = ks_arm.asm('bx lr')[0]
+    for _ in a:
+        fd.write(struct.pack("B", _))
+
+fd.close()
+print("done!")
+```
 
 ## references<br>
 [https://curz0n.github.io/2021/05/10/android-so-reverse/#0x00-%E5%89%8D%E8%A8%80](https://curz0n.github.io/2021/05/10/android-so-reverse/#0x00-%E5%89%8D%E8%A8%80)<br>
