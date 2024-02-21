@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [re]
-title: "py"
+title: "pyinstaller 逆向"
 date: 2024-2-5
 author: wsxk
 comments: true
