@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [re]
-title: "pyinstaller逆向 & pcapng报文分析"
+title: "pyinstaller逆向 & pcapng报文分析 & IDA lumina"
 date: 2024-2-5
 author: wsxk
 comments: true
@@ -14,6 +14,8 @@ comments: true
   - [2.1 安装wireshark](#21-安装wireshark)
   - [2.2 安装pyshark](#22-安装pyshark)
   - [2.3 示例:提取tcp流中的payload](#23-示例提取tcp流中的payload)
+- [3. 什么是Lumina](#3-什么是lumina)
+  - [3.1 如何使用Lumina](#31-如何使用lumina)
 
 
 
@@ -98,3 +100,15 @@ for packet in cap:
 
         print(tcp_payload_clean)
 ```
+
+
+## 3. 什么是Lumina<br>
+Lumina是一种`符号识别服务器`，由IDA专门推出。<br>
+Lumina可以在线识别未命名函数<br>
+
+### 3.1 如何使用Lumina<br>
+[https://abda.nl/lumen/](https://abda.nl/lumen/)<br>
+
+PS: 跟他类似的还有一个阿里云公开的插件 `Finger`<br>
+**注意，在使用Finger时，不要使用科学上网！！！**<br>
+
