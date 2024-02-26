@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [software_build]
-title: "Apache+PHP install on win11"
+title: "Apache+PHP+MySQL install on win11"
 date: 2024-1-15 
 author: wsxk
 comments: true
@@ -16,6 +16,7 @@ comments: true
   - [2.1 官网下载](#21-官网下载)
   - [2.2 配置apache](#22-配置apache)
   - [2.3 验证](#23-验证)
+- [3. MySQL](#3-mysql)
 
 
 ## 前言<br>
@@ -77,3 +78,10 @@ AddType application/x-httpd-php .php
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-12-30/20240115214642.png)
 成功！<br>
 
+
+## 3. MySQL<br>
+[https://dev.mysql.com/downloads/mysql/](https://dev.mysql.com/downloads/mysql/)<br>
+下载mysql版本，`Oracle现在现在东西要你登录账号，问你拿SQL做什么，如实回答就完事了`<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-12-30/20240226212546.png)
+
+随后根据默认安装即可，如果你不想安装在`c`盘，选择自定义安装模式。<br>
