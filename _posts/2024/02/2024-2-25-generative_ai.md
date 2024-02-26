@@ -16,6 +16,7 @@ date: 2024-2-25
   - [1.1 历史](#11-历史)
   - [1.2 LLM如何运作](#12-llm如何运作)
 - [2. 探索并比较不同的LLM](#2-探索并比较不同的llm)
+  - [2.1 不同种类的LLM](#21-不同种类的llm)
 
 
 ## 前言<br>
@@ -84,4 +85,10 @@ ai的历史是比较久远的，**人工智能的第一个原型由打字的聊�
 2、测试、迭代、比较不同类型的模型（Azure） ——> 理解如何测试、迭代、提升LLM性能
 3、如何部署LLM ——> 知道如何在商业中部署模型
 ```
-
+### 2.1 不同种类的LLM<br>
+大致分为三类：<br>
+```
+1. Audio and speech recognition： 即语音和音频识别, 这里的出名模型是  Whisper-type models 
+2. Image generation： 即图像生成，有DALL-E和Midjourney
+3. Text generation: 即文本生成，从GPT-3.5 到 GPT-4.
+```
