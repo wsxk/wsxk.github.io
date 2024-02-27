@@ -18,6 +18,7 @@ date: 2024-2-25
 - [2. 探索并比较不同的LLM](#2-探索并比较不同的llm)
   - [2.1 不同种类的LLM](#21-不同种类的llm)
   - [2.2 Foundation Model](#22-foundation-model)
+  - [2.3 开源模型和私有模型](#23-开源模型和私有模型)
 
 
 ## 前言<br>
@@ -92,6 +93,7 @@ ai的历史是比较久远的，**人工智能的第一个原型由打字的聊�
 1. Audio and speech recognition： 即语音和音频识别, 这里的出名模型是  Whisper-type models 
 2. Image generation： 即图像生成，有DALL-E和Midjourney
 3. Text generation: 即文本生成，从GPT-3.5 到 GPT-4.
+4. vedio generation: 即视频生成，让我期待一首Sora吧！
 ```
 
 ### 2.2 Foundation Model<br>
@@ -108,3 +110,9 @@ ai的历史是比较久远的，**人工智能的第一个原型由打字的聊�
 ```
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-12-30/20240227001210.png)
 图来源于[https://thebabar.medium.com/essential-guide-to-foundation-models-and-large-language-models-27dab58f7404](https://thebabar.medium.com/essential-guide-to-foundation-models-and-large-language-models-27dab58f7404)<br>
+
+### 2.3 开源模型和私有模型<br>
+开源模型，顾名思义，即免费，任何人都可以使用的模型，这些模型可以被**修改、观察和定制**，然而性能上很难跟私有模型媲美<br>
+常见的开源模型有`Alpaca, Bloom , LLaMA`<br>
+私有模型虽然不能被定制，又要花钱，但是性能和通用性往往比较强，例如` OpenAI models, Google Bard , Claude 2`<br>
+
