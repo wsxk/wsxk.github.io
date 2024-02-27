@@ -19,6 +19,7 @@ date: 2024-2-25
   - [2.1 不同种类的LLM](#21-不同种类的llm)
   - [2.2 Foundation Model](#22-foundation-model)
   - [2.3 开源模型和私有模型](#23-开源模型和私有模型)
+  - [2.4 Embedding、Image generation、Text and Code generation](#24-embeddingimage-generationtext-and-code-generation)
 
 
 ## 前言<br>
@@ -88,7 +89,7 @@ ai的历史是比较久远的，**人工智能的第一个原型由打字的聊�
 3、如何部署LLM ——> 知道如何在商业中部署模型
 ```
 ### 2.1 不同种类的LLM<br>
-大致分为三类：<br>
+根据用途大致分为四类：<br>
 ```
 1. Audio and speech recognition： 即语音和音频识别, 这里的出名模型是  Whisper-type models 
 2. Image generation： 即图像生成，有DALL-E和Midjourney
@@ -115,4 +116,36 @@ ai的历史是比较久远的，**人工智能的第一个原型由打字的聊�
 开源模型，顾名思义，即免费，任何人都可以使用的模型，这些模型可以被**修改、观察和定制**，然而性能上很难跟私有模型媲美<br>
 常见的开源模型有`Alpaca, Bloom , LLaMA`<br>
 私有模型虽然不能被定制，又要花钱，但是性能和通用性往往比较强，例如` OpenAI models, Google Bard , Claude 2`<br>
+
+### 2.4 Embedding、Image generation、Text and Code generation<br>
+根据LLM的输出，可以分为大致3种:<br>
+```
+1. embedding: 说白话就是把文本转换为数字
+好处是让机器更容易理解词和句子之间的关联
+输出的内容还可以作为其他模型的输入，例如分类模型，聚类模型（无监督学习的一种，根据数据相关性将数据分成不同簇）
+
+例子： OpenAI embeddings
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-12-30/20240227231713.png)
+
+```
+2. Image generation：输出就是图像啦
+通常被用于图像编辑、合成、翻译
+一般基于 LAION-5B 的图像数据集进行训练
+可以被用来生成新图像，或者对已有图像进行修复、提高分辨率、着色 等等
+
+例子： DALL-E-3  Stable Diffusion models
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-12-30/20240227231954.png)
+
+```
+3. Text and Code generation: 就是生成文本和代码的模型
+通常用于文本总结、翻译，以及回答问题
+文本模型 通常基于 BookCorpus 这种数据集进行训练
+被使用来生成新的文本、回答问题
+
+代码生成模型通常，像  CodeParrot 通常基于github里的代码训练
+可以被使用生成代码，或改善代码
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-12-30/20240227232305.png)
 
