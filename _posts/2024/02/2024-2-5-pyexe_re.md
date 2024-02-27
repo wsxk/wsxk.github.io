@@ -100,7 +100,9 @@ for packet in cap:
 
         print(tcp_payload_clean)
 ```
-
+在使用`wireshark`进行分析`TCP`报文时，需要理解**SEQ和ACK的作用：SEQ指当前发送方发送的数据起始位置序列号，ACK指的是当前发送方已经接收到的数据的末尾序列号**<br>
+有了这个概念你就比较好分析报文了。<br>
+另外，`wireshark追踪流是丢掉报文头部的 只保留了payload`，可以采用原始数据导出.<br>
 
 ## 3. 什么是Lumina<br>
 Lumina是一种`符号识别服务器`，由IDA专门推出。<br>
