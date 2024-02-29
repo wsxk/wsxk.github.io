@@ -22,6 +22,8 @@ date: 2024-2-25
   - [2.4 Embedding、Image generation、Text and Code generation](#24-embeddingimage-generationtext-and-code-generation)
   - [2.5 Encoder Decoder](#25-encoder-decoder)
   - [2.6 服务和模型之间的关系](#26-服务和模型之间的关系)
+  - [2.7 在Azure上测试、迭代不同的模型，理解性能](#27-在azure上测试迭代不同的模型理解性能)
+  - [2.8 改善LLM的性能](#28-改善llm的性能)
 
 
 ## 前言<br>
@@ -171,3 +173,35 @@ Encoder-Decoder : Bard T5
 ### 2.6 服务和模型之间的关系<br>
 `模型(model)`指的是一个服务的核心组件<br>
 `服务(service)`包括`模型、数据、其他相关功能（例如用户界面）`，由云厂商提供相关功能,比如` Azure OpenAI service`<br>
+
+### 2.7 在Azure上测试、迭代不同的模型，理解性能<br>
+(感觉有点打广告的嫌疑<br>
+首先是针对使用场景选择合适的模型候选<br>
+下一步就是用自己的数据来进行测试以及确认工作负载。(迭代过程，靠实验和测量来找到最合适的）<br>
+以`Azure`为例，选择模型来玩需要经过好几个步骤：<br>
+```
+Find the Foundation Model of interest in the catalog, filtering by task, license, or name. It’s also possible to import new models that are not yet included in the catalog.
+
+Review the model card, including a detailed description and code samples, and test it with the Sample Inference widget, by providing a sample prompt to test the result.
+
+Evaluate model performance with objective evaluation metrics on a specific workload and a specific set of data provided in input.
+
+Fine-tune the model on custom training data to improve model performance in a specific workload, leveraging the experimentation and tracking capabilities of Azure Machine Learning.
+
+Deploy the original pre-trained model or the fine-tuned version to a remote real time inference or batch endpoint, to enable applications to consume it.
+```
+
+### 2.8 改善LLM的性能<br>
+目前给出3个方法：<br>
+```
+1. Prompt engineering with context 
+就是你说话给的条件要细，描述详细场景，给LLM足够信息做推理
+
+2. Retrieval Augmented Generation, RAG
+说人话就是，外部提供一个数据库（包含你自己的信息），在提问的时候把数据库的某些信息作为提示输入。
+
+3. Fine-tuned model
+动动自己的小手用自己的数据在微调一波模型吧~
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-12-30/20240229230236.png)
+来源:[https://www.fiddler.ai/blog/four-ways-that-enterprises-deploy-llms?WT.mc_id=academic-105485-koreyst](https://www.fiddler.ai/blog/four-ways-that-enterprises-deploy-llms?WT.mc_id=academic-105485-koreyst)<br>
