@@ -192,7 +192,7 @@ Deploy the original pre-trained model or the fine-tuned version to a remote real
 ```
 
 ### 2.8 改善LLM的性能<br>
-目前给出3个方法：<br>
+目前给出4个方法：<br>
 ```
 1. Prompt engineering with context 
 就是你说话给的条件要细，描述详细场景，给LLM足够信息做推理
@@ -208,6 +208,9 @@ Deploy the original pre-trained model or the fine-tuned version to a remote real
 微调一下让模型能力更差，但是速度更快，更有性价比
 为了延迟问题，可能限制输入的prompt的数量来加快输出
 利用企业的数据保持模型最新状态
+
+4. 从头训练模型
+难度极大，需要某个特定领域的大量数据、极强的训练手法、充足的运算资源
 ```
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-12-30/20240229230236.png)
 来源:[https://www.fiddler.ai/blog/four-ways-that-enterprises-deploy-llms?WT.mc_id=academic-105485-koreyst](https://www.fiddler.ai/blog/four-ways-that-enterprises-deploy-llms?WT.mc_id=academic-105485-koreyst)<br>
