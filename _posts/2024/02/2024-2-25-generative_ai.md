@@ -196,12 +196,18 @@ Deploy the original pre-trained model or the fine-tuned version to a remote real
 ```
 1. Prompt engineering with context 
 就是你说话给的条件要细，描述详细场景，给LLM足够信息做推理
+总之就是能够有条理的描述你的需求，还能给出例子，LLM的回答往往越贴近你的期望，算是高性价比
 
 2. Retrieval Augmented Generation, RAG
 说人话就是，外部提供一个数据库（包含你自己的信息），在提问的时候把数据库的某些信息作为提示输入。
+因为大模型只知道用来训练的数据，不知道之后发生的事件的数据，也不知道保密信息
+通过外置一个向量数据库，把信息作为prompt也带入文本
 
 3. Fine-tuned model
 动动自己的小手用自己的数据在微调一波模型吧~
+微调一下让模型能力更差，但是速度更快，更有性价比
+为了延迟问题，可能限制输入的prompt的数量来加快输出
+利用企业的数据保持模型最新状态
 ```
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-12-30/20240229230236.png)
 来源:[https://www.fiddler.ai/blog/four-ways-that-enterprises-deploy-llms?WT.mc_id=academic-105485-koreyst](https://www.fiddler.ai/blog/four-ways-that-enterprises-deploy-llms?WT.mc_id=academic-105485-koreyst)<br>
