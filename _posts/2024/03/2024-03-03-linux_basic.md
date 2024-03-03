@@ -1,0 +1,86 @@
+---
+layout: post
+tags : [linux]
+date: 2024-3-3
+title: "linux basic"
+author: wsxk
+comments: true
+---
+
+- [写在前面](#写在前面)
+- [1. Command Line](#1-command-line)
+- [2. process、program、filesystem、directories](#2-processprogramfilesystemdirectories)
+- [3. absolute/relative path](#3-absoluterelative-path)
+- [4 environment varibles](#4-environment-varibles)
+- [5. symbolic/hard links](#5-symbolichard-links)
+- [6. pipes](#6-pipes)
+- [7. input/ouput redircetion](#7-inputouput-redircetion)
+
+
+## 写在前面<br>
+虽然学习网络安全四年有余了，至今让你提起linux的一些关键概念，还是有些不了解linux系统中的某些关键概念，倍感羞耻<br>
+
+## 1. Command Line<br>
+俗称`shell`，是一种与用户交互的界面,本质上也是一个进程（运行中的程序）<br>
+用户可以在如下界面输入程序，如`cat flag（寻找叫做cat的程序，以flag作为参数运行）`<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-12-30/20240303202219.png)
+
+## 2. process、program、filesystem、directories<br>
+**process（进程）指运行中的program（程序）**<br>
+**program指的是存储在文件系统(filesystem)中的文件**<br>
+`linux`中的文件系统布局通常如下图所示<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-12-30/20240303202451.png)
+**刚刚说program存储在文件系统中，更准确的来说，存储在文件系统的directories(目录)中**<br>
+
+## 3. absolute/relative path<br>
+**绝对路径absolute path**指的是文件在系统中的存放位置<br>
+**相对路径relative path**指的是文件相对于当前工作目录下的存放位置<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-12-30/20240303202736.png)
+关于目录，`.`表示当前目录，`..`表示上一级目录，`/`开头的表示根目录（即最初始的目录）<br>
+我们可以通过`ls -l`查看文件的类型，常见类型如下：<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-12-30/20240303203344.png)
+
+## 4 environment varibles<br>
+`environment varibles`是一组键值对（key-value）的集合，在每个程序被执行时，会传递给程序<br>
+可以通过`env`程序查看当前的环境变量<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-12-30/20240303203058.png)
+***但凡我们执行诸如 cat flag这样的命令，然而cat又不在当前目录下，我们也没有输入cat的路径，cat的路径都已经保留在环境变量当中**<br>
+
+## 5. symbolic/hard links<br>
+`symbolic links`软链接，指的是`创建一个特殊类型的文件，指向另一个文件`,通过读取这个软链接相当于读取目标文件<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-12-30/20240303210124.png)
+
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-12-30/20240303210208.png)
+当然，也可以链接`目录`<br>
+**注意陷阱：**<br>
+**软连接创建时，如果路径使用相对路径时，在使用该软连接进行文件操作时，寻找真的文件时，使用的相对路径会是你当前的动作目录**，所以如果移动了软连接的位置，就用不了了<br>
+如下图所示：<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-12-30/20240303211454.png)
+
+
+`hard links`硬链接，与软链接有所不同，创建的是一个指向目标文件的**真实的引用**<br>
+如下图所示：<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-12-30/20240303211958.png)
+从图示中也可以看出，文件类型`-`，表示普通文件<br>
+实际原理跟`inode`相关<br>
+
+
+## 6. pipes<br>
+`pipes（管道）`是一种**单向的信息流通机制**<br>
+管道分为两种:<br>
+```
+1. Unnamed pipes（匿名管道）：
+最常用于把一个命令的数据 传递到 另一个命令
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-12-30/20240303212603.png)
+```
+2. Named pipes（命名管道）：也被称为 FIFOS
+可以使用"mkfifo" 命令来创建
+被使用在特定场景下的数据流程
+```
+
+## 7. input/ouput redircetion<br>
+`输入/输出重定向`指的是 命令的输出不一定就在界面上，可以重定向到文件中， 命令的输入也是，不一定是直接在界面输入，也可以重定向到文件中<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-12-30/20240303213020.png)
+
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-12-30/20240303213100.png)
