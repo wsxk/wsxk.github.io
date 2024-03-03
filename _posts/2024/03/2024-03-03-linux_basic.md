@@ -11,7 +11,7 @@ comments: true
 - [1. Command Line](#1-command-line)
 - [2. process、program、filesystem、directories](#2-processprogramfilesystemdirectories)
 - [3. absolute/relative path](#3-absoluterelative-path)
-- [4 environment varibles](#4-environment-varibles)
+- [4. environment varibles](#4-environment-varibles)
 - [5. symbolic/hard links](#5-symbolichard-links)
 - [6. pipes](#6-pipes)
 - [7. input/ouput redircetion](#7-inputouput-redircetion)
@@ -40,7 +40,7 @@ comments: true
 我们可以通过`ls -l`查看文件的类型，常见类型如下：<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-12-30/20240303203344.png)
 
-## 4 environment varibles<br>
+## 4. environment varibles<br>
 `environment varibles`是一组键值对（key-value）的集合，在每个程序被执行时，会传递给程序<br>
 可以通过`env`程序查看当前的环境变量<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-12-30/20240303203058.png)
