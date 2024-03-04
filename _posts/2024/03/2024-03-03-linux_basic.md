@@ -15,6 +15,7 @@ comments: true
 - [5. symbolic/hard links](#5-symbolichard-links)
 - [6. pipes](#6-pipes)
 - [7. input/ouput redircetion](#7-inputouput-redircetion)
+- [8. 权限管理](#8-权限管理)
 
 
 ## 写在前面<br>
@@ -84,3 +85,6 @@ comments: true
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-12-30/20240303213020.png)
 
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-12-30/20240303213100.png)
+
+## 8. 权限管理<br>
+详情可见[https://wsxk.github.io/linux%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86/](https://wsxk.github.io/linux%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86/)<br>
