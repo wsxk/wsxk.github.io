@@ -16,6 +16,7 @@ comments: true
 - [6. pipes](#6-pipes)
 - [7. input/ouput redircetion](#7-inputouput-redircetion)
 - [8. 权限管理](#8-权限管理)
+- [9. linux常见命令](#9-linux常见命令)
 
 
 ## 写在前面<br>
@@ -88,3 +89,22 @@ comments: true
 
 ## 8. 权限管理<br>
 详情可见[https://wsxk.github.io/linux%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86/](https://wsxk.github.io/linux%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86/)<br>
+
+## 9. linux常见命令<br>
+**常用的获取文本的命令**<br>
+```
+more ： 浏览文件内容
+less ： 浏览文件内容
+tail ： 查看文件末尾几行
+head ： 查看文件头几行
+sort ： 文件行排序后输出
+vim ： 文本编辑器
+emacs ： 文本编辑器
+nano ： 文本编辑器
+rev ： 倒序输出
+od ： Octal Dump
+hd ： Hex Dump
+xxd ： 主要用于创建十六进制或二进制的转储
+base32: 内容以base32加密后输出
+base64: 内容以base64加密后输出
+```
