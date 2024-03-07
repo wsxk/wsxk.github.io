@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [AI]
-title: "generative-ai 学习笔记"
+title: "generative-ai 学习笔记 Ⅰ"
 author: wsxk
 comments: true
 date: 2024-2-25

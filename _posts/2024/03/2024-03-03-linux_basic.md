@@ -107,4 +107,9 @@ hd ： Hex Dump
 xxd ： 主要用于创建十六进制或二进制的转储
 base32: 内容以base32加密后输出
 base64: 内容以base64加密后输出
+split： 将一个文件的内容 分成若干文件
+gzip： 压缩/解压缩 文件 后缀： .gz
+bzip2： 压缩/解压缩 文件 后缀： .bz2
+zip: 压缩/解压缩文件    后缀： .zip root权限zip压缩后的文件，普通用户也有读权限，可以通过unzip解压
+tar： 压缩/解压缩文件 tar -xf flag.tar -O 可以把解压的内容输出到命令行中
 ```
