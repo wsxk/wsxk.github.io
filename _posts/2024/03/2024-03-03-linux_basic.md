@@ -17,6 +17,8 @@ comments: true
 - [7. input/ouput redircetion](#7-inputouput-redircetion)
 - [8. 权限管理](#8-权限管理)
 - [9. linux常见命令](#9-linux常见命令)
+  - [9.1 linux命令使用说明书](#91-linux命令使用说明书)
+  - [9.2 常见命令列表](#92-常见命令列表)
 
 
 ## 写在前面<br>
@@ -91,6 +93,20 @@ comments: true
 详情可见[https://wsxk.github.io/linux%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86/](https://wsxk.github.io/linux%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86/)<br>
 
 ## 9. linux常见命令<br>
+### 9.1 linux命令使用说明书<br>
+linux中有很多命令可供选择，为了了解命令的使用方式，了解命令说明书的构造就尤为重要<br>
+以某个例子为例<br>
+```shell
+Usage: cpio [OPTION...] [destination-directory]
+有 []攘括的 OPTION 表示，该参数是可选参数（可加可不加）
+有 ...跟随，表示OPTION可以有一个或多个
+
+除此之外还有其他常见符号
+<> 攘括的参数表明该参数不可缺失，比如 command <filename>
+{} 攘括的参数表明必须使用其中一个参数， 比如 command {a | b}，表示a、b二选一，
+```
+
+### 9.2 常见命令列表<br>
 **常用的获取文本的命令**<br>
 ```
 more ： 浏览文件内容
@@ -98,18 +114,26 @@ less ： 浏览文件内容
 tail ： 查看文件末尾几行
 head ： 查看文件头几行
 sort ： 文件行排序后输出
+rev ： 倒序输出
+
 vim ： 文本编辑器
 emacs ： 文本编辑器
 nano ： 文本编辑器
-rev ： 倒序输出
+
 od ： Octal Dump
 hd ： Hex Dump
 xxd ： 主要用于创建十六进制或二进制的转储
+
 base32: 内容以base32加密后输出
 base64: 内容以base64加密后输出
+
 split： 将一个文件的内容 分成若干文件
+
 gzip： 压缩/解压缩 文件 后缀： .gz
 bzip2： 压缩/解压缩 文件 后缀： .bz2
 zip: 压缩/解压缩文件    后缀： .zip root权限zip压缩后的文件，普通用户也有读权限，可以通过unzip解压
 tar： 压缩/解压缩文件 tar -xf flag.tar -O 可以把解压的内容输出到命令行中
+ar： 创建、修改静态库 ar -crv flag.a flag 后 使用 ar -p flag.a flag 即可打印flag内容
+cpio： 压缩/解压缩 cpio -o <~/1.txt用于创建一个压缩文件
+
 ```
