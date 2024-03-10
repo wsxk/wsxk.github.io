@@ -142,4 +142,9 @@ find：可以通过find找到某文件后，执行某命令 find /flag -exec cat
 make： 编译命令 make --eval='target: ; sh -p' target
 nice： 更改程序优先级 nice cat /flag
 timeout：命令程序执行多长时间 timeout 1.0s cat /flag
+stdbuf： 重新设置stdin/stdout/stderr的缓冲方式(行缓冲、全缓冲、无缓冲)  stdbuf -iL cat /flag
+setarch： 在Linux 中用于设置程序运行时的体系结构相关行为，它可以用于改变当前进程的体系结构报告（如 uname 输出）或设置某些体系结构特定的行为，如ASLR（地址空间布局随机化）  setarch i386 cat /flag
+watch： 监控程序执行 watch -x cat /flag （-x和该选项的区别是是否是直接使用watch运行exec来执行命令）
+socat： 用于在两个字节流之间建立和传输数据 socat exec:'cat /flag' stdout
+
 ```
