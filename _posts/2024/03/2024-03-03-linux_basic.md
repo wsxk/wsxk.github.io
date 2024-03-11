@@ -149,6 +149,6 @@ socat： 用于在两个字节流之间建立和传输数据 socat exec:'cat /fl
 
 whiptail： 图形化界面 whiptail --textbox /flag 20 20
 awk： 强大的文本处理工具， awk  '{print $0}' /flag
-sed： 强大的文本修改工具，
-grep： 强大的文本过滤工具，
+sed： 强大的文本修改工具， sed -e p -n /flag
+grep： 强大的文本过滤工具， 
 ```
