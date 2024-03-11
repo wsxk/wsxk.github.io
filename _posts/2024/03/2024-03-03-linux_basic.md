@@ -147,4 +147,8 @@ setarch： 在Linux 中用于设置程序运行时的体系结构相关行为，
 watch： 监控程序执行 watch -x cat /flag （-x和该选项的区别是是否是直接使用watch运行exec来执行命令）
 socat： 用于在两个字节流之间建立和传输数据 socat exec:'cat /flag' stdout
 
+whiptail： 图形化界面 whiptail --textbox /flag 20 20
+awk： 强大的文本处理工具， awk  '{print $0}' /flag
+sed： 强大的文本修改工具，
+grep： 强大的文本过滤工具，
 ```
