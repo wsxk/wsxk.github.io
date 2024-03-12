@@ -151,4 +151,10 @@ whiptail： 图形化界面 whiptail --textbox /flag 20 20
 awk： 强大的文本处理工具， awk  '{print $0}' /flag
 sed： 强大的文本修改工具， sed -e p -n /flag
 grep： 强大的文本过滤工具， 
+ed： 行文本编辑器， ed -G /flag，然后输入1p 
+
+chown： 改变文件属主和属组
+chmod： 改变文件的权限(u,g,o)
+cp： 文件复制 cp /flag /dev/stdout ，将文件内容复制到标准输出
+mv： 文件移动 
 ```
