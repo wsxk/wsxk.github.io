@@ -157,4 +157,8 @@ chown： 改变文件属主和属组
 chmod： 改变文件的权限(u,g,o)
 cp： 文件复制 cp /flag /dev/stdout ，将文件内容复制到标准输出
 mv： 文件移动 
+
+perl：是perl语言解释器 perl -e 'open(my $fh, "<", "/flag") or die "Cannot open /flag: $!"; print while(<$fh>); close($fh);'
+python： python语言解释器
+ruby： ruby语言解释器
 ```
