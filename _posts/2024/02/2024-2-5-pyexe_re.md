@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [re]
-title: "pyinstaller逆向 & pcapng报文分析 & IDA lumina"
+title: "pyinstaller逆向 & pcapng报文分析 & IDA lumina & AMXX"
 date: 2024-2-5
 author: wsxk
 comments: true
@@ -16,6 +16,7 @@ comments: true
   - [2.3 示例:提取tcp流中的payload](#23-示例提取tcp流中的payload)
 - [3. 什么是Lumina](#3-什么是lumina)
   - [3.1 如何使用Lumina](#31-如何使用lumina)
+- [4. AMXX re](#4-amxx-re)
 
 
 
@@ -114,3 +115,8 @@ Lumina可以在线识别未命名函数<br>
 PS: 跟他类似的还有一个阿里云公开的插件 `Finger`<br>
 **注意，在使用Finger时，不要使用科学上网！！！**<br>
 
+
+## 4. AMXX re<br>
+因做到了原题让我感到想吐🤮<br>
+[https://in1t.top/2022/06/14/justctf-2022-amxx/](https://in1t.top/2022/06/14/justctf-2022-amxx/)<br>
+不过也通过这道题了解了也行`java`和`gradle`的用法，也算不虚此行<br>

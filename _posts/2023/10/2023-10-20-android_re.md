@@ -17,9 +17,9 @@ date: 2023-10-20
 - [5. 代码混淆](#5-代码混淆)
   - [5.1 办法1： ida findcrypt3](#51-办法1-ida-findcrypt3)
   - [5.2 办法2： 反混淆工具](#52-办法2-反混淆工具)
-- [6. 反调试机制](#6-反调试机制)
-- [7. 运行时解密](#7-运行时解密)
-  - [7.1 armariris so运行时解密](#71-armariris-so运行时解密)
+  - [5.3 armariris 混淆](#53-armariris-混淆)
+- [6. 安全加固](#6-安全加固)
+- [7. 反调试机制](#7-反调试机制)
 - [references](#references)
 
 
@@ -108,17 +108,11 @@ android的反编译工具没有findcrypt3,怎么办呢？其实`findcrypt`的原
 [https://seosniffer.com/javascript-deobfuscator](https://seosniffer.com/javascript-deobfuscator)<br>
 [https://github.com/kuizuo/js-deobfuscator](https://github.com/kuizuo/js-deobfuscator)<br>
 
-
-## 6. 反调试机制<br>
-有的apk会有反调试机制，比如检测是否被`frida`、`xposed`、`cydia`等hook框架hook，如果被hook了，就会直接退出<br>
-`frida`详情可参考[https://wsxk.github.io/frida_hook/](https://wsxk.github.io/frida_hook/)<br>
-这里列举一个文章，这篇文章教你如何绕过神秘的反调试：<br>
-[https://bbs.kanxue.com/thread-277034.htm](https://bbs.kanxue.com/thread-277034.htm)<br>
-
-
-## 7. 运行时解密<br>
+### 5.3 armariris 混淆<br>
 有一些ctf的逆向题目，默认情况下代码是加密过的，在运行时会执行**解密函数**来完成解密<br>
-### 7.1 armariris so运行时解密<br>
+以armariris为例，实现在[https://github.com/GoSSIP-SJTU/Armariris](https://github.com/GoSSIP-SJTU/Armariris)<br>
+**本质上是对android中的so进行了加密混淆，影响你的阅读**<br>
+
 so运行时解密，已经有了一站式的解决方案！**unicorn yyds!**<br>
 ```python
 from elftools.elf.constants import P_FLAGS
@@ -205,6 +199,18 @@ for datadiv in datadivs:
 fd.close()
 print("done!")
 ```
+
+## 6. 安全加固<br>
+安全加固也是一种特有的方式，本质上是把实际执行代码加密，并替换android的启动入口点，在android程序启动后，对实际执行代码解密并进行装载<br>
+**与混淆不同的是，混淆是为了影响你对源代码的阅读，而安全加固直接就是不让你读源代码**<br>
+
+## 7. 反调试机制<br>
+有的apk会有反调试机制，比如检测是否被`frida`、`xposed`、`cydia`等hook框架hook，如果被hook了，就会直接退出<br>
+`frida`详情可参考[https://wsxk.github.io/frida_hook/](https://wsxk.github.io/frida_hook/)<br>
+这里列举一个文章，这篇文章教你如何绕过神秘的反调试：<br>
+[https://bbs.kanxue.com/thread-277034.htm](https://bbs.kanxue.com/thread-277034.htm)<br>
+
+
 
 ## references<br>
 [https://curz0n.github.io/2021/05/10/android-so-reverse/#0x00-%E5%89%8D%E8%A8%80](https://curz0n.github.io/2021/05/10/android-so-reverse/#0x00-%E5%89%8D%E8%A8%80)<br>
