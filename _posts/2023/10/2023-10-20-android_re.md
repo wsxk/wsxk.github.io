@@ -204,11 +204,11 @@ print("done!")
 安全加固也是一种特有的方式，本质上是把实际执行代码加密，并替换android的启动入口点，在android程序启动后，对实际执行代码解密并进行装载<br>
 **与混淆不同的是，混淆是为了影响你对源代码的阅读，而安全加固直接就是不让你读源代码**<br>
 这里只能附上高手的blog，之后在慢慢分析<br>
-[blog.niunaijun.top](blog.niunaijun.top)<br>
-[cnblogs.com/bmjoker](cnblogs.com/bmjoker)<br>
+[https://blog.niunaijun.top](https://blog.niunaijun.top)<br>
+[https://cnblogs.com/bmjoker](https://cnblogs.com/bmjoker)<br>
 
-脱壳工具：[github.com/CodingGay/BlackDex](github.com/CodingGay/BlackDex)<br>
-查壳工具：[github.com/MagiCiAn1/APKProtectionSearch](github.com/MagiCiAn1/APKProtectionSearch)<br>
+脱壳工具：[https://github.com/CodingGay/BlackDex](https://github.com/CodingGay/BlackDex)<br>
+查壳工具：[https://github.com/MagiCiAn1/APKProtectionSearch](https://github.com/MagiCiAn1/APKProtectionSearch)<br>
 
 ## 7. 反调试机制<br>
 有的apk会有反调试机制，比如检测是否被`frida`、`xposed`、`cydia`等hook框架hook，如果被hook了，就会直接退出<br>
