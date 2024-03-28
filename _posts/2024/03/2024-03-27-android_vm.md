@@ -14,6 +14,11 @@ comments: true
   - [2.2 ART虚拟机](#22-art虚拟机)
     - [2.2.1 ART和DVM的区别](#221-art和dvm的区别)
 - [3. APK打包流程](#3-apk打包流程)
+  - [3.1 android studio生成apk](#31-android-studio生成apk)
+- [4. Android系统加载流程](#4-android系统加载流程)
+  - [4.1 Bootloader](#41-bootloader)
+  - [4.2 linux系统启动](#42-linux系统启动)
+  - [4.3 init进程](#43-init进程)
 
 
 ## 前言<br>
@@ -77,4 +82,50 @@ ART与DVM最大的区别是，ART虚拟机在安装apk程序时，对.dex文件�
 > > Zipalign是一个android平台上整理APK文件的工具，它对apk中未压缩的数据进行4字节对齐，对齐后就可以使用mmap函数读取文件，可以像读取内存一样对普通文件进行操作。如果没有4字节对齐，就必须显式的读取，这样比较缓慢并且会耗费额外的内存。
 > > 在 Android SDK 中包含一个名为 zipalign 的工具，它能够对打包后的 app 进行优化。 其位于 SDK 的 \build-tools\34.0.0\zipalign.exe 目录下
 
+### 3.1 android studio生成apk<br>
 为了更加清晰的了解生成的`apk文件里有什么`，我安装了`android stuidio`，小玩一下（<br>
+
+
+## 4. Android系统加载流程<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240328230114.png)
+该图引用自[https://www.jianshu.com/p/9f978d57c683](https://www.jianshu.com/p/9f978d57c683)<br>
+我认为能比较好的描述`Android系统的加载流程`
+### 4.1 Bootloader<br>
+一般开机，即手机开始供电，运行的程序就是`bootloader，其起始地址是固定的，取决于各个厂商`<br>
+**bootloader的作用就是将 系统的软硬件环境带到一个合适的状态，为运行操作系统做好准备**<br>
+`bootloader`第一个装载的是`fastboot`<br>
+> 1. 当fastboot被装载后便开始运行，它一般会先检测用户是否按下某些特别按键，这些特别按键是fastboot在编译时预先被约定好的，用于进入调试模式。如果用户没有按这些特别的按键，则fastboot会从NAND Flash中装载Linux内核，装载的地址是在编译fastboot时预先约定好的。
+> 2. 如果你试过root android手机(如： pixel 2)，可以知道刷机时需要在fastboot的时候通过电脑把android镜像刷到手机中
+> 3. fastboot的作用是初始化硬件环境，比如网口、SDRAM等等
+
+### 4.2 linux系统启动<br>
+`fastboot会装载linux内核`<br>
+插播一个题外话，如果你装过linux系统，你会知道，实际上要安装是一个名为`zImage`的文件<br>
+
+```
+zImage是一个压缩后的linux内核，包括以下几个部分：
+1. head.o：是内核的头部文件，负责初始设置
+2. misc.0：含有负责解压内核的代码
+3. piggy.gzip.o： 使用gzip算法压缩的内核镜像代码
+
+zImage是由vmlinux压缩得到的：
+vmlinux 是 Linux 内核的一个重要文件，它是内核的未压缩可执行版本。
+vmlinux 是在内核编译过程中生成的，包含了内核的全部代码和数据。
+这个文件是 ELF（Executable and Linkable Format）格式的，这是一种常用的可执行文件和共享库的格式。
+vmlinux对于调试来说是 非常非常非常 重要的！！！😀
+```
+
+回到正题，**1. 装载linux内核的第一件事就是对内核镜像进行解压缩，并放到内存中**<br>
+**2. 第二阶段是进入内核的入口函数:start_kernel(),它主要完成剩余与硬件平台的相关初始化工作（包括设置体系结构相关的环境，初始化内存结构，建立MMU，页表 等等），在进行一些系列的与内核相关的初始化步骤后，调用第一个用户进程——init进程并等待用户进程的执行**<br>
+`linux在启动init进程前的最后一个阶段是挂在根文件系统（只读，此时linux还在启动阶段，并不稳定，设置只读是为了保证即使linux宕机了也不会损坏根牡蛎），启动init必须要有根文件系统`，其至少要有如下几个目录：<br>
+
+> * /etc/：存储重要的配置文件
+> * /bin/：存储常用且开机时必须用到的执行文件。
+> * /sbin/：存储着开机过程中所需的系统执行文件。
+> * /lib/：存储/bin/及/sbin/的执行文件所需要的链接库，以及Linux的内核模块
+> * /dev/：存储设备文件
+
+之所以要挂在根文件系统，是因为**需要安装适当的内核模块，以便驱动硬件设备,而init程序和内核模块(.ko)都存放在根目录中，没想到吧（**<br>
+第三个阶段就是**3. init程序启动 init服务负责后续初始化系统使用环境的工作,且之后如果有用户程序需要启动，都由init派生**<br>
+
+### 4.3 init进程<br>
