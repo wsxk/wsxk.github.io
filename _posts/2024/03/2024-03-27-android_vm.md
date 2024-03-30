@@ -83,7 +83,16 @@ ART与DVM最大的区别是，ART虚拟机在安装apk程序时，对.dex文件�
 > > 在 Android SDK 中包含一个名为 zipalign 的工具，它能够对打包后的 app 进行优化。 其位于 SDK 的 \build-tools\34.0.0\zipalign.exe 目录下
 
 ### 3.1 android studio生成apk<br>
-为了更加清晰的了解生成的`apk文件里有什么`，我安装了`android stuidio`，小玩一下（<br>
+为了更加清晰的了解生成的`apk文件里有什么`，这里列出一些常见的目录和文件<br>
+| 文件/目录 | 功能介绍 |
+|:------:|:------:|
+|assets| 目录中含有的是apk运行需要的静态文件 |
+|lib| 目录中存放android程序会调用的so|
+|META-INF|目录中存放的是签名信息（如果有）以及各个组件的版本号|
+|res| 目录中存放了资源文件（图片，文本，xml布局，etc）|
+|AndroidManifest.xml|清单，描述了apk的程序入口，版本，等等信息|
+|classes.dex| 先前提到的smali构成的文件|
+|resources.arsc| 资源名称和对应的id关系，R.java中会保存所有资源的id，apk程序如果使用到了某个资源，会使用R.java中的资源id，在resources.arsc中找到对应的资源名称，并索引该资源|
 
 
 ## 4. Android系统加载流程<br>
