@@ -19,6 +19,8 @@ comments: true
   - [4.1 Bootloader](#41-bootloader)
   - [4.2 linux系统启动](#42-linux系统启动)
   - [4.3 init进程](#43-init进程)
+  - [4.4 Zygote进程](#44-zygote进程)
+  - [4.5 SystemServer进程](#45-systemserver进程)
 
 
 ## 前言<br>
@@ -126,7 +128,7 @@ vmlinux对于调试来说是 非常非常非常 重要的！！！😀
 
 回到正题，**1. 装载linux内核的第一件事就是对内核镜像进行解压缩，并放到内存中**<br>
 **2. 第二阶段是进入内核的入口函数:start_kernel(),它主要完成剩余与硬件平台的相关初始化工作（包括设置体系结构相关的环境，初始化内存结构，建立MMU，页表 等等），在进行一些系列的与内核相关的初始化步骤后，调用第一个用户进程——init进程并等待用户进程的执行**<br>
-`linux在启动init进程前的最后一个阶段是挂在根文件系统（只读，此时linux还在启动阶段，并不稳定，设置只读是为了保证即使linux宕机了也不会损坏根牡蛎），启动init必须要有根文件系统`，其至少要有如下几个目录：<br>
+`linux在启动init进程前的最后一个步骤是挂载根文件系统（只读，此时linux还在启动阶段，并不稳定，设置只读是为了保证即使linux宕机了也不会损坏根牡蛎），启动init必须要有根文件系统`，其至少要有如下几个目录：<br>
 
 > * /etc/：存储重要的配置文件
 > * /bin/：存储常用且开机时必须用到的执行文件。
@@ -138,3 +140,24 @@ vmlinux对于调试来说是 非常非常非常 重要的！！！😀
 第三个阶段就是**3. init程序启动 init服务负责后续初始化系统使用环境的工作,且之后如果有用户程序需要启动，都由init派生**<br>
 
 ### 4.3 init进程<br>
+inti进程作为第一个被内核启动的用户空间进程，主要做如下几个动作：<br>
+
+> 1. 初始化系统环境：init 进程负责设置系统环境，包括挂载文件系统、设置网络配置、初始化设备节点等。
+> 2. 启动守护进程：init 进程会根据配置文件（如 /init.rc 和其他 .rc 文件）启动一系列的守护进程（daemons），这些进程负责系统的各种服务和功能，例如 logd（日志服务）、servicemanager（服务管理器）、surfaceflinger（显示系统服务）等。
+> 3. 启动 Zygote 进程：init 进程会启动 Zygote 进程，它是 Android 应用程序和系统服务的基础。Zygote 进程加载 Java 虚拟机（ART 或 Dalvik）和预加载的类和资源，以便加快应用程序的启动速度。所有的 Android 应用程序都是通过从 Zygote 进程 fork 出来的，共享相同的虚拟机实例和预加载的资源。
+
+需要详细了解代码的话，有高人相助[https://www.jianshu.com/p/4e5909d24d65](https://www.jianshu.com/p/4e5909d24d65)<br>
+
+### 4.4 Zygote进程<br>
+先前说过，所有的Android程序均有Zygote进程生成，但是**Zygote跟传统的linux加载程序方式不同，如下图所示**<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240331143245.png)
+`传统linux都是通过fork+exec来启动程序， Zygote进程fork出来后，因为要执行的Dalvik的字节码，其他java环境的需要是一致的，所以只需要加载apk中的字节码解释执行即可，不需要通过exec来执行`<br>
+**通过这种方式来减少加载java环境的时间**<br>
+了解详情[https://www.jianshu.com/p/4e5909d24d65](https://www.jianshu.com/p/4e5909d24d65)<br>
+
+### 4.5 SystemServer进程<br>
+systemserver进程由Zygote进程fork而来，其实该进程主要**承接apk应用的所有服务需要，看图就知道了**<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240331145259.png)
+解释：**1. Android 系统中，Launcher 进程是指运行主屏幕（Home Screen）应用程序的进程,由Zygote进程生成**<br>
+**2. Binder是android提供的一种IPC通信机制(作为备选项，android的IPC通信机制以后在有需要时继续研究)**<br>
+**3. 总而言之，当我们触摸屏幕，点击某个apk，其实都是在和launcher进程进行交互，当要启动某个apk时，launcher会往system_server发送请求，system_server将请求转发给Zygote进程，Zygote进程fork新进程后，不再参与新进程任何后续应用的使用，相应的使用需求都需要通过System_server来解决**<br>
