@@ -80,8 +80,14 @@ Application对象的生命周期是整个程序中最长的，它的生命周期
 > 3. 修改原apk文件并重新打包签名：修改classes.dex为新的classes.dex，修改Androidmanifest.xml文件的启动配置
 > 4. 运行新的apk程序
 
+如下的流程图是上图的细化版本:<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240402195302.png)
+
+下图是**运行加固后的apk后，apk的执行流程**<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240402195334.png)
+该图中的`ProxyApplication`是继承自`Application`的类，它并不叫`ProxyApplication，只是一个代称，(你想怎么取名就怎么取名)`<br>
+先前也说过，`application`类是`android应用中最早加载的类，所以一般加壳/解壳都在这里操作`<br>
+**attachBaseContext方法主要用于为Application提供一个上下文环境，这是应用程序与系统交互的基础,onCreate方法是应用程序初始化的入口点，现在它们都被用于安全加固操作**<br>
 
 ### 5.5 常见加固平台以及安全加固的优劣<br>
 常见的加固平台有：`梆梆加固，爱加密，360加固，腾讯加固`<br>
