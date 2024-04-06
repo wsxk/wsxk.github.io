@@ -14,6 +14,7 @@ comments: true
   - [5.3 Application类](#53-application类)
   - [5.4 android加固流程](#54-android加固流程)
   - [5.5 常见加固平台以及安全加固的优劣](#55-常见加固平台以及安全加固的优劣)
+  - [5.6 脱壳思路](#56-脱壳思路)
 - [references](#references)
 
 
@@ -108,6 +109,12 @@ Application对象的生命周期是整个程序中最长的，它的生命周期
     　　　　3.部分流氓、病毒也会使用加壳技术来保护自己
 
     　　　　4.部分应用市场会拒绝加壳后的应用上架
+
+### 5.6 脱壳思路<br>
+[https://blog.niunaijun.top/index.php/archives/13.html](https://blog.niunaijun.top/index.php/archives/13.html)看完大佬的这篇文章，叹为观止，其中**预测法**给了我极大的震撼，哈哈哈<br>
+另外，大佬的动态脱壳工具也已经开源到了github当中，网址为：<br>
+[https://github.com/CodingGay/BlackDex](https://github.com/CodingGay/BlackDex)<br>
+
 
 ## references<br>
 [https://www.cnblogs.com/bmjoker/p/11831479.html](https://www.cnblogs.com/bmjoker/p/11831479.html)<br>
