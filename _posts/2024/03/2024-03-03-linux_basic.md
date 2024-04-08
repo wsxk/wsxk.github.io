@@ -19,6 +19,7 @@ comments: true
 - [9. linux常见命令](#9-linux常见命令)
   - [9.1 linux命令使用说明书](#91-linux命令使用说明书)
   - [9.2 常见命令列表](#92-常见命令列表)
+- [10. elf文件格式](#10-elf文件格式)
 
 
 ## 写在前面<br>
@@ -176,3 +177,7 @@ void __attribute__((constructor)) func(){
 }
 让函数在so加载时(未执行main函数)被执行
 ```
+
+## 10. elf文件格式<br>
+详情见：<br>
+[https://wsxk.github.io/elf%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F%E8%A7%A3%E6%9E%90/](https://wsxk.github.io/elf%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F%E8%A7%A3%E6%9E%90/)
