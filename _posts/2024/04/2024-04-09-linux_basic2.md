@@ -36,7 +36,7 @@ comments: true
 在确定文件是可执行的后，`kernel`还会为了确定加载什么内容而做如下图所示的检测<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240409231213.png)
 
-> 1. 首先判断文件是否以#!开头，如果是，kernel会提取该行接下来的内容，并将其当作解释器用来执行，原始的命令作为解释器的参数（直接跟在解释器后面）
+> - 1. 首先判断文件是否以#!开头，如果是，kernel会提取该行接下来的内容，并将其当作解释器用来执行，原始的命令作为解释器的参数（直接跟在解释器后面）
 
 例子： <br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240409232105.png)
@@ -58,13 +58,13 @@ comments: true
     
 十分神奇！<br>
 
-> 2. 如果文件的格式满足 /proc/sys/fs/binfmt_misc中的内容，kernel会执行特定格式对应的解释器，原始的命令作为解释器的参数
+> - 2. 如果文件的格式满足 /proc/sys/fs/binfmt_misc中的内容，kernel会执行特定格式对应的解释器，原始的命令作为解释器的参数
 
 举个例子:<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240410220458.png)
 在这里，**如果文件的开头是550d0d0a，那么就用/usr/bin/python3.8来执行这个文件**<br>
 
-> 3. 如果文件是动态链接的elf文件，kernel会选定elf文件中loader定义的值来作为解释器，加载loader和原始文件，并让loader来进行控制
+> - 3. 如果文件是动态链接的elf文件，kernel会选定elf文件中loader定义的值来作为解释器，加载loader和原始文件，并让loader来进行控制
 
 **loader是很重要的，如果elf文件是动态链接的，loader会负责so的地址分配，符号解析，重定位，合并段....等等用途，保证elf能够顺利执行**<br>
 `loader可以通过 readelf -a /bin/cat | grep interpreter`来查询<br>
@@ -72,7 +72,7 @@ comments: true
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240410222710.png)
 
 
-> 4. 如果文件是静态链接的elf，kernel会直接加载它
+> - 4. 如果文件是静态链接的elf，kernel会直接加载它
 
 
-> 5. 其他遗留的文件格式会被检查
+> - 5. 其他遗留的文件格式会被检查
