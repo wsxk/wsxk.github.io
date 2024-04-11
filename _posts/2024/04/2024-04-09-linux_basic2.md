@@ -11,6 +11,7 @@ comments: true
 - [11. program加载与执行过程](#11-program加载与执行过程)
   - [11.1 进程创建](#111-进程创建)
   - [11.2 进程加载](#112-进程加载)
+  - [11.3 进程初始化](#113-进程初始化)
 
 
 ## 前言<br>
@@ -71,8 +72,24 @@ comments: true
 下面这张图也能体现`动态链接elf的加载过程`<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240410222710.png)
 
+例子又来了:<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240411220850.png)
+用`gcc -shared -o preload.so preload.c`将其编译出`so文件`<br>
+我们可以用`strace -E LD_PRELOAD=./preload.so ./cat cat.c 2>&1 | head -n 100`来查看先后调用关系<br> 
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202024-04-11%20221232.png)
+
+如果用的是`strace -E LD_LIBRARY_PATH=/some/lib ./cat cat.c`来追踪的话：<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240411221615.png)
+其他的路径可以自行实验~<br>
+
 
 > - 4 如果文件是静态链接的elf，kernel会直接加载它
 
+很直接，没有啥好说的<br>
 
 > - 5 其他遗留的文件格式会被检查
+
+这个也很直接<br>
+
+### 11.3 进程初始化<br>
+在所有文件都加载完毕后，自动执行的函数通常是：``<br>
