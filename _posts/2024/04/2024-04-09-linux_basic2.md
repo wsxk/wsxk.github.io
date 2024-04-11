@@ -92,4 +92,10 @@ comments: true
 这个也很直接<br>
 
 ### 11.3 进程初始化<br>
-在所有文件都加载完毕后，自动执行的函数通常是：``<br>
+**Every ELF binary can specify constructors, which are functions that run before the program is actually launched.**<br>
+即程序在运行前，可以执行一些构造函数<br>
+例子:<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240411235441.png)
+在二进制的实现：<br>
+我们可以发现，`haha函数被放在了init_array中`<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240411235528.png)
