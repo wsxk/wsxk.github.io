@@ -12,6 +12,10 @@ comments: true
   - [11.1 进程创建](#111-进程创建)
   - [11.2 进程加载](#112-进程加载)
   - [11.3 进程初始化](#113-进程初始化)
+  - [11.4 程序被发起](#114-程序被发起)
+  - [11.5 程序读取环境变量和参数](#115-程序读取环境变量和参数)
+  - [11.6 程序执行正常功能](#116-程序执行正常功能)
+  - [11.7 程序结束](#117-程序结束)
 
 
 ## 前言<br>
@@ -99,3 +103,32 @@ comments: true
 在二进制的实现：<br>
 我们可以发现，`haha函数被放在了init_array中`<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240411235528.png)
+
+
+### 11.4 程序被发起<br>
+其实通过逆向就可以知道，`main`函数并不是第一个被执行的程序<br>
+正常的`elf`程序都会自动调用`libc 中的__libc_start_main()`函数<br>
+**其实11.3中的初始化的构造函数也会作为参数被放入__libc_start_main()函数中被执行**<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240412211738.png)
+
+### 11.5 程序读取环境变量和参数<br>
+main函数的`int main(int argc, void **argv, void **envp);`中，**argv是参数，envp是环境变量**<br>
+
+### 11.6 程序执行正常功能<br>
+执行正常功能没什么好说的，要提到的点是：<br>
+> 1. elf文件中的导入符号必须通过动态库（libc）的导出符号来解析
+> 2. 几乎所有程序都要和外界交互，交互基本上要用到 system call(系统调用)
+> 3. 另一个用到的就是signals，即信号，需要用到sighandler_t signal(int signum, sighandler_t handler)来注册 
+> > 信号会让程序执行暂时中断，并运行handler函数
+> > hanlder函数是一种 函数，只有一个参数： signal的值
+> > 没有特定的handler来处理信号，会默认调用kill来终止程序
+> > signal 9(SIGKILL)和 signal 19(SIGSTOP)无法被handled
+> 4. 最后一个用到的是 共享内存(shared memory)用于不同进程通信，建立时需要system call，建立之后就不再需要用到system call<br>
+
+
+### 11.7 程序结束<br>
+程序只有两种情况会结束运行：<br>
+> 1. 收到没有handler的signal
+> 2. 调用了 exit()这个 system call
+
+注意:**所有的程序在结束后，会保持僵尸状态被其父进程回收，如果父进程已经停止生命周期了，其会被PID 1回收**
