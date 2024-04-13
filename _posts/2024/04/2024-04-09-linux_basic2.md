@@ -113,6 +113,8 @@ comments: true
 
 ### 11.5 程序读取环境变量和参数<br>
 main函数的`int main(int argc, void **argv, void **envp);`中，**argv是参数，envp是环境变量**<br>
+`PS: 如果你想要程序在一个没有环境变量的环境下运行，可以使用 env -i ./program`<br>
+
 
 ### 11.6 程序执行正常功能<br>
 执行正常功能没什么好说的，要提到的点是：<br>
