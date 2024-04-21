@@ -177,6 +177,12 @@ void __attribute__((constructor)) func(){
     printf("test\n");
 }
 让函数在so加载时(未执行main函数)被执行
+
+tee: 很好用的命令，作用是将输入打印到某个文件和屏幕中，通常和fifo管道配合使用：
+mkfifo /tmp/in /tmp/out /tmp/cache
+./program1 </tmp/in >/tmp/out  # 运行program1 从in中读取数据，将输出放入out
+./program2 </tmp/cache >/tmp/in #运行program2 从cache中读取数据，将输出放入in
+cat /tmp/out | tee /tmp/cache # c从out读数据，放入tee命令，tee命令会把数据放入cache，并打印到屏幕
 ```
 
 ### 9.3 Ctrl+c、Ctrl+z、Ctrl+d<br>
@@ -194,6 +200,7 @@ Ctrl+z：
 
 使用场景：当你想要暂时挂起当前正在执行的命令，并返回到命令行界面进行其他操作时，可以使用Ctrl+z。
 比如，你可以使用Ctrl+z暂停一个长时间运行的命令，然后使用fg命令将其恢复到前台继续执行，或者使用bg命令将其放入后台继续执行。
+通过jobs查看哪些任务在进行中。
 ```
 
 ```
