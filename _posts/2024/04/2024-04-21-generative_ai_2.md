@@ -33,4 +33,12 @@ ai有时候会吐出一些奇奇怪怪的输出。<br>
 anyway,就是我是用户我会怎么输入，先测试一轮。<br>
 #### 3.2.2 缓解措施的分层<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240421231553.png)
+```
+1. model层指的就是对模型进行微调，增加一些安全限制
 
+2. Safety System层指的是一些文本过滤器等等功能
+
+3. meta prompt指的就是在用户输入前在加点prompt
+
+4. User Experience指的就是在用户的ui这里限制一下用户的输入，不要做些非法行为（这个破解也太简单了）
+```

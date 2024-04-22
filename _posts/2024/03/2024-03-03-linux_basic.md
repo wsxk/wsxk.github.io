@@ -2,7 +2,7 @@
 layout: post
 tags : [linux]
 date: 2024-3-3
-title: "linux basic"
+title: "linux I: basic"
 author: wsxk
 comments: true
 ---

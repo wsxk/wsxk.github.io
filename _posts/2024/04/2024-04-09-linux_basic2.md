@@ -2,7 +2,7 @@
 layout: post
 tags : [linux]
 date: 2024-4-9
-title: "linux: 程序加载与执行"
+title: "linux II: 程序加载与执行"
 author: wsxk
 comments: true
 ---
