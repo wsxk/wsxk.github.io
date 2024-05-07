@@ -13,6 +13,7 @@ date: 2024-4-21
     - [3.2.1 衡量ai风险的方法](#321-衡量ai风险的方法)
     - [3.2.2 缓解措施的分层](#322-缓解措施的分层)
 - [4. Prompt Engineering基础](#4-prompt-engineering基础)
+  - [4.1 什么是Prompt Engineering](#41-什么是prompt-engineering)
 
 
 ## 3. 负责任得使用AI<br>
@@ -46,3 +47,14 @@ anyway,就是我是用户我会怎么输入，先测试一轮。<br>
 
 ## 4. Prompt Engineering基础<br>
 这节会教大伙如何更好的使用`prompt`技术从`llm`那取得更好的效果。(即答得更准确，更有用)<br>
+### 4.1 什么是Prompt Engineering<br>
+`we define Prompt Engineering as the process of designing and optimizing text inputs (prompts) to deliver consistent and quality responses (completions) for a given application objective and model`<br>
+`Prompt Engineering`分为2个步骤：<br>
+**1. 为给定模型和目标设计初始prompt**<br>
+**2. 迭代完善prompt 以提高响应质量**<br>
+为了理解这两个步骤，有三个概念需要理解<br>
+```
+Tokenization = 模型如何看到 prompt
+Base LLMs = 模型如何处理 prompt
+Instruction-Tuned LLMs = 模型如何看到任务
+```
