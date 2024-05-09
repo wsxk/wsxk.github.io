@@ -14,6 +14,7 @@ date: 2024-4-21
     - [3.2.2 缓解措施的分层](#322-缓解措施的分层)
 - [4. Prompt Engineering基础](#4-prompt-engineering基础)
   - [4.1 什么是Prompt Engineering](#41-什么是prompt-engineering)
+    - [4.1.2 Tokenization](#412-tokenization)
 
 
 ## 3. 负责任得使用AI<br>
@@ -58,3 +59,8 @@ Tokenization = 模型如何看到 prompt
 Base LLMs = 模型如何处理 prompt
 Instruction-Tuned LLMs = 模型如何看到任务
 ```
+
+#### 4.1.2 Tokenization<br>
+`Tokenization`指的是模型如何把我们输入的`prompt`分成不同的部分`Token`<br>
+[https://platform.openai.com/tokenizer?WT.mc_id=academic-105485-koreyst](https://platform.openai.com/tokenizer?WT.mc_id=academic-105485-koreyst)<br>
+这个网址可以看到想要的`token`<br>
