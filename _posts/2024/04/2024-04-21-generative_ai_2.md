@@ -15,6 +15,9 @@ date: 2024-4-21
 - [4. Prompt Engineering基础](#4-prompt-engineering基础)
   - [4.1 什么是Prompt Engineering](#41-什么是prompt-engineering)
     - [4.1.2 Tokenization](#412-tokenization)
+    - [4.1.3 Base LLM](#413-base-llm)
+    - [4.1.4 Instruction Tuned LLMs](#414-instruction-tuned-llms)
+  - [4.2 为什么需要Prompt Engineering](#42-为什么需要prompt-engineering)
 
 
 ## 3. 负责任得使用AI<br>
@@ -64,3 +67,16 @@ Instruction-Tuned LLMs = 模型如何看到任务
 `Tokenization`指的是模型如何把我们输入的`prompt`分成不同的部分`Token`<br>
 [https://platform.openai.com/tokenizer?WT.mc_id=academic-105485-koreyst](https://platform.openai.com/tokenizer?WT.mc_id=academic-105485-koreyst)<br>
 这个网址可以看到想要的`token`<br>
+
+#### 4.1.3 Base LLM<br>
+就是用来预测你输入序列的下一个可能值，基石模型<br>
+
+#### 4.1.4 Instruction Tuned LLMs<br>
+顾名思义，就是用指令`微调`后的大模型，相比于基石模型，在特定领域的回答会更精确。<br>
+
+### 4.2 为什么需要Prompt Engineering<br>
+> 1. 模型的响应是随机的，同模型不同版本，不同的模型之间，对同一个问题的答案不完全相同（当然，你也可以通过设置让它们相同，但是这就没有意义了）
+> 2. 模型会捏造响应（模型的响应基于已有训练集，对于没有训练集训练的知识，模型通常会捏造出不真实的响应）
+> 3. 模型的功能不同（不同版本的模型会出于性能和花费的考虑做出不同的裁剪）
+
+总之就是想要用`prompt engineering`提高精度。<br>
