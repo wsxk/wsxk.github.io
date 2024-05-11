@@ -21,6 +21,8 @@ date: 2024-4-21
   - [4.3 Prompt Construction](#43-prompt-construction)
     - [4.3.1 Basic Prompt](#431-basic-prompt)
     - [4.3.2 Complex Prompt](#432-complex-prompt)
+    - [4.3.3 Instruction Prompt](#433-instruction-prompt)
+  - [4.3.4 Primary Content](#434-primary-content)
 
 
 ## 3. 负责任得使用AI<br>
@@ -121,3 +123,18 @@ print(completion.choices)
 发送的信息其实相当于**历史对话，即你之前对模型做出的设定，做了一些题目和回答，以及模型的回复。**<br>
 **当然了，这也表明你可以伪造模型的回复，这有好有坏，如果使用不当，说不定可以骗到模型意想不到的回答；使用得当，有效的回复会帮助你更有效的得到接下来提问的结果**<br>
 
+#### 4.3.3 Instruction Prompt<br>
+我们可以通过更详细的制定提问，来提高模型的回答准确性。<br>
+|Prompt (Input)|Completion (Output)|	Instruction Type|
+|-|-|-|
+|如何做一个优秀的人| 返回一段话|	Simple|
+|如何做一个优秀的人，给出关键点和训练方法| 返回一段话，带有关键点和训练方法|	Complex|
+|如何做一个优秀的人，提供3个关键点和它的解释，并给出每个关键点至少3个训练方法| 返回一段话，带有3个关键点和每个关键点的至少3个训练方法|	Complex 和 formatted|
+
+### 4.3.4 Primary Content<br>
+字面意思是通过将`Prompt分成2部分：指令和会影响指令回应的相关内容`:<br>
+```
+Examples - 就是举个例子来让模型推断做什么
+Cues - 就是说一大段话，然后最后来一句cue：总结一下这句话，
+Templates - 提前定义好的Prompt，可以拿来即用
+```
