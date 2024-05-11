@@ -22,7 +22,7 @@ date: 2024-4-21
     - [4.3.1 Basic Prompt](#431-basic-prompt)
     - [4.3.2 Complex Prompt](#432-complex-prompt)
     - [4.3.3 Instruction Prompt](#433-instruction-prompt)
-  - [4.3.4 Primary Content](#434-primary-content)
+    - [4.3.4 Primary Content](#434-primary-content)
 
 
 ## 3. 负责任得使用AI<br>
@@ -131,7 +131,7 @@ print(completion.choices)
 |如何做一个优秀的人，给出关键点和训练方法| 返回一段话，带有关键点和训练方法|	Complex|
 |如何做一个优秀的人，提供3个关键点和它的解释，并给出每个关键点至少3个训练方法| 返回一段话，带有3个关键点和每个关键点的至少3个训练方法|	Complex 和 formatted|
 
-### 4.3.4 Primary Content<br>
+#### 4.3.4 Primary Content<br>
 字面意思是通过将`Prompt分成2部分：指令和会影响指令回应的相关内容`:<br>
 ```
 Examples - 就是举个例子来让模型推断做什么
