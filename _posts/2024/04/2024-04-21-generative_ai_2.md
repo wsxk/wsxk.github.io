@@ -18,6 +18,9 @@ date: 2024-4-21
     - [4.1.3 Base LLM](#413-base-llm)
     - [4.1.4 Instruction Tuned LLMs](#414-instruction-tuned-llms)
   - [4.2 为什么需要Prompt Engineering](#42-为什么需要prompt-engineering)
+  - [4.3 Prompt Construction](#43-prompt-construction)
+    - [4.3.1 Basic Prompt](#431-basic-prompt)
+    - [4.3.2 Complex Prompt](#432-complex-prompt)
 
 
 ## 3. 负责任得使用AI<br>
@@ -79,4 +82,42 @@ Instruction-Tuned LLMs = 模型如何看到任务
 > 2. 模型会捏造响应（模型的响应基于已有训练集，对于没有训练集训练的知识，模型通常会捏造出不真实的响应）
 > 3. 模型的功能不同（不同版本的模型会出于性能和花费的考虑做出不同的裁剪）
 
-总之就是想要用`prompt engineering`提高精度。<br>
+总之就是想要用`prompt engineering`提高回答的精度。<br>
+
+### 4.3 Prompt Construction<br>
+#### 4.3.1 Basic Prompt<br>
+就是没有任何使用方法，上来就直接问，比如:<br>
+`唱一首中国国歌`
+
+#### 4.3.2 Complex Prompt<br>
+以`OPENAI API`为例，其提供了更复杂的机制帮助我们来使用`Prompt`<br>
+给出一个例子:<br>
+```python
+from openai import OpenAI
+from dotenv import load_dotenv
+
+load_dotenv()
+client = OpenAI()
+
+completion = client.chat.completions.create(
+  model="gpt-3.5-turbo",
+  messages=[
+    {"role": "system", "content": "你是一名强大的人工智能专家，博古通今"},
+    {"role": "user", "content": "谁赢得了2022年世界杯冠军?"},
+    {"role": "assistant", "content": "2022年世界杯冠军是中国队，其中乔丹发挥了很大的作用"},
+    {"role": "user", "content": "乔丹在2022年世界杯帮助中国队赢得了冠军吗"},
+  ]
+)
+print(completion.choices)
+```
+这是使用`OpenAI 的python库和API来进行的对话，发送消息的格式如上`<br>
+其中:<br>
+|role | name|
+|-|-|
+|system| 通常是用来为模型设置某些初始设定|
+|user| 来自用户的提问|
+|assistant| 模型的回答|
+
+发送的信息其实相当于**历史对话，即你之前对模型做出的设定，做了一些题目和回答，以及模型的回复。**<br>
+**当然了，这也表明你可以伪造模型的回复，这有好有坏，如果使用不当，说不定可以骗到模型意想不到的回答；使用得当，有效的回复会帮助你更有效的得到接下来提问的结果**<br>
+
