@@ -25,6 +25,7 @@ date: 2024-4-21
     - [4.3.4 Primary Content](#434-primary-content)
     - [4.3.5 Supporting Content](#435-supporting-content)
     - [4.3.4 总结](#434-总结)
+- [5. Advanced Prompt](#5-advanced-prompt)
 
 
 ## 3. 负责任得使用AI<br>
@@ -149,3 +150,6 @@ Templates - 提前定义好的Prompt，可以拿来即用
 #### 4.3.4 总结<br>
 其实`prompt = instruction + Primary Content + Supporting Content`<br>
 不一定全要加，用就完事了。<br>
+
+
+## 5. Advanced Prompt<br>
