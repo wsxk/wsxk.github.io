@@ -114,6 +114,7 @@ print(completion.choices)
 ```
 这是使用`OpenAI 的python库和API来进行的对话，发送消息的格式如上`<br>
 其中:<br>
+
 |role | name|
 |-|-|
 |system| 通常是用来为模型设置某些初始设定|
@@ -125,6 +126,7 @@ print(completion.choices)
 
 #### 4.3.3 Instruction Prompt<br>
 我们可以通过更详细的制定提问，来提高模型的回答准确性。<br>
+
 |Prompt (Input)|Completion (Output)|	Instruction Type|
 |-|-|-|
 |如何做一个优秀的人| 返回一段话|	Simple|
