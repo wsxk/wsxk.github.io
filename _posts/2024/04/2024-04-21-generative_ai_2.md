@@ -23,6 +23,8 @@ date: 2024-4-21
     - [4.3.2 Complex Prompt](#432-complex-prompt)
     - [4.3.3 Instruction Prompt](#433-instruction-prompt)
     - [4.3.4 Primary Content](#434-primary-content)
+    - [4.3.5 Supporting Content](#435-supporting-content)
+    - [4.3.4 总结](#434-总结)
 
 
 ## 3. 负责任得使用AI<br>
@@ -140,3 +142,10 @@ Examples - 就是举个例子来让模型推断做什么
 Cues - 就是说一大段话，然后最后来一句cue：总结一下这句话，
 Templates - 提前定义好的Prompt，可以拿来即用
 ```
+
+#### 4.3.5 Supporting Content<br>
+以某种形式影响`LLM输出`的内容被叫做`Supporting Content`,它可以是调整参数，格式化输出，主题分类等等<br>
+
+#### 4.3.4 总结<br>
+其实`prompt = instruction + Primary Content + Supporting Content`<br>
+不一定全要加，用就完事了。<br>
