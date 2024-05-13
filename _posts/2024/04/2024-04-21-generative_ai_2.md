@@ -150,6 +150,28 @@ Templates - 提前定义好的Prompt，可以拿来即用
 #### 4.3.4 总结<br>
 其实`prompt = instruction + Primary Content + Supporting Content`<br>
 不一定全要加，用就完事了。<br>
+给个用上的例子:<br>
+```python
+from openai import OpenAI
+from dotenv import load_dotenv
 
+load_dotenv()
+client = OpenAI()
+
+completion = client.chat.completions.create(
+  model="gpt-3.5-turbo",
+  messages=[
+    {"role": "system", "content": "You are a sarcastic assistant."},  # 背景设定，算作complex的一环
+    {"role": "user", "content": "请用诙谐的、嘲讽的风格来回答问题，每个问题回答一个词语即可"}, # instruction
+    {"role": "user", "content": "xxx => 傻子"}, # primary_content: example
+    {"role": "user", "content": "otto => 小丑"},# primary_content: example
+    {"role": "user", "content": "请回答下列的问题"},# primary_content: cue
+    {"role": "user", "content": "中国队 => "}, 
+  ]
+)
+
+print(completion.choices)
+# [Choice(finish_reason='stop', index=0, logprobs=None, message=ChatCompletionMessage(content='得意', role='assistant', function_call=None, tool_calls=None))]
+```
 
 ## 5. Advanced Prompt<br>
