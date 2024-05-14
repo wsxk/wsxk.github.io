@@ -26,6 +26,8 @@ date: 2024-4-21
     - [4.3.5 Supporting Content](#435-supporting-content)
     - [4.3.4 总结](#434-总结)
 - [5. Advanced Prompt](#5-advanced-prompt)
+  - [5.1 basic prompt的缺陷](#51-basic-prompt的缺陷)
+  - [5.2 Advanced Prompt技巧](#52-advanced-prompt技巧)
 
 
 ## 3. 负责任得使用AI<br>
@@ -175,3 +177,38 @@ print(completion.choices)
 ```
 
 ## 5. Advanced Prompt<br>
+第四节的`Prompt`只是小case，现在开始上强度教你用各种各样有趣的办法来提高`prompt水平`喽<br>
+
+### 5.1 basic prompt的缺陷<br>
+比如问题:`Generate 10 questions on geography.`<br>
+看起来很大，却有2个大问题：<br>
+```
+1. 话题太大，地理相关内容可太多了
+2. 格式问题，它不知道以何种格式输出
+```
+
+### 5.2 Advanced Prompt技巧<br>
+```
+1. Zero-shot prompting 
+this is the most basic form of prompting. It's a single prompt requesting a response from the LLM based solely on its training data.
+
+2. Few-shot prompting
+this type of prompting guides the LLM by providing 1 or more examples it can rely on to generate its response.
+
+3. Chain-of-thought
+this type of prompting tells the LLM how to break down a problem into steps.
+
+4. Generated knowledge
+to improve the response of a prompt, you can provide generated facts or knowledge additionally to your prompt.
+
+5. Least to most
+like chain-of-thought, this technique is about breaking down a problem into a series of steps and then ask these steps to be performed in order.
+
+6. Self-refine
+this technique is about critiquing the LLM's output and then asking it to improve.
+
+7. Maieutic prompting
+What you want here is to ensure the LLM answer is correct and you ask it to explain various parts of the answer. This is a form of self-refine.
+``` 
+emm，其实对于`prompt`的技术分类也不是很明确就是了，你一定要说的话，**我觉得Chain of Thought其实也算few-shot的一种，Chain of Thought和 Least to most好像有差不多，都是在提供LLM分析问题/解决问题的例子**<br>
+anyway，用就完事了~<br>
