@@ -13,6 +13,9 @@ comments: true
   - [1.2 http1.0 请求/回复格式](#12-http10-请求回复格式)
   - [1.3 http1.0 状态码](#13-http10-状态码)
   - [1.4 Method](#14-method)
+  - [1.5 HTTP URL Scheme](#15-http-url-scheme)
+  - [1.6 url encoding](#16-url-encoding)
+  - [1.7 Content-Type](#17-content-type)
 
 
 ## 前言<br>
@@ -29,18 +32,19 @@ comments: true
 响应的`http response`: HTTP/1.0 200 OK<br>
 一个`http request`的格式如下:<br>
 
-| Method| SP(separator) | Request-URI | SP | HTTP-Version|CRLF(就是'\r\n')|
+| Method| SP(space) | Request-URI | SP | HTTP-Version|CRLF(就是'\r\n')|
 |-|-|-|-|-|-|
 |Get|空格|/|空格|HTTP/1.0| \r\n|
 
 
 一个`http response`的格式如下:<br>
 
-| HTTP-Version| SP(separator) | Status Code | SP | Reason-Phase|CRLF(就是'\r\n')|
+| HTTP-Version| SP(space) | Status Code | SP | Reason-Phase|CRLF(就是'\r\n')|
 |-|-|-|-|-|-|
 |HTTP/1.0|空格|200|空格|ok| \r\n|
 
 ### 1.3 http1.0 状态码<br>
+http在返回响应时，会附加状态码，告诉你响应的信息<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240514214913.png)
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240514214956.png)
 
@@ -50,3 +54,24 @@ comments: true
 **POST**请求用于**将客户端的信息传到服务器**<br>
 **HEAD**请求用于**本质上和GET一样从服务器获取资源，但是不会真的获取资源，只是获取资源的大小**<br>
 
+### 1.5 HTTP URL Scheme<br>
+`HTTP URL`是发送`http请求`的目标资源所在的位置标识，其结构如下：<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240515225953.png)
+在这个例子中<br>
+```
+scheme: http
+host: example.com
+port: 80
+path: cat.gif
+query: width=256&height=256
+fragment: t=2s 
+```
+
+### 1.6 url encoding<br>
+因为输入**url**访问某个网址是，有些字符无法被打印出来，或者识别时有矛盾之处，一般通过`url encoding`的方式，即`%+hex`的形式<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240515232601.png)
+
+### 1.7 Content-Type<br>
+在发送`POST`请求时，请求体的格式，常用的有2种`x-www-form-urlencoded`和`JSON`<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240515232836.png)
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240515232901.png)
