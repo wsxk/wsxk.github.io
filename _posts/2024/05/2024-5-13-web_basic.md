@@ -16,6 +16,8 @@ comments: true
   - [1.5 HTTP URL Scheme](#15-http-url-scheme)
   - [1.6 url encoding](#16-url-encoding)
   - [1.7 Content-Type](#17-content-type)
+  - [1.8 Cookie](#18-cookie)
+    - [1.8.1 Session ID](#181-session-id)
 
 
 ## 前言<br>
@@ -76,3 +78,77 @@ fragment: t=2s
 在发送`POST`请求时，请求体的格式，常用的有2种`x-www-form-urlencoded`和`JSON`<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240515232836.png)
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240515232901.png)
+
+
+### 1.8 Cookie<br>
+1.1节中提到，`http`是一种**无状态**的协议，这意味着什么呢？就是服务器并不了解你先前跟它进行交互了内容->意味着如果你登录了某个网站，但是网站服务器在你登录后就不认你了，约等于白登了，这可怎么办?<br>
+解决的办法是**在http的header中新增一个属性来维持状态，对于服务端来说，服务端返回一个cookie在http的响应头中: Set-Cookie,客户端拿到这个属性后，在接下来的交互中都在http的请求头中添加: Cookie**<br>
+比如客户端发送了一个请求，如下:<br>
+```
+POST /login HTTP/1.0
+Host: account.example.com
+Content-Length: 32
+Content-Type: application/x-www-form-urlencoded
+
+username=Connor&password=password
+```
+
+服务端收到一个响应，如下:<br>
+```
+HTTP/1.0 302 Moved Temporarily
+Location: http://account.example.com/
+Set-Cookie: authed=Connor
+```
+
+接下来客户端在请求的时候：<br>
+```
+GET / HTTP/1.0
+Host: account.example.com
+Cookie: authed=Connor
+```
+
+服务端收到请求后，返回:<br>
+```
+HTTP/1.0 200 OK
+Content-Type: text/html; charset=UTF-8
+Content-Length: 40
+Connection: close
+
+<html><body>Hello, Connor!</body></html>
+```
+
+#### 1.8.1 Session ID<br>
+用cookie的时候有一个问题啊，像**authed=Connor这样的属性，可以直接被改为authed=admin，导致获得服务端的管理员权限，这并不是好事**<br>
+`Session ID`的出现缓解了这个问题:<br>
+客户端发送请求时:<br>
+```
+POST /login HTTP/1.0
+Host: account.example.com
+Content-Length: 32
+Content-Type: application/x-www-form-urlencoded
+
+username=Connor&password=password
+```
+
+服务端接受请求并返回:<br>
+```
+HTTP/1.0 302 Moved Temporarily
+Location: http://account.example.com/
+Set-Cookie: session_id=A1B2C3D4
+```
+至于**session_id=A1B2C3D4 标识为 用户Connor这个情报，会存储在服务端的数据库里**<br>
+接下来的步骤就大差不差了<br>
+```
+GET / HTTP/1.0
+Host: account.example.com
+Cookie: session_id=A1B2C3D4
+```
+
+```
+HTTP/1.0 200 OK
+Content-Type: text/html; charset=UTF-8
+Content-Length: 40
+Connection: close
+
+<html><body>Hello, Connor!</body></html>
+```
