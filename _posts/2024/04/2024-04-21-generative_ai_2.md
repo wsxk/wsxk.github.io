@@ -29,6 +29,7 @@ date: 2024-4-21
   - [5.1 basic prompt的缺陷](#51-basic-prompt的缺陷)
   - [5.2 Advanced Prompt技巧](#52-advanced-prompt技巧)
   - [5.3 Using temperature to vary your output](#53-using-temperature-to-vary-your-output)
+- [6. text-generation-apps](#6-text-generation-apps)
 
 
 ## 3. 负责任得使用AI<br>
@@ -216,3 +217,8 @@ anyway，用就完事了~<br>
 
 ### 5.3 Using temperature to vary your output<br>
 **PS: 在api中，可以通过temperature参数来确定答案的随机程度，从0到1，随机性越强**<br>
+
+
+## 6. text-generation-apps<br>
+开始实操一下，其实和之前写得代码差不太多<br>
+
