@@ -2,7 +2,7 @@
 layout: post
 tags: [web]
 date: 2024-5-13
-title: "http协议"
+title: "http协议&common commands"
 author: wsxk
 comments: true
 ---
@@ -18,6 +18,7 @@ comments: true
   - [1.7 Content-Type](#17-content-type)
   - [1.8 Cookie](#18-cookie)
     - [1.8.1 Session ID](#181-session-id)
+- [2. 常见的请求命令](#2-常见的请求命令)
 
 
 ## 前言<br>
@@ -151,4 +152,15 @@ Content-Length: 40
 Connection: close
 
 <html><body>Hello, Connor!</body></html>
+```
+
+
+## 2. 常见的请求命令<br>
+也介绍一下发送web请求的常见命令有哪些:<br>
+
+```
+curl 127.0.0.1:80 //向127.0.0.1:80发送http请求
+
+nc 127.0.0.1 80 
+GET / HTTP/1.0 //进入nc后，输入这条请求，然后回车2次
 ```
