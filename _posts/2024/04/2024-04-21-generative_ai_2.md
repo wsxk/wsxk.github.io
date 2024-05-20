@@ -30,6 +30,8 @@ date: 2024-4-21
   - [5.2 Advanced Prompt技巧](#52-advanced-prompt技巧)
   - [5.3 Using temperature to vary your output](#53-using-temperature-to-vary-your-output)
 - [6. text-generation-apps](#6-text-generation-apps)
+- [7. building-chat-applications](#7-building-chat-applications)
+  - [7.1 Integrating Generative AI into Chat Applications](#71-integrating-generative-ai-into-chat-applications)
 
 
 ## 3. 负责任得使用AI<br>
@@ -261,3 +263,23 @@ print("Shopping list:")
 print(completion.choices[0].message.content)
 
 ```
+
+## 7. building-chat-applications<br>
+**为了构建一个好用的chat application，首先需要回答如下2个问题**：<br>
+```
+1. 构建app： 我们如何针对特定用例高效构建和无缝集成这些人工智能驱动的应用程序？
+
+2. 监控: 部署后，我们如何监控并确保应用程序在功能方面和遵守负责任人工智能的六项原则，能够以最高质量水平运行？
+```
+
+### 7.1 Integrating Generative AI into Chat Applications<br>
+我们首先需要了解`chatbot`和`Generative AI-Powered Chat Application`的区别:<br>
+
+|Chatbot|Generative AI-Powered Chat Application|
+|-|-|
+|专注于任务，基于规则|上下文感知|
+|通常集成在一个大系统中|可以持有一个或多个chatbots|
+|限制于编程功能|包含generative ai models|
+|专业且结构化的交互|能够进行开放领域的讨论|
+
+总之就是各种吹**Generative AI集成的聊天应用**啦<br>
