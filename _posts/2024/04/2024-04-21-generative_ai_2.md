@@ -32,6 +32,7 @@ date: 2024-4-21
 - [6. text-generation-apps](#6-text-generation-apps)
 - [7. building-chat-applications](#7-building-chat-applications)
   - [7.1 Integrating Generative AI into Chat Applications](#71-integrating-generative-ai-into-chat-applications)
+  - [7.2 User Experience (UX)](#72-user-experience-ux)
 
 
 ## 3. 负责任得使用AI<br>
@@ -299,3 +300,17 @@ print(completion.choices[0].message.content)
 利用在广泛的数据集上经过微调和训练的模型，为您的应用程序提供自然语言功能
 ```
 
+### 7.2 User Experience (UX)<br>
+用户体验是很重要的！<br>
+一般用户体验原则适用于聊天应用程序，但由于涉及机器学习组件，这里有一些额外的考虑因素变得特别重要。<br>
+
+```
+解决歧义的机制：
+生成式人工智能模型有时会生成歧义的答案。如果用户遇到此问题，允许用户要求澄清的功能可能会有所帮助。
+
+上下文保留：
+先进的生成式人工智能模型能够记住对话中的上下文，这可能是用户体验的必要资产。赋予用户控制和管理上下文的能力可以改善用户体验，但会带来保留敏感用户信息的风险。考虑这些信息的存储时间（例如引入保留策略）可以平衡上下文需求和隐私。
+
+个性化：
+人工智能模型具有学习和适应能力，为用户提供个性化体验。通过用户个人资料等功能定制用户体验，不仅让用户感到被理解，而且还有助于他们寻求特定答案，创造更高效、更令人满意的交互。
+```
