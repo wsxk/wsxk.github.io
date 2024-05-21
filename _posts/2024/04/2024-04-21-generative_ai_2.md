@@ -283,3 +283,19 @@ print(completion.choices[0].message.content)
 |专业且结构化的交互|能够进行开放领域的讨论|
 
 总之就是各种吹**Generative AI集成的聊天应用**啦<br>
+
+为了更方便的开发ai应用程序，使用现成的先进**SDKs and APIs**是很重要的，好处如下:<br>
+```
+1. Expedites the development process and reduces overhead:
+加速开发步骤并减少开销，很直观的原因，让你专注于逻辑
+
+2. Better performance：
+不用考虑程序的可拓展性或者突发的用户浏览徒增的问题，SDK和API已经提供了现成的解决方案
+
+3. Easier maintenance：
+更新只需要更换library即可
+
+4. Access to cutting edge technology: 
+利用在广泛的数据集上经过微调和训练的模型，为您的应用程序提供自然语言功能
+```
+
