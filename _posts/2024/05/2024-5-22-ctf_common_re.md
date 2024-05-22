@@ -1,35 +1,45 @@
 ---
 layout: post
 tags: [re]
-title: "Re 常见加解密算法识别与"
+title: "Re 常见加解密算法识别与加解密脚本"
 date: 2024-5-22
 author: wsxk
 comments: true
 ---
 
 - [0. findcrypt3](#0-findcrypt3)
-- [1. base64](#1-base64)
-- [2. TEA](#2-tea)
-- [3. RC4](#3-rc4)
-- [4. AES](#4-aes)
-- [5. MD5](#5-md5)
+- [1.  古典加密算法](#1--古典加密算法)
+  - [1.1 caesar](#11-caesar)
+  - [1.2 vigenere](#12-vigenere)
+- [2. base64](#2-base64)
+- [3. TEA](#3-tea)
+- [4. RC4](#4-rc4)
+- [5. AES](#5-aes)
+- [6. MD5](#6-md5)
 
 ## 0. findcrypt3<br>
 https://github.com/polymorf/findcrypt-yara<br>
 好用的ida插件，帮助你快速识别算法。<br>
 当然了，有时候这个插件也不一定能帮助你找到这个问题，所以你需要知道一些常见算法的特征<br>
 
+## 1.  古典加密算法<br>
 
-## 1. base64<br>
+### 1.1 caesar<br>
+
+### 1.2 vigenere<br>
+
+
+
+## 2. base64<br>
 如果在程序中出现了`base64`的索引表，大概率是用了base64，有些人可能会对base64的表进行部分更换，问题也不大。<br>
 
-## 2. TEA<br>
+## 3. TEA<br>
 关于TEA算法的识别，如果程序中出现了固定常数`0x9e377969/0x61c88647`，那么很有可能是tea加密或其变种
 
-## 3. RC4<br>
+## 4. RC4<br>
 常见的流加密方式。识别方式为，初始代码中会对大小为256的表进行赋值和交换操作<br>
 
-## 4. AES<br>
+## 5. AES<br>
 对`aes`的识别首先需要知道AES加密的步骤。<br>
 首先是根据key生成轮密钥。
 > 1初始化：即 明文 和 密钥 作异或
@@ -43,7 +53,7 @@ https://github.com/polymorf/findcrypt-yara<br>
 
 因此如果代码中发现了s盒（s盒可以参加仓库的aes的c代码）,可以判断是aes加密，具体模式需要自己判断<br>
 
-## 5. MD5<br>
+## 6. MD5<br>
 md5加密的加密步骤通常如下：<br>
 ```c
 md5_ctx sample
@@ -52,3 +62,5 @@ md5_update_string(&sample,plain)
 md5_final(digest,&sample)
 ```
 在md5_init函数中，会出现初始化赋值`0x67452301 0xefcdab89 0x98badcfe 0x10325476`，即有可能是md5加密
+
+

@@ -33,6 +33,9 @@ date: 2024-4-21
 - [7. building-chat-applications](#7-building-chat-applications)
   - [7.1 Integrating Generative AI into Chat Applications](#71-integrating-generative-ai-into-chat-applications)
   - [7.2 User Experience (UX)](#72-user-experience-ux)
+  - [7.3 Customization](#73-customization)
+  - [7.4 Considerations for a High Quality AI-Driven Chat Experience](#74-considerations-for-a-high-quality-ai-driven-chat-experience)
+  - [7.5 Implementing Responsible AI Practices in Chat Applications](#75-implementing-responsible-ai-practices-in-chat-applications)
 
 
 ## 3. 负责任得使用AI<br>
@@ -314,3 +317,42 @@ print(completion.choices[0].message.content)
 个性化：
 人工智能模型具有学习和适应能力，为用户提供个性化体验。通过用户个人资料等功能定制用户体验，不仅让用户感到被理解，而且还有助于他们寻求特定答案，创造更高效、更令人满意的交互。
 ```
+
+### 7.3 Customization<br>
+`Customization`，定制化，目前有两种方法来为特定应用做定制:<br>
+```
+Using a DSL:
+DSL stands for domain specific language. 
+You can leverage a so called DSL model trained on a specific domain to understand it's concepts and scenarios.
+
+Apply fine-tuning:
+Fine-tuning is the process of further training your model with specific data.
+```
+
+### 7.4 Considerations for a High Quality AI-Driven Chat Experience<br>
+思考高质量的`ai驱动的聊天体验`的关键衡量标准<br>
+
+| Metric                        | Definition                                                                                                             | Considerations for Chat Developer                                         |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| **Uptime**                    | Measures the time the application is operational and accessible by users.                                              | How will you minimize downtime?                                           |
+| **Response Time**             | The time taken by the application to reply to a user's query.                                                          | How can you optimize query processing to improve response time?           |
+| **Precision**                 | The ratio of true positive predictions to the total number of positive predictions                                     | How will you validate the precision of your model?                        |
+| **Recall (Sensitivity)**      | The ratio of true positive predictions to the actual number of positives                                               | How will you measure and improve recall?                                  |
+| **F1 Score**                  | The harmonic mean of precision and recall, that balances the trade-off between both.                                   | What is your target F1 Score? How will you balance precision and recall?  |
+| **Perplexity**                | Measures how well the probability distribution predicted by the model aligns with the actual distribution of the data. | How will you minimize perplexity?                                         |
+| **User Satisfaction Metrics** | Measures the user's perception of the application. Often captured through surveys.                                     | How often will you collect user feedback? How will you adapt based on it? |
+| **Error Rate**                | The rate at which the model makes mistakes in understanding or output.                                                 | What strategies do you have in place to reduce error rates?               |
+| **Retraining Cycles**         | The frequency with which the model is updated to incorporate new data and insights.                                    | How often will you retrain the model? What triggers a retraining cycle?   |
+| **Anomaly Detection**         | Tools and techniques for identifying unusual patterns that do not conform to expected behavior.                        | How will you respond to anomalies?                                        |
+
+### 7.5 Implementing Responsible AI Practices in Chat Applications<br>
+衡量`负责任的AI`的评价标准<br>
+
+| Principles             | Microsoft's Definition                                | Considerations for Chat Developer                                      | Why It's Important                                                                     |
+| ---------------------- | ----------------------------------------------------- | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| Fairness               | AI systems should treat all people fairly.            | Ensure the chat application does not discriminate based on user data.  | To build trust and inclusivity among users; avoids legal ramifications.                |
+| Reliability and Safety | AI systems should perform reliably and safely.        | Implement testing and fail-safes to minimize errors and risks.         | Ensures user satisfaction and prevents potential harm.                                 |
+| Privacy and Security   | AI systems should be secure and respect privacy.      | Implement strong encryption and data protection measures.              | To safeguard sensitive user data and comply with privacy laws.                         |
+| Inclusiveness          | AI systems should empower everyone and engage people. | Design UI/UX that is accessible and easy-to-use for diverse audiences. | Ensures a wider range of people can use the application effectively.                   |
+| Transparency           | AI systems should be understandable.                  | Provide clear documentation and reasoning for AI responses.            | Users are more likely to trust a system if they can understand how decisions are made. |
+| Accountability         | People should be accountable for AI systems.          | Establish a clear process for auditing and improving AI decisions.     | Enables ongoing improvement and corrective measures in case of mistakes.               |
