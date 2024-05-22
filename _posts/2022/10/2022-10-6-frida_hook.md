@@ -7,13 +7,17 @@ date: 2022-10-6
 comments: true
 ---
 
-PS:`修改于2024-1-20`<br>
+PS:`修改于2024-5-22`<br>
 
 - [1. frida：真机调试](#1-frida真机调试)
   - [1.1 前置条件](#11-前置条件)
   - [1.2 安装frida](#12-安装frida)
   - [1.3 firda使用](#13-firda使用)
-- [2. frida：模拟器调试](#2-frida模拟器调试)
+- [2. frida：模拟器调试:例子](#2-frida模拟器调试例子)
+  - [2.1 java.perform和Interceptor.attach](#21-javaperform和interceptorattach)
+- [3. 推荐阅读](#3-推荐阅读)
+- [4. 坑](#4-坑)
+  - [4.1 x86-64模拟器hook so层函数](#41-x86-64模拟器hook-so层函数)
 
 ## 1. frida：真机调试<br>
 ### 1.1 前置条件<br>
@@ -103,7 +107,7 @@ Java.perform(function x() {
 });
 ```
 
-## 2. frida：模拟器调试<br>
+## 2. frida：模拟器调试:例子<br>
 这里采用**夜神模拟器**对的模拟终端进行测试<br>
 使用步骤和`1.2节`开始后的步骤一样<br>
 ```python
@@ -147,3 +151,19 @@ Java.perform(() => {
     };
   });
 ```
+### 2.1 java.perform和Interceptor.attach<br>
+`java.perform`是在`hook java层时比较好用的`<br>
+`Interceptor.attach`在hook`native层`时用的<br>
+
+
+## 3. 推荐阅读<br>
+https://github.com/r0ysue/AndroidSecurityStudy<br>
+这个教程是个好东西，能帮助你快速了解frida用法。<br>
+
+## 4. 坑<br>
+
+### 4.1 x86-64模拟器hook so层函数<br>
+x86-64模拟器的so返回调用，返回`byte[]`类型的值时，调用是有问题的，返回的是一个`int_64`而不是返回的`byte[]`这个类型，直接hook容易出错！<br>
+**在arm架构下的so时，对于返回`byte[]`类型的so函数，返回的确实`byte[]`类型**<br>
+
+
