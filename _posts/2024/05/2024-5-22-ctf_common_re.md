@@ -9,7 +9,7 @@ comments: true
 
 - [0. findcrypt3](#0-findcrypt3)
 - [1.  古典加密算法](#1--古典加密算法)
-  - [1.1 caesar](#11-caesar)
+  - [1.1 caesar: 凯撒密码](#11-caesar-凯撒密码)
   - [1.2 vigenere](#12-vigenere)
 - [2. base64](#2-base64)
 - [3. TEA](#3-tea)
@@ -23,8 +23,8 @@ https://github.com/polymorf/findcrypt-yara<br>
 当然了，有时候这个插件也不一定能帮助你找到这个问题，所以你需要知道一些常见算法的特征<br>
 
 ## 1.  古典加密算法<br>
+### 1.1 caesar: 凯撒密码<br>
 
-### 1.1 caesar<br>
 
 ### 1.2 vigenere<br>
 

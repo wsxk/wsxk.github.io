@@ -18,6 +18,7 @@ PS:`修改于2024-5-22`<br>
 - [3. 推荐阅读](#3-推荐阅读)
 - [4. 坑](#4-坑)
   - [4.1 x86-64模拟器hook so层函数](#41-x86-64模拟器hook-so层函数)
+  - [4.2 使用 new classname() 创建的实例的hook](#42-使用-new-classname-创建的实例的hook)
 
 ## 1. frida：真机调试<br>
 ### 1.1 前置条件<br>
@@ -166,4 +167,9 @@ https://github.com/r0ysue/AndroidSecurityStudy<br>
 x86-64模拟器的so返回调用，返回`byte[]`类型的值时，调用是有问题的，返回的是一个`int_64`而不是返回的`byte[]`这个类型，直接hook容易出错！<br>
 **在arm架构下的so时，对于返回`byte[]`类型的so函数，返回的确实`byte[]`类型**<br>
 
+### 4.2 使用 new classname() 创建的实例的hook<br>
+比如`classname`类的实现在包`a.b.c.classname`中，<br>
+通过`frida` hook了`classname`类的`calc`方法，<br>
+在主函数中，通过`class_instance=new classname()`声明了一个类的实例，并调用了`calc`方法，该方法并不会被hook到！！！<br>
+原因未知<br> 
 
