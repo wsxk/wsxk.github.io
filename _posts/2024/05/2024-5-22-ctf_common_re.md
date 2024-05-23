@@ -39,11 +39,13 @@ https://github.com/polymorf/findcrypt-yara<br>
 ## 1.  古典加密算法<br>
 ### 1.1 caesar: 凯撒密码<br>
 凯撒密码的加密、解密可以通过取模的加减法进行计算。首先将字母用数字替代 A = 0,B = 1, …, Z = 25。 当偏移量为n的时候加密方法是<br>
+
 $$ 
 c = m + n {\ }mod {\,}26 
 $$
 
 解密方法是：<br>
+
 $$
 m = c - n {\ } mod {\,}26
 $$
