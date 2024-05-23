@@ -15,7 +15,21 @@ comments: true
 - [3. TEA](#3-tea)
 - [4. RC4](#4-rc4)
 - [5. AES](#5-aes)
+  - [5.1 AES加解密脚本](#51-aes加解密脚本)
 - [6. MD5](#6-md5)
+
+
+<head>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            tex2jax: {
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+            inlineMath: [['$','$']]
+            }
+        });
+    </script>
+</head>
 
 ## 0. findcrypt3<br>
 https://github.com/polymorf/findcrypt-yara<br>
@@ -24,11 +38,93 @@ https://github.com/polymorf/findcrypt-yara<br>
 
 ## 1.  古典加密算法<br>
 ### 1.1 caesar: 凯撒密码<br>
+凯撒密码的加密、解密可以通过取模的加减法进行计算。首先将字母用数字替代 A = 0,B = 1, …, Z = 25。 当偏移量为n的时候加密方法是<br>
+$$ 
+c = m + n {\ }mod {\,}26 
+$$
 
+解密方法是：<br>
+$$
+m = c - n {\ } mod {\,}26
+$$
+
+其加解密脚本为:<br>
+```python
+
+key = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+shift = 3
+
+def encrypt_caesar(plaintext, shift):
+    ciphertext = ''
+    for char in plaintext:
+        if char in key:
+            ciphertext += key[(key.index(char) + shift) % 26]
+        else:
+            ciphertext += char
+    return ciphertext
+
+def decrypt_caesar(ciphertext, shift):
+    return encrypt_caesar(ciphertext, -shift)
+
+
+data = "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG"
+encrypt = encrypt_caesar(data, shift)
+print(encrypt)
+print(decrypt_caesar(encrypt,shift))
+```
 
 ### 1.2 vigenere<br>
+viginere加密是从caesar引申而来的加密方式:<br>
 
+$$
+c_i = m_i + k_i {\;} mod {\;} 26
+$$
 
+其实是把固定的值`n` 替换成了一组密钥`k`<br>
+解密方式:<br>
+
+$$
+m_i = c_i - k_i {\;} mod {\;} 26
+$$
+
+其加解密脚本:<br>
+```python
+
+alpha = 'abcdefghijklmnopqrstuvwxyz'
+key = 'hhhhh'
+
+def encrypt_vigenere(plain_text, key):
+    encrypted_text = ''
+    key_length = len(key)
+    key_index = 0
+    for char in plain_text:
+        if char in alpha:
+            shift = alpha.index(key[key_index])
+            encrypted_text += alpha[(alpha.index(char) + shift) % 26]
+            key_index = (key_index + 1) % key_length
+        else:
+            encrypted_text += char
+    return encrypted_text
+
+def decrypt_vigenere(encrypted_text, key):
+    decrypted_text = ''
+    key_length = len(key)
+    key_index = 0
+    for char in encrypted_text:
+        if char in alpha:
+            shift = alpha.index(key[key_index])
+            decrypted_text += alpha[(alpha.index(char) - shift) % 26]
+            key_index = (key_index + 1) % key_length
+        else:
+            decrypted_text += char
+    return decrypted_text
+
+data = "attackatdawn"
+encrypted_data = encrypt_vigenere(data, key)    
+print(encrypted_data)
+decrypted_data = decrypt_vigenere(encrypted_data, key)
+print(decrypted_data)
+```
 
 ## 2. base64<br>
 如果在程序中出现了`base64`的索引表，大概率是用了base64，有些人可能会对base64的表进行部分更换，问题也不大。<br>
@@ -52,6 +148,24 @@ https://github.com/polymorf/findcrypt-yara<br>
 > 第10轮: 字节替换、行移位、轮密钥加
 
 因此如果代码中发现了s盒（s盒可以参加仓库的aes的c代码）,可以判断是aes加密，具体模式需要自己判断<br>
+
+### 5.1 AES加解密脚本<br>
+以`AES ECB`模式为例<br>
+```python
+from Crypto.Cipher import AES
+
+key = b'1234567890123456'
+aes = AES.new(key, AES.MODE_ECB)
+
+# Encrypt
+data = b'Hello, world!!!!'
+encrypt=aes.encrypt(data)
+print(encrypt)
+
+# decrypt
+decrypt=aes.decrypt(encrypt)
+print(decrypt)
+```
 
 ## 6. MD5<br>
 md5加密的加密步骤通常如下：<br>
