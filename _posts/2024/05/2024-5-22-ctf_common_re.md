@@ -11,7 +11,9 @@ comments: true
 - [1.  古典加密算法](#1--古典加密算法)
   - [1.1 caesar: 凯撒密码](#11-caesar-凯撒密码)
   - [1.2 vigenere](#12-vigenere)
-- [2. base64](#2-base64)
+- [2. base系列](#2-base系列)
+  - [2.1 base64](#21-base64)
+  - [2.2 base32](#22-base32)
 - [3. TEA](#3-tea)
 - [4. RC4](#4-rc4)
 - [5. AES](#5-aes)
@@ -128,8 +130,37 @@ decrypted_data = decrypt_vigenere(encrypted_data, key)
 print(decrypted_data)
 ```
 
-## 2. base64<br>
+## 2. base系列<br>
+### 2.1 base64<br>
 如果在程序中出现了`base64`的索引表，大概率是用了base64，有些人可能会对base64的表进行部分更换，问题也不大。<br>
+```python
+import base64
+
+origin_charset = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+#custom_charset = b"ZYXWVUTSRQPONMLKJIHGFEDCBAzyxwvutsrqponmlkjihgfedcba9876543210+/"
+custom_charset = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+def base64_encode(data):
+    return base64.b64encode(data).translate(bytes.maketrans(origin_charset, custom_charset))
+
+def base64_decode(data):
+    return base64.b64decode(data.translate(bytes.maketrans(origin_charset, custom_charset)))
+
+data = b"attackatdawn"
+encoded_data = base64_encode(data)
+print(encoded_data)
+decoded_data = base64_decode(encoded_data)
+print(decoded_data)
+```
+### 2.2 base32<br>
+也是一种加密方式，只不过相比于`base64`而言，字符更少:<br>
+```python
+import base64
+#输入的数据必须是比特流
+s = b'aaaaa'
+enc = base64.b32encode(s)
+print(enc)
+print(base64.b32decode(enc))
+```
 
 ## 3. TEA<br>
 关于TEA算法的识别，如果程序中出现了固定常数`0x9e377969/0x61c88647`，那么很有可能是tea加密或其变种
