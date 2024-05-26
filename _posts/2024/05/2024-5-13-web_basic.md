@@ -161,13 +161,18 @@ Connection: close
 ```
 curl http://127.0.0.1:80 //向127.0.0.1:80发送http GET请求
 curl -H "host: b11ab65a32592f0fd37ba7759a6de76f" http://127.0.0.1:80  //设置http header中的 host值为...
+curl 127.0.0.1:80/fc3955bdfea3b9c7dac7d59e34185456 //设置path
 
 nc 127.0.0.1 80 
 GET / HTTP/1.0 //进入nc后，输入这条请求，然后回车2次
 
+
 nc 127.0.0.1 80
 GET / HTTP/1.0
 host: 100dcacc5ffc67b48792a2b30d7ee143
+
+nc 127.0.0.1 80
+GET /aef0ee14a27ef83e38b22b09180a103b HTTP/1.0
 ```
 
 ```python
@@ -175,6 +180,8 @@ host: 100dcacc5ffc67b48792a2b30d7ee143
 import requests
 # url
 url="http://127.0.0.1:80"
+path="/18d1688fbe6b578ae13ce97d7fafbf9d"
+url = url + path
 
 # http header
 headers = {
