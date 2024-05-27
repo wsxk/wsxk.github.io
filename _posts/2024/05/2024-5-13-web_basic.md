@@ -162,6 +162,9 @@ Connection: close
 curl http://127.0.0.1:80 //向127.0.0.1:80发送http GET请求
 curl -H "host: b11ab65a32592f0fd37ba7759a6de76f" http://127.0.0.1:80  //设置http header中的 host值为...
 curl 127.0.0.1:80/fc3955bdfea3b9c7dac7d59e34185456 //设置path
+curl http://127.0.0.1:80/a7ab7b05%206a9d8202/d92f5dee%20fcd0cf26 //%20为url encoding
+curl http://127.0.0.1:80?a=dacd37221eb9ef75e5d50b24f296b17b
+curl "http://127.0.0.1:80?a=607d2f069bcb2b86fcea941751f24fe7&b=1665f68d%20e6bbc013%26415f68e5%23a305dda1"
 
 nc 127.0.0.1 80 
 GET / HTTP/1.0 //进入nc后，输入这条请求，然后回车2次
@@ -173,6 +176,15 @@ host: 100dcacc5ffc67b48792a2b30d7ee143
 
 nc 127.0.0.1 80
 GET /aef0ee14a27ef83e38b22b09180a103b HTTP/1.0
+
+nc 127.0.0.1 80
+GET /f1dd49e5%206aeed482/d8042f4e%20c2975dad HTTP/1.0
+
+nc 127.0.0.1 80
+GET /?a=0837188035ef848ed0806ac863d9fb46 HTTP/1.0
+
+nc 127.0.0.1 80
+GET /?a=52f494087c910cc921786b605d7234a8&b=d0c7acd4%20e16da5a2%263e4dc2b2%23634cea49 HTTP/1.0
 ```
 
 ```python
@@ -180,8 +192,9 @@ GET /aef0ee14a27ef83e38b22b09180a103b HTTP/1.0
 import requests
 # url
 url="http://127.0.0.1:80"
-path="/18d1688fbe6b578ae13ce97d7fafbf9d"
-url = url + path
+path="/b82e99c8%2092e052fc/573c4bf0%20795c1a4b"
+query="?a=ac0faf4ebb8e0cd7160b88b2c95fe1c0&b=f4a8c59d%2057d882e5%2619341cea%23758df232"
+url = url + path + query
 
 # http header
 headers = {
