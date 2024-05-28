@@ -19,6 +19,8 @@ comments: true
   - [1.8 Cookie](#18-cookie)
     - [1.8.1 Session ID](#181-session-id)
 - [2. 常见的请求命令](#2-常见的请求命令)
+  - [2.1 get请求常见方法](#21-get请求常见方法)
+  - [2.2 post请求常见方法](#22-post请求常见方法)
 
 
 ## 前言<br>
@@ -157,7 +159,7 @@ Connection: close
 
 ## 2. 常见的请求命令<br>
 也介绍一下发送web请求的常见命令有哪些:<br>
-
+### 2.1 get请求常见方法<br>
 ```
 curl http://127.0.0.1:80 //向127.0.0.1:80发送http GET请求
 curl -H "host: b11ab65a32592f0fd37ba7759a6de76f" http://127.0.0.1:80  //设置http header中的 host值为...
@@ -188,7 +190,7 @@ GET /?a=52f494087c910cc921786b605d7234a8&b=d0c7acd4%20e16da5a2%263e4dc2b2%23634c
 ```
 
 ```python
-'''如何发送http请求并设置格式'''
+'''如何发送http get请求并设置格式'''
 import requests
 # url
 url="http://127.0.0.1:80"
@@ -203,6 +205,36 @@ headers = {
 
 # send request
 response = requests.get(url,headers=headers)
+
+# print result
+print(response.status_code)
+print(response.text)
+```
+
+### 2.2 post请求常见方法<br>
+```
+curl -X POST -d "a=36bc958a729a642c1e439fa724628477" 127.0.0.1:80 
+
+//cat request.txt
+POST / HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 34
+
+a=74b2d8fe7c4063c71f4b4235af364ea6
+// shell 
+cat request.txt | nc 127.0.0.1 80
+```
+
+```python
+import requests
+# url
+url="http://127.0.0.1:80"
+
+# data
+data = {"a":"53183fa80350b0ee22613e2ef4e82841"}
+
+# send request
+response = requests.post(url,data=data)
 
 # print result
 print(response.status_code)
