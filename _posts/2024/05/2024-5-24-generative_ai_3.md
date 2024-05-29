@@ -13,6 +13,7 @@ date: 2024-5-24
   - [8.2 what are Text Embeddings](#82-what-are-text-embeddings)
   - [8.3 How is the Embedding index created?](#83-how-is-the-embedding-index-created)
   - [8.4 how to search?](#84-how-to-search)
+  - [8.5 实例](#85-实例)
 
 ## 前言<br>
 欢迎在阅读本篇之前，阅读[generative-ai 学习笔记 Ⅱ](https://wsxk.github.io/generative_ai_2/)<br>
@@ -60,3 +61,97 @@ Today we are going to learn about Azure Machine Learning.
 ### 8.4 how to search?<br>
 上文提到的搜索某个东西,其实用到了**cosine similarity**的技术，在我们搜索的`内容`被转换成`vector`后，会与`vector database`的各个`vector`进行**cosine similarity**的计算来比对相似度。相似度高的会被取出。<br>
 
+### 8.5 实例<br>
+看了一个比较有趣的sample<br>
+写法值得学习，很高级（😄<br>
+```python
+import os
+import pandas as pd
+import numpy as np
+from openai import OpenAI
+from dotenv import load_dotenv
+
+load_dotenv()
+
+API_KEY = os.getenv("OPENAI_API_KEY","")
+assert API_KEY, "ERROR: OpenAI Key is missing"
+
+client = OpenAI(
+    api_key=API_KEY
+    )
+
+model = 'text-embedding-ada-002'
+
+SIMILARITIES_RESULTS_THRESHOLD = 0.75
+DATASET_NAME = "./08-building-search-applications/embedding_index_3m.json"
+
+
+def load_dataset(source: str) -> pd.core.frame.DataFrame:
+    # Load the video session index
+    pd_vectors = pd.read_json(source)
+    # for col in pd_vectors:
+    #     print(col,end=": ")
+    #     print(pd_vectors[col][0])
+    return pd_vectors.drop(columns=["text"], errors="ignore").fillna("") # 删除名为text的列，如果没有则忽略，缺省值用空字符串填充
+
+def cosine_similarity(a, b):
+    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)) # cosθ = a·b / |a||b|
+
+def get_videos(
+    query: str, dataset: pd.core.frame.DataFrame, rows: int
+) -> pd.core.frame.DataFrame:
+    # create a copy of the dataset
+    video_vectors = dataset.copy()
+
+    # get the embeddings for the query    
+    query_embeddings = client.embeddings.create(input=query, model=model).data[0].embedding
+
+    # create a new column with the calculated similarity for each row
+    video_vectors["similarity"] = video_vectors["ada_v2"].apply(
+        lambda x: cosine_similarity(np.array(query_embeddings), np.array(x))
+    )
+
+    # filter the videos by similarity
+    mask = video_vectors["similarity"] >= SIMILARITIES_RESULTS_THRESHOLD
+    # print(mask)
+    video_vectors = video_vectors[mask].copy()
+    # print(video_vectors)
+
+    # sort the videos by similarity
+    video_vectors = video_vectors.sort_values(by="similarity", ascending=False).head(
+        rows
+    )
+
+    # return the top rows
+    return video_vectors.head(rows)
+
+def display_results(videos: pd.core.frame.DataFrame, query: str):
+    def _gen_yt_url(video_id: str, seconds: int) -> str:
+        """convert time in format 00:00:00 to seconds"""
+        return f"https://youtu.be/{video_id}?t={seconds}"
+
+    print(f"\nVideos similar to '{query}':")
+    for _, row in videos.iterrows():
+        print("_________________")
+        print(_)
+        print(row)
+        print("_________________")
+        youtube_url = _gen_yt_url(row["videoId"], row["seconds"])
+        print(f" - {row['title']}")
+        print(f"   Summary: {' '.join(row['summary'].split()[:15])}...")
+        print(f"   YouTube: {youtube_url}")
+        print(f"   Similarity: {row['similarity']}")
+        print(f"   Speakers: {row['speaker']}")
+
+
+pd_vectors = load_dataset(DATASET_NAME)
+
+
+# get user query from imput
+while True:
+    query = input("Enter a query: ")
+    if query == "exit":
+        break
+    videos = get_videos(query, pd_vectors, 5)
+    display_results(videos, query)
+```

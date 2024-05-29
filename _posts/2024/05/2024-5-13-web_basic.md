@@ -214,6 +214,8 @@ print(response.text)
 ### 2.2 post请求常见方法<br>
 ```
 curl -X POST -d "a=36bc958a729a642c1e439fa724628477" 127.0.0.1:80 
+curl -X POST -d "a=952f68a808decdb76c6ff9d06044496e&b=92d2589b%205a1d8061%267dfd0805%256234d00" 127.0.0.1 80
+
 
 //cat request.txt
 POST / HTTP/1.1
@@ -223,6 +225,15 @@ Content-Length: 34
 a=74b2d8fe7c4063c71f4b4235af364ea6
 // shell 
 cat request.txt | nc 127.0.0.1 80
+
+//cat request.txt
+POST / HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 78
+
+a=165333bc6f3693dcd5666114b34a59ff&b=6f604c8d%208fdf70a4%26119c2577%23aff4f336
+//shell
+cat request.txt | nc 127.0.0.1 80
 ```
 
 ```python
@@ -231,7 +242,7 @@ import requests
 url="http://127.0.0.1:80"
 
 # data
-data = {"a":"53183fa80350b0ee22613e2ef4e82841"}
+data = {"a":"86ee51c2362aa07e4b66c91214b4b603","b":"68c23f54 e8131336&6bea23a9#c051674f"}
 
 # send request
 response = requests.post(url,data=data)
