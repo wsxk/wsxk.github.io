@@ -215,7 +215,7 @@ print(response.text)
 ```
 curl -X POST -d "a=36bc958a729a642c1e439fa724628477" 127.0.0.1:80 
 curl -X POST -d "a=952f68a808decdb76c6ff9d06044496e&b=92d2589b%205a1d8061%267dfd0805%256234d00" 127.0.0.1 80
-
+curl -X POST -H "Content-Type: application/json" -d '{"a":"831bef1a7bb83227c0007e07138f3119"}' 127.0.0.1 80 //设置请求头为POST 且设置header中包含json格式， 并发送数据
 
 //cat request.txt
 POST / HTTP/1.1
@@ -234,6 +234,15 @@ Content-Length: 78
 a=165333bc6f3693dcd5666114b34a59ff&b=6f604c8d%208fdf70a4%26119c2577%23aff4f336
 //shell
 cat request.txt | nc 127.0.0.1 80
+
+//cat request.txt
+POST / HTTP/1.1
+Content-Type: application/json
+Content-length: 40
+
+{"a":"7fe0bbfe024a48fe556f3e6b48bf31fa"}
+//shell
+cat request.txt | nc 127.0.0.1 80
 ```
 
 ```python
@@ -246,6 +255,26 @@ data = {"a":"86ee51c2362aa07e4b66c91214b4b603","b":"68c23f54 e8131336&6bea23a9#c
 
 # send request
 response = requests.post(url,data=data)
+
+# print result
+print(response.status_code)
+print(response.text)
+```
+
+json格式发送报文:<br>
+```python
+import requests
+# url
+url="http://127.0.0.1:80"
+
+# header
+# headers = {"Content-Type":"application/json"}
+
+# data
+data = {"a":"4f08d97c05e6b92eafacb055bc1ac3a9"}
+
+# send request
+response = requests.post(url,json=data)
 
 # print result
 print(response.status_code)

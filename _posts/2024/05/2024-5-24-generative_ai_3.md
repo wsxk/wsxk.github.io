@@ -8,17 +8,21 @@ date: 2024-5-24
 ---
 
 - [前言](#前言)
-- [8. Building a Search Applications](#8-building-a-search-applications)
+- [8. Building Search Applications](#8-building-search-applications)
   - [8.1 what is semantic search](#81-what-is-semantic-search)
   - [8.2 what are Text Embeddings](#82-what-are-text-embeddings)
   - [8.3 How is the Embedding index created?](#83-how-is-the-embedding-index-created)
   - [8.4 how to search?](#84-how-to-search)
   - [8.5 实例](#85-实例)
+- [9. Building  Image Applications](#9-building--image-applications)
+  - [9.1 What is DALL-E and Midjourney?](#91-what-is-dall-e-and-midjourney)
+- [插曲: tokenization和text embedding](#插曲-tokenization和text-embedding)
+  - [9.2 How does DALL-E and Midjourney Work](#92-how-does-dall-e-and-midjourney-work)
 
 ## 前言<br>
 欢迎在阅读本篇之前，阅读[generative-ai 学习笔记 Ⅱ](https://wsxk.github.io/generative_ai_2/)<br>
 
-## 8. Building a Search Applications<br>
+## 8. Building Search Applications<br>
 本节中，我们会学习:<br>
 ```
 1. Semantic vs Keyword search
@@ -155,3 +159,44 @@ while True:
     videos = get_videos(query, pd_vectors, 5)
     display_results(videos, query)
 ```
+
+
+## 9. Building  Image Applications<br>
+图像生成还蛮重要的，有很多的应用:<br>
+> 1. Image editing and synthesis. 
+> > 图像编辑和合成可以用到
+> 2. Applied to a variety of industries. 
+> > 各种各样的行业也能用到，例如：医疗科技、旅游、游戏开发
+
+### 9.1 What is DALL-E and Midjourney?<br>
+`DALL-E`和`Midjourney`是两款比较著名的图片生成大模型。<br>
+它们都允许你用用户prompts生成图片<br>
+```
+DALL-E
+
+由2个部分组成：CLIP和 Diffused attention
+
+CLIP是生成embedding的模型，将用户输入（图片和文本）转换为embeddings
+
+Diffused attention用于读入embeddings，输出图片
+```
+
+`Midjourney`与之类似，也能生成图片。<br>
+
+
+## 插曲: tokenization和text embedding<br>
+```
+Tokenization是预处理阶段，用于将文本分解为基本单元。
+Text Embeddings是特征提取阶段，用于将tokens转换为向量表示。
+```
+
+### 9.2 How does DALL-E and Midjourney Work<br>
+对于`DALL-E`而言<br>
+```
+DALL-E 是一个 Generative AI model， 基于 transformer 架构，还带有一个 autoregressive transformer
+
+autoregressive transformer定义了模型如何根据文本描述生成图像，它一次生成一个像素，然后使用生成的像素生成下一个像素。经过神经网络中的多层，直到图像完整
+
+通过此过程，DALL-E 可以控制其生成的图像中的属性、对象、特征等。但是，DALL-E 2 和 3 对生成的图像的控制更强。
+```
+
