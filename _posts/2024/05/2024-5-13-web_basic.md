@@ -21,6 +21,7 @@ comments: true
 - [2. 常见的请求命令](#2-常见的请求命令)
   - [2.1 get请求常见方法](#21-get请求常见方法)
   - [2.2 post请求常见方法](#22-post请求常见方法)
+  - [2.3 redirect](#23-redirect)
 
 
 ## 前言<br>
@@ -216,6 +217,8 @@ print(response.text)
 curl -X POST -d "a=36bc958a729a642c1e439fa724628477" 127.0.0.1:80 
 curl -X POST -d "a=952f68a808decdb76c6ff9d06044496e&b=92d2589b%205a1d8061%267dfd0805%256234d00" 127.0.0.1 80
 curl -X POST -H "Content-Type: application/json" -d '{"a":"831bef1a7bb83227c0007e07138f3119"}' 127.0.0.1 80 //设置请求头为POST 且设置header中包含json格式， 并发送数据
+curl -X POST -H "Content-Type: application/json" -d '{"a":"502882929ae954b6679eb27c2eb3fc0d", "b": {"c": "7f62289d", "d":["e1962678","fca36192 b740bc29&a6b562e7#49bd0dd7"]}}' 127.0.0.1 80   //curl 发送post请求，格式为json，附带很多数据
+
 
 //cat request.txt
 POST / HTTP/1.1
@@ -243,8 +246,18 @@ Content-length: 40
 {"a":"7fe0bbfe024a48fe556f3e6b48bf31fa"}
 //shell
 cat request.txt | nc 127.0.0.1 80
-```
 
+//cat requests.txt
+POST / HTTP/1.1
+Content-Type: application/json
+Content-length: 116
+
+{"a":"1f505e240843ee9354938de975eec33f","b":{"c":"454b9523","d":["68459370","891941a7 7f3127e0&4117cd71#0b00fc7f"]}}
+//shell
+cat requests.txt | nc 127.0.0.1 80
+
+```
+`x-www-form-urlencoded`方法。<br>
 ```python
 import requests
 # url
@@ -267,14 +280,40 @@ import requests
 # url
 url="http://127.0.0.1:80"
 
-# header
-# headers = {"Content-Type":"application/json"}
+#header
+headers = {"Content-Type":"application/json"}
 
 # data
-data = {"a":"4f08d97c05e6b92eafacb055bc1ac3a9"}
+data = {"a":"6f0bd5e837421e735dfab604004ea550","b":{"c":"81020930","d":["51f7240a","a709924d 7f163fe0&e51e575d#cf74727d"]}}
 
 # send request
-response = requests.post(url,json=data)
+response = requests.post(url,json=data,headers=headers)
+
+# print result
+print(response.status_code)
+print(response.text)
+```
+
+### 2.3 redirect<br>
+有时候需要你重定向访问某个网址<br>
+```
+curl -L 127.0.0.1 80 //-L让curl自动跟随重定向网址
+
+//nc的重定向需要知道重定向路径 
+```
+```python
+import requests
+# url
+url="http://127.0.0.1:80"
+
+#header
+headers = {"Content-Type":"application/json"}
+
+# data
+data = {"a":"6f0bd5e837421e735dfab604004ea550","b":{"c":"81020930","d":["51f7240a","a709924d 7f163fe0&e51e575d#cf74727d"]}}
+
+# send request
+response = requests.post(url,json=data,headers=headers,allow_redirects=True)
 
 # print result
 print(response.status_code)
