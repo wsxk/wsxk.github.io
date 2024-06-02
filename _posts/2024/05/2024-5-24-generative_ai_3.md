@@ -16,7 +16,7 @@ date: 2024-5-24
   - [8.5 实例](#85-实例)
 - [9. Building  Image Applications](#9-building--image-applications)
   - [9.1 What is DALL-E and Midjourney?](#91-what-is-dall-e-and-midjourney)
-- [插曲: tokenization和text embedding](#插曲-tokenization和text-embedding)
+  - [插曲: tokenization和text embedding](#插曲-tokenization和text-embedding)
   - [9.2 How does DALL-E and Midjourney Work](#92-how-does-dall-e-and-midjourney-work)
 
 ## 前言<br>
@@ -184,7 +184,7 @@ Diffused attention用于读入embeddings，输出图片
 `Midjourney`与之类似，也能生成图片。<br>
 
 
-## 插曲: tokenization和text embedding<br>
+### 插曲: tokenization和text embedding<br>
 ```
 Tokenization是预处理阶段，用于将文本分解为基本单元。
 Text Embeddings是特征提取阶段，用于将tokens转换为向量表示。
