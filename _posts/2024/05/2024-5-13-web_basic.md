@@ -22,6 +22,7 @@ comments: true
   - [2.1 get请求常见方法](#21-get请求常见方法)
   - [2.2 post请求常见方法](#22-post请求常见方法)
   - [2.3 redirect](#23-redirect)
+  - [2.4 cookie](#24-cookie)
 
 
 ## 前言<br>
@@ -299,8 +300,45 @@ print(response.text)
 ```
 curl -L 127.0.0.1 80 //-L让curl自动跟随重定向网址
 
-//nc的重定向需要知道重定向路径 
+//nc的重定向需要知道重定向路径,随后再nc一次即可
 ```
+```python
+import requests
+# url
+url="http://127.0.0.1:80"
+
+#header
+headers = {"Content-Type":"application/json"}
+
+# data
+data = {"a":"6f0bd5e837421e735dfab604004ea550","b":{"c":"81020930","d":["51f7240a","a709924d 7f163fe0&e51e575d#cf74727d"]}}
+
+# send request
+response = requests.post(url,json=data,headers=headers,allow_redirects=True)
+
+# print result
+print(response.status_code)
+print(response.text)
+```
+
+### 2.4 cookie<br>
+如何用之前提到的命令带上cookie呢？<br>
+```
+// -L自动追踪重定向， -c 将服务器的cookie保存在cookie.txt中，-b会在每次访问时自动代入cookie.txt 
+curl -L -c cookie.txt -b cookie.txt 127.0.0.1:80 
+
+
+//cat request.txt 
+POST / HTTP/1.1
+Cookie: cookie=6b2bd093f4b0c05e75fa321ebaf4eed9
+Content-Type: application/json
+Content-length: 116
+
+{"a":"1f505e240843ee9354938de975eec33f","b":{"c":"454b9523","d":["68459370","891941a7 7f3127e0&4117cd71#0b00fc7f"]}}
+// 需要注意的点在于， nc不能像curl那样一手包办，需要先访问一次获得cookie，再把cookie带上
+cat request.txt | nc 127.0.0.1 80
+```
+python 就很简单了，自动带cookie。<br>
 ```python
 import requests
 # url
