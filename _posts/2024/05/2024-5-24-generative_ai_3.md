@@ -209,6 +209,7 @@ import os
 import requests
 from PIL import Image
 import dotenv
+from io import BytesIO
 
 # import dotenv
 dotenv.load_dotenv()
@@ -223,17 +224,19 @@ try:
         model="dall-e-3",
         prompt='Bunny on horse, holding a lollipop, on a foggy meadow where it grows daffodils',    # Enter your prompt text here
         size='1024x1024',
-        n=1
+        n=1,
     )
     # Set the directory for the stored image
     image_dir = os.path.join(os.curdir, 'images')
-
+    
     # If the directory doesn't exist, create it
     if not os.path.isdir(image_dir):
         os.mkdir(image_dir)
+    print(image_dir)
 
     # Initialize the image path (note the filetype should be png)
     image_path = os.path.join(image_dir, 'generated-image.png')
+    print(image_path)
 
     # Retrieve the generated image
     print(generation_response)
@@ -252,4 +255,15 @@ except client.error.InvalidRequestError as err:
     print(err)
 
 # ---creating variation below---
+response = client.images.create_variation(
+  image=open(image_path, "rb"),
+  n=1,
+  size="1024x1024",
+)
+print(response)
+image_url_variation = response.data[0].url
+print(image_url_variation)
+generated_image_variation = requests.get(image_url_variation).content
+img = Image.open(BytesIO(generated_image_variation))
+img.show()
 ```
