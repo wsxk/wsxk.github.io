@@ -18,6 +18,7 @@ date: 2024-5-24
   - [9.1 What is DALL-E and Midjourney?](#91-what-is-dall-e-and-midjourney)
   - [插曲: tokenization和text embedding](#插曲-tokenization和text-embedding)
   - [9.2 How does DALL-E and Midjourney Work](#92-how-does-dall-e-and-midjourney-work)
+  - [9.3 instance](#93-instance)
 
 ## 前言<br>
 欢迎在阅读本篇之前，阅读[generative-ai 学习笔记 Ⅱ](https://wsxk.github.io/generative_ai_2/)<br>
@@ -200,3 +201,55 @@ autoregressive transformer定义了模型如何根据文本描述生成图像，
 通过此过程，DALL-E 可以控制其生成的图像中的属性、对象、特征等。但是，DALL-E 2 和 3 对生成的图像的控制更强。
 ```
 
+### 9.3 instance<br>
+来点实例：<br>
+```python
+from openai import OpenAI
+import os
+import requests
+from PIL import Image
+import dotenv
+
+# import dotenv
+dotenv.load_dotenv()
+
+ 
+client = OpenAI()
+
+
+try:
+    # Create an image by using the image generation API
+    generation_response = client.images.generate(
+        model="dall-e-3",
+        prompt='Bunny on horse, holding a lollipop, on a foggy meadow where it grows daffodils',    # Enter your prompt text here
+        size='1024x1024',
+        n=1
+    )
+    # Set the directory for the stored image
+    image_dir = os.path.join(os.curdir, 'images')
+
+    # If the directory doesn't exist, create it
+    if not os.path.isdir(image_dir):
+        os.mkdir(image_dir)
+
+    # Initialize the image path (note the filetype should be png)
+    image_path = os.path.join(image_dir, 'generated-image.png')
+
+    # Retrieve the generated image
+    print(generation_response)
+
+    image_url = generation_response.data[0].url # extract image URL from response
+    generated_image = requests.get(image_url).content  # download the image
+    with open(image_path, "wb") as image_file:
+        image_file.write(generated_image)
+
+    # Display the image in the default image viewer
+    image = Image.open(image_path)
+    image.show()
+
+# catch exceptions
+except client.error.InvalidRequestError as err:
+    print(err)
+
+# ---creating variation below---
+```
