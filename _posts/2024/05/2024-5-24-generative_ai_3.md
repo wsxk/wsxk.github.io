@@ -265,21 +265,21 @@ print(image_url_variation)
 generated_image_variation = requests.get(image_url_variation).content
 img = Image.open(BytesIO(generated_image_variation))
 img.show()
-with open("generated-image-variation.png", "wb") as image_file:
+with open("./images/generated-image-variation.png", "wb") as image_file:
     image_file.write(generated_image_variation)
 
 
 # ---creating edits below---
-response = client.images.edit(
-  image=open("./images/generated-image.png", "rb"),
-  mask=open("./images/generated-image-variation.png", "rb"), # ['RGBA', 'LA', 'L']必须是这些类型的图片，RGB类型是不行的
-  prompt="An image of a rabbit with a hat on its head.",
-  n=1,
-  size="1024x1024"
-)
-image_url = response['data'][0]['url']
-img = Image.open(BytesIO(requests.get(image_url).content))
-img.show()
+# response = client.images.edit(
+#   image=open("./images/generated-image.png", "rb"),
+#   mask=open("./images/generated-image-variation.png", "rb"), # ['RGBA', 'LA', 'L']必须是这些类型的图片，RGB类型是不行的
+#   prompt="An image of a rabbit with a hat on its head.",
+#   n=1,
+#   size="1024x1024"
+# )
+# image_url = response['data'][0]['url']
+# img = Image.open(BytesIO(requests.get(image_url).content))
+# img.show()
 ```
 
 ```python
