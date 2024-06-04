@@ -217,7 +217,6 @@ dotenv.load_dotenv()
  
 client = OpenAI()
 
-
 try:
     # Create an image by using the image generation API
     generation_response = client.images.generate(
@@ -266,4 +265,63 @@ print(image_url_variation)
 generated_image_variation = requests.get(image_url_variation).content
 img = Image.open(BytesIO(generated_image_variation))
 img.show()
+with open("generated-image-variation.png", "wb") as image_file:
+    image_file.write(generated_image_variation)
+
+
+# ---creating edits below---
+response = client.images.edit(
+  image=open("./images/generated-image.png", "rb"),
+  mask=open("./images/generated-image-variation.png", "rb"), # ['RGBA', 'LA', 'L']必须是这些类型的图片，RGB类型是不行的
+  prompt="An image of a rabbit with a hat on its head.",
+  n=1,
+  size="1024x1024"
+)
+image_url = response['data'][0]['url']
+img = Image.open(BytesIO(requests.get(image_url).content))
+img.show()
 ```
+
+```python
+from openai import OpenAI
+import os
+import requests
+from PIL import Image
+import dotenv
+
+# import dotenv
+dotenv.load_dotenv()
+
+openai = OpenAI()
+
+image_dir = os.path.join(os.curdir, 'images')
+
+# Initialize the image path (note the filetype should be png)
+image_path = os.path.join(image_dir, 'generated-image.png')
+
+# ---creating variation below---
+try:
+    print("LOG creating variation")
+    response = openai.images.create_variation(
+        image=open(image_path, "rb"),
+        n=1,
+        size="1024x1024"
+    )
+
+    image_path = os.path.join(image_dir, 'generated_variation.png')
+
+    image_url = response.data[0].url
+
+    print("LOG downloading image")
+    generated_image = requests.get(image_url).content  # download the image
+    with open(image_path, "wb") as image_file:
+        image_file.write(generated_image)
+
+    # Display the image in the default image viewer
+    image = Image.open(image_path)
+    image.show()
+except openai.error.InvalidRequestError as err:
+    print(err)
+```
+
+
