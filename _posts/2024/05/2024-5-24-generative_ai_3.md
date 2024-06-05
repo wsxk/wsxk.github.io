@@ -18,7 +18,8 @@ date: 2024-5-24
   - [9.1 What is DALL-E and Midjourney?](#91-what-is-dall-e-and-midjourney)
   - [插曲: tokenization和text embedding](#插曲-tokenization和text-embedding)
   - [9.2 How does DALL-E and Midjourney Work](#92-how-does-dall-e-and-midjourney-work)
-  - [9.3 instance](#93-instance)
+  - [9.3 实例](#93-实例)
+  - [9.4 增加安全措施的实例](#94-增加安全措施的实例)
 
 ## 前言<br>
 欢迎在阅读本篇之前，阅读[generative-ai 学习笔记 Ⅱ](https://wsxk.github.io/generative_ai_2/)<br>
@@ -201,7 +202,7 @@ autoregressive transformer定义了模型如何根据文本描述生成图像，
 通过此过程，DALL-E 可以控制其生成的图像中的属性、对象、特征等。但是，DALL-E 2 和 3 对生成的图像的控制更强。
 ```
 
-### 9.3 instance<br>
+### 9.3 实例<br>
 来点实例：<br>
 ```python
 from openai import OpenAI
@@ -324,4 +325,60 @@ except openai.error.InvalidRequestError as err:
     print(err)
 ```
 
+### 9.4 增加安全措施的实例<br>
+```python
+from openai import OpenAI
+import os
+import requests
+from PIL import Image
+import dotenv
 
+# import dotenv
+dotenv.load_dotenv()
+
+disallow_list = "swords, violence, blood, gore, nudity, sexual content, adult content, adult themes, adult language, adult humor, adult jokes, adult situations, adult"
+
+meta_prompt = f"""You are an assistant designer that creates images for children. 
+
+The image needs to be safe for work and appropriate for children. 
+
+The image needs to be in color.  
+
+The image needs to be in landscape orientation.  
+
+The image needs to be in a 16:9 aspect ratio. 
+
+Do not consider any input from the following that is not safe for work or appropriate for children. 
+{disallow_list}"""
+
+prompt = f"""{meta_prompt}
+Generate monument of the Arc of Triumph in Paris, France, in the evening light with a small child holding a Teddy looks on.
+"""
+client = OpenAI()
+# Create an image by using the image generation API
+generation_response = client.images.generate(
+    prompt=prompt,    # Enter your prompt text here
+    size='1024x1024',
+    n=2,
+)
+# Set the directory for the stored image
+image_dir = os.path.join(os.curdir, 'images')
+
+# If the directory doesn't exist, create it
+if not os.path.isdir(image_dir):
+    os.mkdir(image_dir)
+
+# Initialize the image path (note the filetype should be png)
+image_path = os.path.join(image_dir, 'generated-image.png')
+
+# Retrieve the generated image
+image_url = generation_response["data"][0]["url"]  # extract image URL from response
+generated_image = requests.get(image_url).content  # download the image
+with open(image_path, "wb") as image_file:
+    image_file.write(generated_image)
+
+# Display the image in the default image viewer
+image = Image.open(image_path)
+image.show()
+
+```
