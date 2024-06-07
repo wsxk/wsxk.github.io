@@ -2,7 +2,7 @@
 layout: post
 tags: [web]
 date: 2024-5-13
-title: "http协议&common commands"
+title: "http协议&常见的http请求命令用法"
 author: wsxk
 comments: true
 ---
