@@ -81,7 +81,10 @@ write(4,
       "HTTP/1.0 200 OK\r\n\r\nFLAG",
       27)                                = 27
 close(4)  
+```
 
+
+```c
 // 上述只处理一条链接，实际上的网络会发送多条链接，解决办法：
 socket(AF_INET, SOCK_STREAM, IPPROTO_IP) = 3
 bind(3, 
@@ -99,7 +102,41 @@ accept(3, NULL, NULL)                    = 4
 ```
 
 ### 1.1 用汇编来实现上述步骤<br>
+使用`as -o server.o server.s && ld -o server server.o`命令来完成编译。<br>
+
+```asm
+.intel_syntax noprefix
+.globl _start
+
+.section .data
+    sockfd:
+        .long 0 # safed fd
+    sockaddr_in:
+        .word 2 # sa_family= AF_INET
+        .word 0x5000 # sin_port (htons(bind_poer))
+        .long 0x00000000 # sin_addr (inet_addr(bind_address))
+        .long 0, 0 # sin_zero
+
+.section .text
+_start:
+    mov rdi, 2      # domain = AF_INET
+    mov rsi, 1      # type = SOCK_STREAM (tcp)
+    mov rdx, 0      # protocol = 0 (default)
+    mov rax, 41     # SYS_socket
+    syscall
+    mov [sockfd], eax
 
 
+    xor rdi, rdi
+    mov edi, [sockfd]
+    lea rsi, [sockaddr_in]
+    mov rdx, 16
+    mov rax, 49     # SYS_bind
+    syscall
+
+    mov rdi, 0
+    mov rax, 60     # SYS_exit
+    syscall
+```
 
 
