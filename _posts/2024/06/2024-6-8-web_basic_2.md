@@ -105,10 +105,13 @@ accept(3, NULL, NULL)                    = 4
 使用`as -o server.o server.s && ld -o server server.o`命令来完成编译。<br>
 
 ```asm
+# assembler grammar, GNU Assembler(GAS)
 .intel_syntax noprefix
 .globl _start
 
 .section .data
+    acceptfd:
+        .long 0
     sockfd:
         .long 0 # safed fd
     sockaddr_in:
@@ -116,6 +119,8 @@ accept(3, NULL, NULL)                    = 4
         .word 0x5000 # sin_port (htons(bind_poer))
         .long 0x00000000 # sin_addr (inet_addr(bind_address))
         .long 0, 0 # sin_zero
+    http_response:
+        .asciz "HTTP/1.0 200 OK\r\n\r\n"
 
 .section .text
 _start:
@@ -134,8 +139,42 @@ _start:
     mov rax, 49     # SYS_bind
     syscall
 
-    mov rdi, 0
+    xor rdi, rdi
+    mov edi, [sockfd]
+    mov rsi, 0
+    mov rax, 50     # SYS_listen
+    syscall
+
+    xor rdi, rdi
+    mov edi, [sockfd]
+    mov rsi, 0
+    mov rdx, 0
+    mov rax, 43     # SYS_accept
+    syscall
+    mov [acceptfd], eax
+
+    xor rdi, rdi
+    mov edi, [acceptfd]
+    sub rsp, 0x100
+    mov rsi, rsp
+    mov rdx, 0x100
+    mov rax, 0      # SYS_read
+    syscall
+
+    xor rdi, rdi
+    mov edi, [acceptfd]
+    lea rsi, [http_response]
+    mov rdx, 19
+    mov rax, 1      # SYS_write
+    syscall
+
+    xor rdi, rdi
+    mov edi, [acceptfd]
+    mov rax, 3      # SYS_close
+    syscall
+
     mov rax, 60     # SYS_exit
+    mov rdi, 0
     syscall
 ```
 
