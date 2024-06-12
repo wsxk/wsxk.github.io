@@ -104,7 +104,7 @@ accept(3, NULL, NULL)                    = 4
 ### 1.1 用汇编来实现上述步骤<br>
 使用`as -o server.o server.s && ld -o server server.o`命令来完成编译。<br>
 
-```asm
+```c
 # assembler grammar, GNU Assembler(GAS)
 .intel_syntax noprefix
 .globl _start
