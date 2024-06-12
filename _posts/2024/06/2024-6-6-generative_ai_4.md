@@ -12,6 +12,8 @@ date: 2024-6-6
 - [11. Integrating with function calling](#11-integrating-with-function-calling)
   - [11.1 Why Function Calling](#111-why-function-calling)
   - [11.2 Illustrating the problem through a scenario](#112-illustrating-the-problem-through-a-scenario)
+  - [11.3 Use Cases for using function calls](#113-use-cases-for-using-function-calls)
+  - [11.4 Integrating Function Calls into an Application](#114-integrating-function-calls-into-an-application)
 
 
 ## 前言<br>
@@ -114,3 +116,91 @@ print(response2.choices[0].message.content)
 **这是因为LLM以写下的prompt的方式来提取非结构化的数据，并返回非结构化的数据。所以我们需要有一个结构化的格式，以便我们知道当存储或使用数据时，会发生什么**<br>
 这就是要用`function calling`的原因。<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240611230845.png)
+
+### 11.3 Use Cases for using function calls<br>
+总之，使用所谓的`function calling`还有其他好处（有时候我真的挺佩服老美的，能想这么多奇葩好处<br>
+
+```
+Calling External Tools. 使用拓展工具 
+Chatbots are great at providing answers to questions from users. By using function calling, the chatbots can use messages from users to complete certain tasks. For example, a student can ask the chatbot to "Send email to my instructor saying I need more assistance with this subject". This can make a function call to send_email(to: string, body: string)
+
+Create API or Database Queries.  创建API或者数据库查询
+Users can find information using natural language that gets converted into a formatted query or API request. An example of this could be a teacher who requests "Who are the students that completed the last assignment" which could call a function named get_completed(student_name: string, assignment: int, current_status: string)
+
+Creating Structured Data.  创建结构化数据
+Users can take a block of text or CSV and use the LLM to extract important information from it. For example, a student can convert a Wikipedia article about peace agreements to create AI flash cards. This can be done by using a function called get_important_facts(agreement_name: string, date_signed: string, parties_involved: list)
+```
+
+创建`function call`有3个主要步骤<br>
+```
+1、Calling the Chat Completions API with a list of your functions and a user message.
+
+2、Reading the model's response to perform an action ie execute a function or API Call.
+
+3、Making another call to Chat Completions API with the response from your function to use that information to create a response to the user.
+
+```
+如下图所示：<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240612230158.png)
+小小的举个例子：<br>
+```python
+import os
+import json
+from openai import OpenAI
+from dotenv import load_dotenv
+load_dotenv()
+
+client = OpenAI()
+deployment = "gpt-3.5-turbo"
+
+# step 1 : creating messages
+messages= [ {"role": "user", "content": "Find me a good course for a beginner student to learn Azure."} ]
+# step 2 : creating functions
+functions = [
+   {
+      "name":"search_courses",
+      "description":"Retrieves courses from the search index based on the parameters provided",
+      "parameters":{
+         "type":"object",
+         "properties":{
+            "role":{
+               "type":"string",
+               "description":"The role of the learner (i.e. developer, data scientist, student, etc.)"
+            },
+            "product":{
+               "type":"string",
+               "description":"The product that the lesson is covering (i.e. Azure, Power BI, etc.)"
+            },
+            "level":{
+               "type":"string",
+               "description":"The level of experience the learner has prior to taking the course (i.e. beginner, intermediate, advanced)"
+            }
+         },
+         "required":[
+            "role"
+         ]
+      }
+   }
+]
+# step 3 : Making the function call
+response = client.chat.completions.create(model=deployment,
+                                        messages=messages,
+                                        functions=functions,
+                                        function_call="auto")
+
+print(response.choices[0].message)
+```
+个人感觉**creating functions**这个步骤很精髓啊<br>
+- `name` - The name of the function that we want to have called.
+- `description` - This is the description of how the function works. Here it's important to be specific and clear.
+- `parameters` - A list of values and format that you want the model to produce in its response. The parameters array consists of items where item have the following properties:
+  1.  `type` - The data type of the properties will be stored in.
+  1.  `properties` - List of the specific values that the model will use for its response
+      1. `name` - The key is the name of the property that the model will use in its formatted response, for example, `product`.
+      1. `type` - The data type of this property, for example, `string`.
+      1. `description` - Description of the specific property.
+
+There's also an optional property `required` - required property for the function call to be completed.
+
+### 11.4 Integrating Function Calls into an Application<br>
+直接看实例<br>
