@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [web]
-title: "Building a Web Server"
+title: "Building a Web Server（汇编实现）"
 author: wsxk
 date: 2024-6-8
 comments: true
@@ -110,6 +110,10 @@ accept(3, NULL, NULL)                    = 4
 .globl _start
 
 .section .data
+    file_path:
+        .space 40
+    accept_content:
+        .space 0x100
     acceptfd:
         .long 0
     sockfd:
@@ -155,11 +159,14 @@ _start:
 
     xor rdi, rdi
     mov edi, [acceptfd]
-    sub rsp, 0x100
-    mov rsi, rsp
+    lea rsi, [accept_content]
     mov rdx, 0x100
     mov rax, 0      # SYS_read
     syscall
+
+    lea rdi, [accept_content]
+    lea rsi, [file_path]
+    call parse_request
 
     xor rdi, rdi
     mov edi, [acceptfd]
@@ -176,6 +183,9 @@ _start:
     mov rax, 60     # SYS_exit
     mov rdi, 0
     syscall
+
+parse_request:
+    ret
 ```
 
 
