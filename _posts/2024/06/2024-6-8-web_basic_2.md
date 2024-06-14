@@ -105,13 +105,25 @@ accept(3, NULL, NULL)                    = 4
 使用`as -o server.o server.s && ld -o server server.o`命令来完成编译。<br>
 
 ```c
-# assembler grammar, GNU Assembler(GAS)
+#assembler grammar, GNU Assembler(GAS)
 .intel_syntax noprefix
 .globl _start
 
 .section .data
+    get:
+        .asciz "GET"
+    get_len:
+        .long 3
+    post:
+        .asciz "/POST"
+    file_fd:
+        .long 0
     file_path:
         .space 40
+    file_content:
+        .space 0x100
+    file_content_len:
+        .long 0
     accept_content:
         .space 0x100
     acceptfd:
@@ -125,6 +137,8 @@ accept(3, NULL, NULL)                    = 4
         .long 0, 0 # sin_zero
     http_response:
         .asciz "HTTP/1.0 200 OK\r\n\r\n"
+    http_response_len:
+        .long 19
 
 .section .text
 _start:
@@ -149,6 +163,7 @@ _start:
     mov rax, 50     # SYS_listen
     syscall
 
+accept_loop:
     xor rdi, rdi
     mov edi, [sockfd]
     mov rsi, 0
@@ -158,6 +173,17 @@ _start:
     mov [acceptfd], eax
 
     xor rdi, rdi
+    mov rax, 57     # SYS_fork
+    syscall
+    cmp rax, 0
+    jnz close_accept_fd
+
+    xor rdi, rdi
+    mov edi, [sockfd]
+    mov rax, 3      # SYS_close
+    syscall
+
+    xor rdi, rdi
     mov edi, [acceptfd]
     lea rsi, [accept_content]
     mov rdx, 0x100
@@ -165,13 +191,40 @@ _start:
     syscall
 
     lea rdi, [accept_content]
-    lea rsi, [file_path]
     call parse_request
+
+    xor rdi, rdi
+    lea rdi, [file_path]
+    mov rsi, 0 # O_RDONLY
+    mov rax, 2      # SYS_open
+    syscall
+    mov [file_fd], eax
+
+    xor rdi, rdi
+    mov edi, [file_fd]
+    lea rsi, [file_content]
+    mov rdx, 0x100
+    mov rax, 0      # SYS_read
+    syscall
+    mov [file_content_len], eax
+
+    xor rdi, rdi
+    mov edi, [file_fd]
+    mov rax, 3      # SYS_close
+    syscall
 
     xor rdi, rdi
     mov edi, [acceptfd]
     lea rsi, [http_response]
     mov rdx, 19
+    mov rax, 1      # SYS_write
+    syscall
+
+    xor rdi, rdi
+    mov edi, [acceptfd]
+    lea rsi, [file_content]
+    xor rdx, rdx
+    mov edx, file_content_len
     mov rax, 1      # SYS_write
     syscall
 
@@ -184,7 +237,34 @@ _start:
     mov rdi, 0
     syscall
 
+close_accept_fd:
+    xor rdi, rdi
+    mov edi, [acceptfd]
+    mov rax, 3
+    syscall
+    jmp accept_loop
+
 parse_request:
+    # process get request
+    lea rsi, [get]
+    xor rcx, rcx
+    mov ecx, [get_len]
+    repe cmpsb
+    jne process_post
+process_get:
+    mov rsi, rdi
+    inc rsi
+    lea rdi, [file_path]
+path_loop_get:
+    lodsb
+    stosb
+    mov al, [rsi]
+    cmp al, 32
+    jz parse_end
+    loop path_loop_get
+process_post:
+    nop
+parse_end:
     ret
 ```
 

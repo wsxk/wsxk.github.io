@@ -222,14 +222,14 @@ messages= [ {"role": "user", "content": "Find me a good course for a beginner st
 # step 2 : creating functions
 functions = [
    {
-      "name":"search_courses",
-      "description":"Retrieves courses from the search index based on the parameters provided",
-      "parameters":{
-         "type":"object",
-         "properties":{
-            "role":{
-               "type":"string",
-               "description":"The role of the learner (i.e. developer, data scientist, student, etc.)"
+      "name":"search_courses",   # 函数名称
+      "description":"Retrieves courses from the search index based on the parameters provided", # 函数功能描述，简介准确
+      "parameters":{   # 函数参数
+         "type":"object", # 参数的类型，为object，即字典
+         "properties":{   # 参数的属性有哪些，即字典中包含哪些属性
+            "role":{     # 属性名称
+               "type":"string", # 属性类型
+               "description":"The role of the learner (i.e. developer, data scientist, student, etc.)" # 属性描述
             },
             "product":{
                "type":"string",
@@ -240,7 +240,7 @@ functions = [
                "description":"The level of experience the learner has prior to taking the course (i.e. beginner, intermediate, advanced)"
             }
          },
-         "required":[
+         "required":[  # 必须参数，即参数中必须包含的属性名称
             "role"
          ]
       }
@@ -249,16 +249,16 @@ functions = [
 # step 3 : Making the function call
 response = client.chat.completions.create(model=deployment,
                                         messages=messages,
-                                        functions=functions,
-                                        function_call="auto")
+                                        functions=functions,  # 把函数描述放入这里，对于LLM来说，这就是可调用的函数列表
+                                        function_call="auto") # 让LLM决定何时调用函数
 print("response_message:")
 print(response.choices[0].message)
 print()
 
 response_message = response.choices[0].message
 
-def search_courses(role, product, level):
-   url = "https://learn.microsoft.com/api/catalog/"
+def search_courses(role, product, level):   # 函数的实际实现
+   url = "https://learn.microsoft.com/api/catalog/"   # 从目标api获取数据
    params = {
       "role": role,
       "product": product,
@@ -274,9 +274,9 @@ def search_courses(role, product, level):
    return str(results)
 
 # Check if the model wants to call a function
-if response_message.function_call.name:
+if response_message.function_call.name:  # 这里在返回值会告诉你要调用函数
    print("Recommended Function call:")
-   print(response_message.function_call.name)
+   print(response_message.function_call.name)  # 打印要调用的函数名称
    print()
 
    # Call the function.
@@ -285,13 +285,13 @@ if response_message.function_call.name:
    available_functions = {
             "search_courses": search_courses,
    }
-   function_to_call = available_functions[function_name]
+   function_to_call = available_functions[function_name]  
 
    function_args = json.loads(response_message.function_call.arguments)
    print("function_args:")
    print(function_args)
    print()
-   function_response = function_to_call(**function_args)
+   function_response = function_to_call(**function_args) # 实际根据函数名称，调用了真的函数，**在这里的作用是将一个字典展开为关键字参数（keyword arguments）
 
    print("Output of function call:")
    print(function_response)
@@ -317,12 +317,6 @@ if response_message.function_call.name:
             "content":function_response,
       }
    )
-
-function_to_call = available_functions[function_name]
-
-function_args = json.loads(response_message.function_call.arguments)
-function_response = function_to_call(**function_args)
-
 
 print("Messages in next request:")
 print(messages)
