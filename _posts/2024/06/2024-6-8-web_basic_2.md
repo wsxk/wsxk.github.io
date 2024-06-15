@@ -115,17 +115,21 @@ accept(3, NULL, NULL)                    = 4
     get_len:
         .long 3
     post:
-        .asciz "/POST"
+        .asciz "POST"
+    post_len:
+        .long 4
     file_fd:
         .long 0
     file_path:
         .space 40
     file_content:
-        .space 0x100
+        .space 0x200
     file_content_len:
         .long 0
     accept_content:
-        .space 0x100
+        .space 0x200
+    accept_content_len:
+        .long 0
     acceptfd:
         .long 0
     sockfd:
@@ -186,13 +190,41 @@ accept_loop:
     xor rdi, rdi
     mov edi, [acceptfd]
     lea rsi, [accept_content]
-    mov rdx, 0x100
+    mov rdx, 0x200
     mov rax, 0      # SYS_read
     syscall
+    mov [accept_content_len], eax
 
-    lea rdi, [accept_content]
     call parse_request
+    ret
 
+close_accept_fd:
+    xor rdi, rdi
+    mov edi, [acceptfd]
+    mov rax, 3
+    syscall
+    jmp accept_loop
+
+# process get request
+parse_request:
+    lea rdi, [accept_content]
+    lea rsi, [get]
+    xor rcx, rcx
+    mov ecx, [get_len]
+    repe cmpsb
+    jne process_post
+process_get:
+    mov rsi, rdi
+    inc rsi
+    lea rdi, [file_path]
+path_loop_get:
+    lodsb
+    stosb
+    mov al, [rsi]
+    cmp al, 32
+    jz parse_get
+    loop path_loop_get
+parse_get:
     xor rdi, rdi
     lea rdi, [file_path]
     mov rsi, 0 # O_RDONLY
@@ -203,7 +235,7 @@ accept_loop:
     xor rdi, rdi
     mov edi, [file_fd]
     lea rsi, [file_content]
-    mov rdx, 0x100
+    mov rdx, 0x200
     mov rax, 0      # SYS_read
     syscall
     mov [file_content_len], eax
@@ -237,35 +269,91 @@ accept_loop:
     mov rdi, 0
     syscall
 
-close_accept_fd:
-    xor rdi, rdi
-    mov edi, [acceptfd]
-    mov rax, 3
-    syscall
-    jmp accept_loop
-
-parse_request:
-    # process get request
-    lea rsi, [get]
+# process post request
+process_post:
+    lea rdi, [accept_content]
+    lea rsi, [post]
     xor rcx, rcx
-    mov ecx, [get_len]
+    mov ecx, [post_len]
     repe cmpsb
-    jne process_post
-process_get:
+    jnz parse_end
+
     mov rsi, rdi
     inc rsi
     lea rdi, [file_path]
-path_loop_get:
+path_loop_post:
     lodsb
     stosb
     mov al, [rsi]
     cmp al, 32
-    jz parse_end
-    loop path_loop_get
-process_post:
-    nop
+    jz find_crlfcrlf
+    loop path_loop_post
+
+    lea rsi, [accept_content]
+find_crlfcrlf:
+    mov al, [rsi]
+    cmp al, 13  # '\r'
+    jne next_byte
+    cmp byte ptr [rsi + 1], 10  # '\n'
+    jne next_byte
+    cmp byte ptr [rsi + 2], 13  # '\r'
+    jne next_byte
+    cmp byte ptr [rsi + 3], 10  # '\n'
+    jne next_byte
+
+    # 找到 "\r\n\r\n"，POST数据从 (rsi + 4) 开始
+    add rsi, 4
+    lea rdi, [file_content]
+    mov ecx, 0
+loop_gain_data:
+    mov al, [rsi]
+    mov [rdi], al
+    inc rdi
+    inc rsi
+    inc ecx
+    cmp al, 0
+
+    jne loop_gain_data
+    sub ecx, 1
+    mov [file_content_len], ecx
+    jmp parse_post
+
+next_byte:
+    inc rsi
+    loop find_crlfcrlf
+
+parse_post:
+    xor rdi, rdi
+    lea rdi, [file_path]
+    mov rsi, 65 # O_WRONLY | O_CREAT
+    mov rdx, 511 # 0o777
+    mov rax, 2      # SYS_open
+    syscall
+    mov [file_fd], eax
+
+    xor rdi, rdi
+    mov edi, [file_fd]
+    lea rsi, [file_content]
+    mov edx, [file_content_len]
+    mov rax, 1      # SYS_write
+    syscall
+
+    xor rdi, rdi
+    mov edi, [file_fd]
+    mov rax, 3      # SYS_close
+    syscall
+
+    xor rdi, rdi
+    mov edi, [acceptfd]
+    lea rsi, [http_response]
+    mov rdx, 19
+    mov rax, 1      # SYS_write
+    syscall
+
+    mov rax, 60     # SYS_exit
+    mov rdi, 0
+    syscall
 parse_end:
     ret
 ```
-
 

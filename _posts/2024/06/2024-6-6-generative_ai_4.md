@@ -14,6 +14,7 @@ date: 2024-6-6
   - [11.2 Illustrating the problem through a scenario](#112-illustrating-the-problem-through-a-scenario)
   - [11.3 Use Cases for using function calls](#113-use-cases-for-using-function-calls)
   - [11.4 Integrating Function Calls into an Application](#114-integrating-function-calls-into-an-application)
+- [12. Designing UX for AI Applications](#12-designing-ux-for-ai-applications)
 
 
 ## 前言<br>
@@ -332,3 +333,6 @@ second_response = client.chat.completions.create(
 
 print(second_response.choices[0].message.content)
 ```
+
+## 12. Designing UX for AI Applications<br>
+本节可以简单概述为，**基于用户体验和用户需要，基于合作和反馈机制，构建可信透明的ai应用。**<br>
