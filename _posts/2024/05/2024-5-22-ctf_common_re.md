@@ -137,15 +137,17 @@ print(decrypted_data)
 import base64
 
 origin_charset = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
-#custom_charset = b"ZYXWVUTSRQPONMLKJIHGFEDCBAzyxwvutsrqponmlkjihgfedcba9876543210+/"
-custom_charset = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+custom_charset = b"0123456789ABCMtuvwxNOPQRabcdefghijklSTUVWXDEFGHIJKLYZmnopqrsyz+/"
+#custom_charset = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 def base64_encode(data):
-    return base64.b64encode(data).translate(bytes.maketrans(origin_charset, custom_charset))
+    return base64.b64encode(data).translate(data.maketrans(origin_charset, custom_charset))
 
 def base64_decode(data):
-    return base64.b64decode(data.translate(bytes.maketrans(origin_charset, custom_charset)))
+    return base64.b64decode(data.translate(data.maketrans(custom_charset, origin_charset)))
 
 data = b"attackatdawn"
+# print(data.maketrans(origin_charset, custom_charset))
+# print(data.maketrans(custom_charset, origin_charset))
 encoded_data = base64_encode(data)
 print(encoded_data)
 decoded_data = base64_decode(encoded_data)
@@ -167,6 +169,21 @@ print(base64.b32decode(enc))
 
 ## 4. RC4<br>
 常见的流加密方式。识别方式为，初始代码中会对大小为256的表进行赋值和交换操作<br>
+RC4算法是可逆的，即encrypt和decrypt是一样的。<br>
+```python
+from Crypto.Cipher import ARC4
+
+key=b"keykeykey"
+plain =b"ctf_is_fun"
+
+rc4 = ARC4.new(key)
+cipher = rc4.encrypt(plain)
+print(cipher)
+# 注意，使用RC4时只能加密一次，如果要解密，需要重新初始化RC4对象
+rc4 = ARC4.new(key)
+dec = rc4.decrypt(cipher)
+print(dec)
+```
 
 ## 5. AES<br>
 对`aes`的识别首先需要知道AES加密的步骤。<br>
