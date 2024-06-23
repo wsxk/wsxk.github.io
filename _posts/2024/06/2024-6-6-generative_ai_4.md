@@ -16,6 +16,7 @@ date: 2024-6-6
   - [11.4 Integrating Function Calls into an Application](#114-integrating-function-calls-into-an-application)
 - [12. Designing UX for AI Applications](#12-designing-ux-for-ai-applications)
   - [12.1 影响UX的因素](#121-影响ux的因素)
+- [13. Securing Your Generative AI Applications](#13-securing-your-generative-ai-applications)
 
 
 ## 前言<br>
@@ -368,3 +369,4 @@ print(second_response.choices[0].message.content)
 UX 术语中的辅助功能意味着用户体验能够适合不同能力（包括但不限于残障人士）的用户。
 ```
 
+## 13. Securing Your Generative AI Applications<br>
