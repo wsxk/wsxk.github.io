@@ -23,6 +23,7 @@ comments: true
   - [2.2 post请求常见方法](#22-post请求常见方法)
   - [2.3 redirect](#23-redirect)
   - [2.4 cookie](#24-cookie)
+- [3. 网络命令的其他用途](#3-网络命令的其他用途)
 
 
 ## 前言<br>
@@ -356,4 +357,26 @@ response = requests.post(url,json=data,headers=headers,allow_redirects=True)
 # print result
 print(response.status_code)
 print(response.text)
+```
+
+
+## 3. 网络命令的其他用途<br>
+```
+为了connect到 10.0.0.2 31337端口
+nc 10.0.0.2 31337
+
+为了监听本机的31337端口
+nc -l 31337
+
+扫描当前网段哪个ip开发了31337端口
+namp -p 31337 10.0.0.0/24 
+
+nmap -sS -p 31337 -T5 -Pn -n --min-rate 1000 10.0.0.0/16
+-sS 使用TCP SYN扫描
+-p 31337: 指定要扫描的端口为31337。
+-T5: 设置扫描速度为最高（注意：这可能会增加被防火墙检测到的风险）。
+-Pn: 跳过主机发现阶段，直接进行端口扫描。
+-n: 禁用DNS解析以减少解析时间。
+--min-rate 1000: 设定最小扫描速率为1000个包每秒。
+10.0.0.0/16: 指定要扫描的网络范围为10.0.0.0到10.0.255.255。
 ```
