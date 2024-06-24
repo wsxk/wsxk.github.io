@@ -370,3 +370,14 @@ UX 术语中的辅助功能意味着用户体验能够适合不同能力（包�
 ```
 
 ## 13. Securing Your Generative AI Applications<br>
+就是ai的安全性很重要，核心点有3个：<br>
+```
+1. Impact of AI/ML: 
+AI/ML have significant impacts on daily life and as such safeguarding them has become essential.
+
+2. Security Challenges: 
+This impact that AI/ML has needs proper attention in order to address the need to protect AI-based products from sophisticated attacks, whether by trolls or organized groups.
+
+3. Strategic Problems: 
+The tech industry must proactively address strategic challenges to ensure long-term customer safety and data security.
+```
