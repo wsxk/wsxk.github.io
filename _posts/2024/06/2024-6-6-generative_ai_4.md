@@ -17,6 +17,7 @@ date: 2024-6-6
 - [12. Designing UX for AI Applications](#12-designing-ux-for-ai-applications)
   - [12.1 影响UX的因素](#121-影响ux的因素)
 - [13. Securing Your Generative AI Applications](#13-securing-your-generative-ai-applications)
+  - [13.1 Understanding the threats and risks of AI](#131-understanding-the-threats-and-risks-of-ai)
 
 
 ## 前言<br>
@@ -370,7 +371,7 @@ UX 术语中的辅助功能意味着用户体验能够适合不同能力（包�
 ```
 
 ## 13. Securing Your Generative AI Applications<br>
-就是ai的安全性很重要，核心点有3个：<br>
+就是ai的安全性很重要，核心的思考点有3个：<br>
 ```
 1. Impact of AI/ML: 
 AI/ML have significant impacts on daily life and as such safeguarding them has become essential.
@@ -381,3 +382,31 @@ This impact that AI/ML has needs proper attention in order to address the need t
 3. Strategic Problems: 
 The tech industry must proactively address strategic challenges to ensure long-term customer safety and data security.
 ```
+
+### 13.1 Understanding the threats and risks of AI<br>
+接下来具体AI有哪些威胁和风险：<br>
+```
+1. Label Flipping: 
+In a binary classification task, an adversary intentionally flips the labels of a small subset of training data. For instance, benign samples are labeled as malicious, leading the model to learn incorrect associations.
+
+Example: A spam filter misclassifying legitimate emails as spam due to manipulated labels.
+
+2. Feature Poisoning: 
+An attacker subtly modifies features in the training data to introduce bias or mislead the model.
+
+Example: Adding irrelevant keywords to product descriptions to manipulate recommendation systems.
+
+3. Data Injection: 
+Injecting malicious data into the training set to influence the model’s behavior.
+
+Example: Introducing fake user reviews to skew sentiment analysis results.
+
+4. Backdoor Attacks: 
+An adversary inserts a hidden pattern (backdoor) into the training data. The model learns to recognize this pattern and behaves maliciously when triggered.
+
+Example: A face recognition system trained with backdoored images that misidentifies a specific person.
+```
+其实整了半天，都只是对训练数据集做手脚，区别在于对训练集哪部分数据做手脚罢了
+另外[The MITRE Corporation基于ATT&CK做了AI攻击模式库 ATLAS](https://atlas.mitre.org/?WT.mc_id=academic-105485-koreyst)这个链接里降了AI的全部风险...<br>
+另外，**OWASP**把**Prompt Injection、Supply Chain Vulnerabilities、Overreliance**列为AI的重要风险<br>
+
