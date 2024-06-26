@@ -18,6 +18,8 @@ date: 2024-6-6
   - [12.1 影响UX的因素](#121-影响ux的因素)
 - [13. Securing Your Generative AI Applications](#13-securing-your-generative-ai-applications)
   - [13.1 Understanding the threats and risks of AI](#131-understanding-the-threats-and-risks-of-ai)
+  - [13.2 LLMS和AI systems的安全测试](#132-llms和ai-systems的安全测试)
+  - [13.3 LLMS和AI systems的保护要点](#133-llms和ai-systems的保护要点)
 
 
 ## 前言<br>
@@ -410,3 +412,30 @@ Example: A face recognition system trained with backdoored images that misidenti
 另外[The MITRE Corporation基于ATT&CK做了AI攻击模式库 ATLAS](https://atlas.mitre.org/?WT.mc_id=academic-105485-koreyst)这个链接里降了AI的全部风险...<br>
 另外，**OWASP**把**Prompt Injection、Supply Chain Vulnerabilities、Overreliance**列为AI的重要风险<br>
 
+### 13.2 LLMS和AI systems的安全测试<br>
+涵盖重要的测试方法：
+```
+1. Data sanitization: 
+这是从训练数据或 AI 系统或 LLM 的输入中删除或匿名化敏感或私人信息的过程。数据清理可以通过减少机密或个人数据的暴露来帮助防止数据泄露和恶意操纵。
+
+2. Adversarial testing: 
+这是生成对抗性示例并将其应用于 AI 系统或 LLM 的输入或输出的过程，以评估其对对抗性攻击的稳健性和弹性。对抗性测试可以帮助识别和减轻可能被攻击者利用的 AI 系统或 LLM 的漏洞和弱点。
+
+3. Model verification: 
+这是验证 AI 系统或 LLM 的模型参数或架构的正确性和完整性的过程。模型验证可以通过确保模型受到保护和认证来帮助检测和防止模型窃取。
+
+4. Output validation: 
+这是验证 AI 系统或 LLM 输出质量和可靠性的过程。输出验证可通过确保输出一致且准确来帮助检测和纠正恶意操纵。
+
+5. Emulating real-world threats - AI red teaming:
+通过使用类似的工具、策略和程序来识别系统风险并测试防御者的反应，模拟现实世界的威胁现在被认为是构建弹性人工智能系统的标准做法。
+```
+[https://github.com/openai/evals/tree/main](https://github.com/openai/evals/tree/main)这个网址里还有openai提供的用于验证模型安全性的数据集~<br>
+
+
+### 13.3 LLMS和AI systems的保护要点<br>
+```
+1. 模型和算法
+2. ai安全：即模型的偏见、歧视、道德问题要少；决策时的可问责性、透明度和可解释性要高
+3、用户隐私数据
+```
