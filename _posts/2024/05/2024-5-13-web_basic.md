@@ -385,4 +385,8 @@ tcpdump -A 'tcp and port 31337' -w capture.pcap
 -A 表示监控报文的数据并以ASCII形式打印
 'tcp port 31337'表示监听tcp报文，端口是31337
 -w表示把报文输出到文件中
+
+tcpdump -A 'host 10.0.0.4 and host 10.0.0.2' -e
+截获跟10.0.0.4与10.0.0.2相关的报文
+-e告诉tcpdump显示以太网头信息，包括源和目的 MAC地址
 ```
