@@ -20,6 +20,7 @@ date: 2024-6-6
   - [13.1 Understanding the threats and risks of AI](#131-understanding-the-threats-and-risks-of-ai)
   - [13.2 LLMS和AI systems的安全测试](#132-llms和ai-systems的安全测试)
   - [13.3 LLMS和AI systems的保护要点](#133-llms和ai-systems的保护要点)
+- [14. The Generative AI Application Lifecycle](#14-the-generative-ai-application-lifecycle)
 
 
 ## 前言<br>
@@ -439,3 +440,7 @@ Example: A face recognition system trained with backdoored images that misidenti
 2. ai安全：即模型的偏见、歧视、道德问题要少；决策时的可问责性、透明度和可解释性要高
 3、用户隐私数据
 ```
+
+## 14. The Generative AI Application Lifecycle<br>
+个人感觉没用，pass<br>
+
