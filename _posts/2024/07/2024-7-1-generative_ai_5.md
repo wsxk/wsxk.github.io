@@ -159,3 +159,16 @@ def chatbot(user_input):
 
 chatbot(user_input)
 ```
+
+
+## 16. open-source-models<br>
+anyway，在huggingface上使用一些开源模型就对了，省钱又省事~<br>
+[https://huggingface.co/chat](https://huggingface.co/chat)
+
+## 17. ai-agents<br>
+AI 代理是生成式 AI 领域中一个非常令人兴奋的领域。这种兴奋有时会带来术语及其应用的混淆。为了使事情简单化并涵盖大多数涉及 AI 代理的工具，我们将使用以下定义：<br>
+**人工智能代理通过让大型语言模型 (LLM) 访问状态和工具来执行任务。**<br>
+其大概原理图如下：<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240629225719.png)
+开源项目`LangChain agent`就是其中之一，其工作原理如下：<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240629225555.png)
