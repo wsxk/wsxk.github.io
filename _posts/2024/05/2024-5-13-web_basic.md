@@ -389,4 +389,7 @@ tcpdump -A 'tcp and port 31337' -w capture.pcap
 tcpdump -A 'host 10.0.0.4 and host 10.0.0.2' -e
 截获跟10.0.0.4与10.0.0.2相关的报文
 -e告诉tcpdump显示以太网头信息，包括源和目的 MAC地址
+
+ip addr add 10.0.0.2/24 dev eth0
+通过ip addr add往网口添加ip地址，然后监听nc -l 31337 即可监听到tcp报文了
 ```
