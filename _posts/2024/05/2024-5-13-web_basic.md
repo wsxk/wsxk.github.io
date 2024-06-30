@@ -24,6 +24,7 @@ comments: true
   - [2.3 redirect](#23-redirect)
   - [2.4 cookie](#24-cookie)
 - [3. 扫描/监听报文命令](#3-扫描监听报文命令)
+- [4. scapy编写发送脚本](#4-scapy编写发送脚本)
 
 
 ## 前言<br>
@@ -392,4 +393,15 @@ tcpdump -A 'host 10.0.0.4 and host 10.0.0.2' -e
 
 ip addr add 10.0.0.2/24 dev eth0
 通过ip addr add往网口添加ip地址，然后监听nc -l 31337 即可监听到tcp报文了
+```
+
+## 4. scapy编写发送脚本<br>
+```python
+from scapy.all import *
+
+ether_packet = Ether()  # 创建以太包
+ether_packet.type= 0xffff  # 设置type
+ether_packet.src = "0e:4d:29:31:40:c8" # 设置dst
+ether_packet.show() # 展示报文内容
+sendp(ether_packet,iface="eth0") # 对网卡的设置很重要，不然你可能发送了没有回显
 ```
