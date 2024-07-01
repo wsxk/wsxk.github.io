@@ -25,6 +25,10 @@ comments: true
   - [2.4 cookie](#24-cookie)
 - [3. 扫描/监听报文命令](#3-扫描监听报文命令)
 - [4. scapy编写发送脚本](#4-scapy编写发送脚本)
+  - [4.1 发送以太网报文](#41-发送以太网报文)
+  - [4.2 发送IP报文](#42-发送ip报文)
+  - [4.3 发送TCP报文](#43-发送tcp报文)
+  - [4.4 TCP三次握手](#44-tcp三次握手)
 
 
 ## 前言<br>
@@ -396,6 +400,7 @@ ip addr add 10.0.0.2/24 dev eth0
 ```
 
 ## 4. scapy编写发送脚本<br>
+### 4.1 发送以太网报文<br>
 ```python
 from scapy.all import *
 
@@ -404,4 +409,39 @@ ether_packet.type= 0xffff  # 设置type
 ether_packet.src = "0e:4d:29:31:40:c8" # 设置dst
 ether_packet.show() # 展示报文内容
 sendp(ether_packet,iface="eth0") # 对网卡的设置很重要，不然你可能发送了没有回显
+```
+
+### 4.2 发送IP报文<br>
+```python
+from scapy.all import *
+ip = IP(proto=0xff,src="10.0.0.2",dst="10.0.0.3")
+ip.show()
+send(ip) # send会自动处理二层报文和路由
+```
+
+### 4.3 发送TCP报文<br>
+```python
+from scapy.all import *
+#TCP sport=31337, dport=31337, seq=31337, ack=31337, flags=APRSF
+tcp = TCP(sport=31337,dport=31337,seq=31337,ack=31337,flags="APRSF")
+tcp.show()
+ip = IP(dst="10.0.0.3")
+packet = ip/tcp
+packet.show()
+send(packet)
+```
+
+### 4.4 TCP三次握手<br>
+```python
+from scapy.all import *
+#`TCP sport=31337, dport=31337, seq=31337`
+tcp = TCP(sport=31337,dport=31337,seq=31337,flags="S")
+ip = IP(dst="10.0.0.3")
+packet = ip/tcp
+packet.show()
+
+syn_ack_packet = sr1(packet)
+if syn_ack_packet and syn_ack_packet[TCP].flags == 'SA':
+	  ack_packet = IP(dst="10.0.0.3") / TCP(sport=31337,dport=31337, flags='A',seq=syn_ack_packet.ack, ack=syn_ack_packet.seq + 1)
+	  send(ack_packet)
 ```
