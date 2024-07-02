@@ -8,6 +8,13 @@ date: 2024-7-1
 ---
 
 - [前言](#前言)
+- [15. Retrieval Augmented Generation (RAG) and Vector Databases](#15-retrieval-augmented-generation-rag-and-vector-databases)
+  - [15.1 RAG运行步骤](#151-rag运行步骤)
+  - [15.2 创建知识库(向量库)](#152-创建知识库向量库)
+  - [15.3 检索](#153-检索)
+- [16. open-source-models](#16-open-source-models)
+- [17. ai-agents](#17-ai-agents)
+- [18. Fine Tuning](#18-fine-tuning)
 
 
 ## 前言<br>
