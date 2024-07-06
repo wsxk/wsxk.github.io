@@ -66,3 +66,13 @@ r, w, x, a, o
 另一方面，访问控制矩阵的每一行都会存储在`subjects`中<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240706173215.png)
 具体到linux系统中，即`getcap /usr/bin/ping`可以查看的内容<br>
+
+`ACL`和`capabilities`的区别<br>
+```
+1、 ACL要求认证（即你是谁），CAP不需要，所以CAP不能被仿造且传播时必须要被良好控制
+
+2、CAP提供了最细粒度的权限控制，特别是被创建来执行特定任务的短期进程...但是实际上不可能记录进程对每个文件的权限，所以linux中CAP主要限制的是内核的资源
+
+3、ACL对文件更好用，CAP对进程更好用
+撤销也是如此~
+```
