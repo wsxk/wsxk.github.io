@@ -12,6 +12,7 @@ date: 2024-7-5
 - [2. Modeling Access Control](#2-modeling-access-control)
   - [2.1 Access Control Matrix](#21-access-control-matrix)
   - [2.2 Access Control Matrix 实施策略](#22-access-control-matrix-实施策略)
+- [3. POSIX的ACL](#3-posix的acl)
 
 ## 前言<br>
 访问控制其实和linux中遇到的文件系统权限，apparmor是息息相关的
@@ -75,4 +76,44 @@ r, w, x, a, o
 
 3、ACL对文件更好用，CAP对进程更好用
 撤销也是如此~
+```
+
+## 3. POSIX的ACL<br>
+用`12bits`来表示各个文件的ACL<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240707110723.png)
+```
+--- SUID SGID Sticky-bit
+--- r    w    x     owner
+--- r    w    x     file's group
+--- r    w    x     other
+```
+
+可以通过`cat /etc/passwd`查看用户基本信息<br>
+查询到的信息一般如下所示<br>
+```
+root:x:0:0:root:/root:/bin/bash
+
+:表示分隔符
+1. root : 表示用户名
+2. x    ：表示密码，x是占位符，如果x在就说明密码被存在另外一个文件里，一般是/etc/shadow
+3. 0    ：用户id，即uid
+4. 0    ：组id，即gid
+5. root ：用户描述字段，告诉你这个用户是干啥的
+6. /root：用户的主要目录在哪里
+7. /bin/bash：用户登录时使用的shell程序
+```
+
+现在查看一下`/etc/shadow`中的内容<br>
+```
+root:!:19531:0:99999:7:::
+
+1. root ： 表示用户名
+2. !    ： 加密后的密码，如果是！或* ，说明无法用这个账户登录
+3. 19531： 上次密码更改的日期，这是自1970年1月1日以来的天数，表示上次密码更改的日期。可以使用这个数字计算具体的日期。19531 表示 2023年7月16日。
+4. 0    ： 密码最小使用天数，0表示没有限制
+5. 99999： 密码最大使用天数，99999基本表示永不过期了~
+6. 7    ： 密码警告期，密码到期前7天发出警告，提示用户改天数
+7.      ： 密码不活动期，用户密码过期后账号被锁定前的非活动天数。空字段表示没有定义
+8.      ： 账号到期日期，自1970年1月一日以来的天数，没有内容表示账号永不过期
+9.      ： 保留字段
 ```
