@@ -13,6 +13,8 @@ date: 2024-7-5
   - [2.1 Access Control Matrix](#21-access-control-matrix)
   - [2.2 Access Control Matrix 实施策略](#22-access-control-matrix-实施策略)
 - [3. POSIX的ACL](#3-posix的acl)
+- [4. 访问控制的类型](#4-访问控制的类型)
+  - [4.1 Mandatory Access Control讲解](#41-mandatory-access-control讲解)
 
 ## 前言<br>
 访问控制其实和linux中遇到的文件系统权限，apparmor是息息相关的
@@ -117,3 +119,25 @@ root:!:19531:0:99999:7:::
 8.      ： 账号到期日期，自1970年1月一日以来的天数，没有内容表示账号永不过期
 9.      ： 保留字段
 ```
+
+## 4. 访问控制的类型<br>
+```
+Discretionary Access Control:自主访问控制
+即object的拥有者可以决定谁能访问这个object
+
+Mandatory Access Control： 强制访问控制
+系统决定谁能访问objcet
+
+Originator Controlled Access Control： 基于原创者的访问控制
+object的创始人决定其他人对该object的权限
+目前还没有有效的实现，因为目前的访问控制都是针对实体，而它是针对实体中的信息
+
+Role Based Access Control (RBAC)：基于角色的访问控制
+用户的权限由其角色控制，并且每个主体在任何时刻只能有一个角色
+
+Attribute Based Access Control (ABAC)：基于属性的访问控制
+用户会有一些属性（id，年龄，身份，etc），而访问控制策略就是各种属性的复杂布尔表达式
+```
+**在自主访问控制和强制访问控制都存在的系统中，一般先进行强制访问控制，然后再进行自主访问控制**<br>
+
+### 4.1 Mandatory Access Control讲解<br>
