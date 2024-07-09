@@ -141,3 +141,40 @@ Attribute Based Access Control (ABAC)：基于属性的访问控制
 **在自主访问控制和强制访问控制都存在的系统中，一般先进行强制访问控制，然后再进行自主访问控制**<br>
 
 ### 4.1 Mandatory Access Control讲解<br>
+现实中MAC会如何实现呢?<br>
+军事机密等级，从上到下分别是`top secret、secret、confidential、unclassfied`
+在MAC中，也有类似的等级，接下来说定义：<br>
+```
+L(S) = ls is the security clearance of subject S
+
+L(O) = lO is the security classification of object O
+
+For all security classifications li,i=0, …, k-1, li < li+1 
+
+总之，每个`subject和object都有一个等级`。比较规则如下:
+
+Simple-Security Condition (preliminary version)
+S can read O if lO ≤ lS 
+
+*-Property (preliminary version)
+S can write O if lS ≤ lO
+
+如果s的等级比o大，就可以读o的内容，这个很好理解
+如果s的等级比o小，就可以写o的内容，这里主要是因为：
+如果s的等级比o大就可以写o的内容的话，s可以把o的内容读出，然后写入其他低等级的文件中，导致信息向下泄露
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240709213852.png)
+但是这种机制太粗粒度了，又有了新的分类：<br>
+
+```
+The security level (L, C) dominates the security level (L’, C’) if L’ ≤ L and C’ ⊆C
+
+实践起来就是：
+S can read O iff S dom O
+即 LO ≤ LS and CO ⊆ CS
+
+*-Property
+S can write to O iff O dom S
+即 LS ≤ LO and CS ⊆ CO
+```
+这就是著名的**Bell-LaPadula Model（贝尔-拉帕杜拉模型）**<br>
