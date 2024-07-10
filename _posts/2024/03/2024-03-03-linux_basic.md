@@ -158,6 +158,7 @@ ed： 行文本编辑器， ed -G /flag，然后输入1p
 usermod: usermod -aG group_ztsmuhtj hacker 将hacker加入group中，加入后需要su hacker刷新会话才会生效
 chown： 改变文件属主和属组
 chmod： 改变文件的权限(u,g,o)
+cat /etc/group: 查看所有用户的所属组
 cp： 文件复制 cp /flag /dev/stdout ，将文件内容复制到标准输出
 mv： 文件移动 
 
