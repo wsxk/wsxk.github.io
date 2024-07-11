@@ -1,7 +1,7 @@
 ---
+layout: post
 title: "Cryptography"
 tags: [crypto]
-layout: [post]
 date: 2024-7-11
 author: wsxk
 comments: true
@@ -10,7 +10,6 @@ comments: true
 - [前言](#前言)
 - [1. 密码学三要素](#1-密码学三要素)
 - [2. One-Time Pad (OTP)](#2-one-time-pad-otp)
-
 
 ## 前言<br>
 常见的密码算法编写可看[Re 常见加解密算法识别与加解密脚本](https://wsxk.github.io/ctf_common_re/)<br>
@@ -30,8 +29,11 @@ comments: true
 ```
 简单的加解密逻辑:<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240711213949.png)
+
 加密： 明文在key和加密函数的作用下得到密文。<br>
+
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240711214006.png)
+
 解密： 密文在key和解密函数的作用下得到明文<br>
 
 ## 2. One-Time Pad (OTP)<br>
