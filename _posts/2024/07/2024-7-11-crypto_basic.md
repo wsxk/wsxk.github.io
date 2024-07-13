@@ -19,6 +19,7 @@ comments: true
     - [3.3.1 ECB(Electronic Codebook)](#331-ecbelectronic-codebook)
     - [3.3.2 cbc(Cipher Blocking Chaining)](#332-cbccipher-blocking-chaining)
     - [3.3.3 CTR(Counter)](#333-ctrcounter)
+- [4. key exchange](#4-key-exchange)
 
 ## 前言<br>
 常见的密码算法编写可看[Re 常见加解密算法识别与加解密脚本](https://wsxk.github.io/ctf_common_re/)<br>
@@ -112,3 +113,12 @@ Block Size: 128-bits
 #### 3.3.3 CTR(Counter)<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240712192919.png)
 能并行计算，还能去除plaintext和ciphertext之间的关联！<br>
+
+## 4. key exchange<br>
+在网络环境中，A和B要想通信，不被C窃听消息，需要进行加密通信<br>
+然而，要用对称加密进行通信，需要A和B都有相同的key，才行<br>
+如果A和B直接把key发送到网络去，key也会被C窃听，那加密通信就没有意义<br>
+**密钥交换算法Diffie-Hellman应运而生**<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240713091657.png)
+anyway,相应的数学逻辑就不过多赘述（我也不会😄<br>
+在这里再推荐一下之前写得blog[ECDHE算法学习](https://wsxk.github.io/ECDHE/)<br>
