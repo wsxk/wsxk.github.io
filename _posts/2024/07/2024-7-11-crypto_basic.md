@@ -20,6 +20,10 @@ comments: true
     - [3.3.2 cbc(Cipher Blocking Chaining)](#332-cbccipher-blocking-chaining)
     - [3.3.3 CTR(Counter)](#333-ctrcounter)
 - [4. key exchange](#4-key-exchange)
+- [5. Asymmetric encrypt(非对称加密)](#5-asymmetric-encrypt非对称加密)
+  - [5.1 Fermat's little theorem(费马小定理)](#51-fermats-little-theorem费马小定理)
+  - [5.2 Euler's theorem(欧拉定理)](#52-eulers-theorem欧拉定理)
+  - [5.3 RSA(Rivest-Shamir-Adleman)](#53-rsarivest-shamir-adleman)
 
 ## 前言<br>
 常见的密码算法编写可看[Re 常见加解密算法识别与加解密脚本](https://wsxk.github.io/ctf_common_re/)<br>
@@ -122,3 +126,26 @@ Block Size: 128-bits
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240713091657.png)
 anyway,相应的数学逻辑就不过多赘述（我也不会😄<br>
 在这里再推荐一下之前写得blog[ECDHE算法学习](https://wsxk.github.io/ECDHE/)<br>
+
+
+## 5. Asymmetric encrypt(非对称加密)<br>
+数学真的是博大精深啊！<br>
+非对称加密起源与一些数学定理<br>
+### 5.1 Fermat's little theorem(费马小定理)<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240713222223.png)
+
+### 5.2 Euler's theorem(欧拉定理)<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240713222452.png)
+**欧拉定理是费马小定理的推广，当然，p也不能被a整除**<br>
+
+
+### 5.3 RSA(Rivest-Shamir-Adleman)<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240713223011.png)
+**RSA就是基于欧拉定理的运用得到的**<br>
+rsa的key的生成过程如下图所示:<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240713223140.png)
+rsa的加密过程如下图所示:<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240713223156.png)
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240713223232.png)
+当然，RSA的逆运用可以当作就是**签名(signature)**了<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240713223321.png)
