@@ -24,6 +24,11 @@ comments: true
   - [5.1 Fermat's little theorem(费马小定理)](#51-fermats-little-theorem费马小定理)
   - [5.2 Euler's theorem(欧拉定理)](#52-eulers-theorem欧拉定理)
   - [5.3 RSA(Rivest-Shamir-Adleman)](#53-rsarivest-shamir-adleman)
+- [6. Hashing(哈希)](#6-hashing哈希)
+  - [6.1 hashing Resistance Properties](#61-hashing-resistance-properties)
+  - [6.2 password hashing (with salt)](#62-password-hashing-with-salt)
+  - [6.3 Proof of work](#63-proof-of-work)
+- [7. Trust(证书)](#7-trust证书)
 
 ## 前言<br>
 常见的密码算法编写可看[Re 常见加解密算法识别与加解密脚本](https://wsxk.github.io/ctf_common_re/)<br>
@@ -136,7 +141,7 @@ anyway,相应的数学逻辑就不过多赘述（我也不会😄<br>
 
 ### 5.2 Euler's theorem(欧拉定理)<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240713222452.png)
-**欧拉定理是费马小定理的推广，当然，p也不能被a整除**<br>
+**欧拉定理是费马小定理的推广，当然，(pq)也不能被a整除**<br>
 
 
 ### 5.3 RSA(Rivest-Shamir-Adleman)<br>
@@ -149,3 +154,29 @@ rsa的加密过程如下图所示:<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240713223232.png)
 当然，RSA的逆运用可以当作就是**签名(signature)**了<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240713223321.png)
+
+
+## 6. Hashing(哈希)<br>
+**hashing指的是，对于任意长度的输入input，在进行hash操作后，得到固定长度的输出output**<br>
+**hashing是 one-way的，这意味着，一但input在进行hash操作得到output后，无法通过某种算法使output还原会input，你只能通过爆破（枚举）的手段来找**<br>
+另外提一点，因为输入长度是随意的，输出长度固定，其实一定是存在不同的input，output是相同的。<br>
+所以这就引出了hash的某些抗抵抗性:<br>
+### 6.1 hashing Resistance Properties<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240714104208.png)
+
+### 6.2 password hashing (with salt)<br>
+在系统中存放密码都是存的hash<br>
+但是只是存放密码的hash是很容易爆破的（似乎有某些办法可以加快爆破速度）<br>
+于是`salt`应用而生:<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240714104825.png)
+
+### 6.3 Proof of work<br>
+hash也应用在区块链当中充当工作证明<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240714104901.png)
+
+
+## 7. Trust(证书)<br>
+证书的存在就是用于识别身份的，和身份证类似<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240714105015.png)
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240714105028.png)
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240714105047.png)
