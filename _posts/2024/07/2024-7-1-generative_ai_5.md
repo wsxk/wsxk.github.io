@@ -15,7 +15,8 @@ date: 2024-7-1
 - [16. open-source-models](#16-open-source-models)
 - [17. ai-agents](#17-ai-agents)
 - [18. Fine Tuning](#18-fine-tuning)
-- [19. 待办](#19-待办)
+- [19. RAG(using langchain)](#19-ragusing-langchain)
+- [待办](#待办)
 
 
 ## 前言<br>
@@ -212,7 +213,41 @@ AI 代理是生成式 AI 领域中一个非常令人兴奋的领域。这种兴�
 4. 部署微调模型的托管环境
 ```
 
-## 19. 待办<br>
+## 19. RAG(using langchain)<br>
+目前掌握如下代码:<br>
+```python
+import os
+import dotenv
+
+dotenv.load_dotenv() #从.env文件中加载环境变量，其中包括openai api key 以及 langchain api key(用作langsmith，追踪调用用的)
+os.environ["LANGCHAIN_TRACING_V2"] = "true" #允许追踪
+
+from langchain_openai import ChatOpenAI # 用openapi
+llm = ChatOpenAI(model="gpt-3.5-turbo-0125") # 选用模型
+
+import bs4
+from langchain import hub
+from langchain_chroma import Chroma
+from langchain_community.document_loaders import WebBaseLoader
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnablePassthrough
+from langchain_openai import OpenAIEmbeddings
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+# Load, chunk and index the contents of the blog.
+loader = WebBaseLoader(
+    web_paths=("https://lilianweng.github.io/posts/2023-06-23-agent/",), # 用作知识库的网址
+    bs_kwargs=dict(
+        parse_only=bs4.SoupStrainer( 
+            class_=("post-content", "post-title", "post-header")
+        ) # 用beautifulsoup的strainer来parse html文本，这里的意思是提取含有 post-content  post-title post-header 类的元素的数据提取出来
+    ),
+)
+docs = loader.load() # 加载数据
+print(docs[0].page_content[:500]) # 打印第0个网址的相关内容
+```
+
+## 待办<br>
 1. 用`langchain`体验一波`RAG`的使用<br>
 2. 体验hugging face<br>
 3. 体验一波`langchain agents`<br>
