@@ -12,10 +12,10 @@ date: 2024-7-1
   - [15.1 RAG运行步骤](#151-rag运行步骤)
   - [15.2 创建知识库(向量库)](#152-创建知识库向量库)
   - [15.3 检索](#153-检索)
+  - [15.4 RAG(using langchain)](#154-ragusing-langchain)
 - [16. open-source-models](#16-open-source-models)
 - [17. ai-agents](#17-ai-agents)
 - [18. Fine Tuning](#18-fine-tuning)
-- [19. RAG(using langchain)](#19-ragusing-langchain)
 - [待办](#待办)
 
 
@@ -61,31 +61,12 @@ RAG-Token,RAG-Token 在生成答案时的步骤如下：
 **RAG-Sequence：基于每个检索文档生成多个完整答案，然后选择或集成这些答案。**<br>
 **RAG-Token：逐词生成答案，每个词的生成都利用了所有检索到的文档的信息。**<br>
 
-接下来会介绍如何执行1/3步骤的实现<br>
+接下来会介绍如何`RAG运行步骤 1 3`的思路<br>
 
 ### 15.2 创建知识库(向量库)<br>
 与传统数据库不同，向量数据库是一种专门用于存储、管理和搜索`embedding vector`的数据库。它存储文档的数字表示。将数据分解为`embeddings`使我们的 AI 系统更容易理解和处理数据。<br>
 我们将`embeddings`存储在向量数据库中，因为 LLM 接受的`token`数量是有限的。由于无法将整个`embeddings`传递给 LLM，因此我们需要将它们分解成块`chunk`，当用户提出问题时，最像问题的`embeddings`将与提示一起返回。分块还可以降低通过LLM的`token`数量的成本。<br>
 一些流行的矢量数据库包括 Azure Cosmos DB、Clarifyai、Pinecone、Chromadb、ScaNN、Qdrant 和 DeepLake。<br>
-分块的代码如下:<br>
-```python
-def split_text(text, max_length, min_length):
-    words = text.split()
-    chunks = []
-    current_chunk = []
-
-    for word in words:
-        current_chunk.append(word)
-        if len(' '.join(current_chunk)) < max_length and len(' '.join(current_chunk)) > min_length:
-            chunks.append(' '.join(current_chunk))
-            current_chunk = []
-
-    # If the last chunk didn't reach the minimum length, add it anyway
-    if current_chunk:
-        chunks.append(' '.join(current_chunk))
-
-    return chunks
-```
 
 ### 15.3 检索<br>
 检索的核心思路有4种<br>
@@ -101,74 +82,47 @@ Retrieval will be done by querying the documents whose vector representations ar
 ```
 这里面的关键点在于如何**衡量向量相似度**，目前常用的方法有`余弦相似度、欧几里得距离、点积`<br>
 
-为数据库的每个向量创建索引的方法如下:<br>
+### 15.4 RAG(using langchain)<br>
+目前掌握如下代码:<br>
 ```python
-from sklearn.neighbors import NearestNeighbors
+import os
+import dotenv
 
-embeddings = flattened_df['embeddings'].to_list()
+dotenv.load_dotenv() #从.env文件中加载环境变量，其中包括openai api key 以及 langchain api key(用作langsmith，追踪调用用的)
+os.environ["LANGCHAIN_TRACING_V2"] = "true" #允许追踪
 
-# Create the search index
-nbrs = NearestNeighbors(n_neighbors=5, algorithm='ball_tree').fit(embeddings)
+from langchain_openai import ChatOpenAI # 用openapi
+llm = ChatOpenAI(model="gpt-3.5-turbo-0125") # 选用模型
 
-# To query the index, you can use the kneighbors method
-distances, indices = nbrs.kneighbors(embeddings)
+import bs4
+from langchain import hub
+from langchain_chroma import Chroma
+from langchain_community.document_loaders import WebBaseLoader
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnablePassthrough
+from langchain_openai import OpenAIEmbeddings
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+# Load, chunk and index the contents of the blog.
+loader = WebBaseLoader(
+    web_paths=("https://lilianweng.github.io/posts/2023-06-23-agent/",), # 用作知识库的网址
+    bs_kwargs=dict(
+        parse_only=bs4.SoupStrainer( 
+            class_=("post-content", "post-title", "post-header")
+        ) # 用beautifulsoup的strainer来parse html文本，这里的意思是提取含有 post-content  post-title post-header 类的元素的数据提取出来
+    ),
+)
+docs = loader.load() # 加载数据
+print(docs[0].page_content[:500]) # 打印第0个网址的相关内容
+
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+text_splitter = RecursiveCharacterTextSplitter(
+    chunk_size=1000, chunk_overlap=200, add_start_index=True
+) # 用langchain_text_splitters中的RecursiveCharacterTextSplitter来当作文本分割器，这里每个chunk的size是1000，重叠的部分size为200（这一部分是为了能够体现块之间的上下文关联关系而设立的），add_start_index=true会把该chunk在原文中的起始位置作为metadata的一部分
+all_splits = text_splitter.split_documents(docs) #执行分割
+print(len(all_splits))
+print(all_splits[10].metadata)
 ```
-
-查询数据库后，您可能需要按最相关的顺序对结果进行排序。
-```python
-# Find the most similar documents
-distances, indices = nbrs.kneighbors([query_vector])
-
-index = []
-# Print the most similar documents
-for i in range(3):
-    index = indices[0][i]
-    for index in indices[0]:
-        print(flattened_df['chunks'].iloc[index])
-        print(flattened_df['path'].iloc[index])
-        print(flattened_df['distances'].iloc[index])
-    else:
-        print(f"Index {index} not found in DataFrame")
-```
-
-总结:<br>
-```python
-user_input = "what is a perceptron?"
-
-def chatbot(user_input):
-    # Convert the question to a query vector
-    query_vector = create_embeddings(user_input)
-
-    # Find the most similar documents
-    distances, indices = nbrs.kneighbors([query_vector])
-
-    # add documents to query  to provide context
-    history = []
-    for index in indices[0]:
-        history.append(flattened_df['chunks'].iloc[index])
-
-    # combine the history and the user input
-    history.append(user_input)
-
-    # create a message object
-    messages=[
-        {"role": "system", "content": "You are an AI assiatant that helps with AI questions."},
-        {"role": "user", "content": history[-1]}
-    ]
-
-    # use chat completion to generate a response
-    response = openai.chat.completions.create(
-        model="gpt-4",
-        temperature=0.7,
-        max_tokens=800,
-        messages=messages
-    )
-
-    return response.choices[0].message
-
-chatbot(user_input)
-```
-
 
 ## 16. open-source-models<br>
 anyway，在huggingface上使用一些开源模型就对了，省钱又省事~<br>
@@ -213,39 +167,7 @@ AI 代理是生成式 AI 领域中一个非常令人兴奋的领域。这种兴�
 4. 部署微调模型的托管环境
 ```
 
-## 19. RAG(using langchain)<br>
-目前掌握如下代码:<br>
-```python
-import os
-import dotenv
 
-dotenv.load_dotenv() #从.env文件中加载环境变量，其中包括openai api key 以及 langchain api key(用作langsmith，追踪调用用的)
-os.environ["LANGCHAIN_TRACING_V2"] = "true" #允许追踪
-
-from langchain_openai import ChatOpenAI # 用openapi
-llm = ChatOpenAI(model="gpt-3.5-turbo-0125") # 选用模型
-
-import bs4
-from langchain import hub
-from langchain_chroma import Chroma
-from langchain_community.document_loaders import WebBaseLoader
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.runnables import RunnablePassthrough
-from langchain_openai import OpenAIEmbeddings
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-
-# Load, chunk and index the contents of the blog.
-loader = WebBaseLoader(
-    web_paths=("https://lilianweng.github.io/posts/2023-06-23-agent/",), # 用作知识库的网址
-    bs_kwargs=dict(
-        parse_only=bs4.SoupStrainer( 
-            class_=("post-content", "post-title", "post-header")
-        ) # 用beautifulsoup的strainer来parse html文本，这里的意思是提取含有 post-content  post-title post-header 类的元素的数据提取出来
-    ),
-)
-docs = loader.load() # 加载数据
-print(docs[0].page_content[:500]) # 打印第0个网址的相关内容
-```
 
 ## 待办<br>
 1. 用`langchain`体验一波`RAG`的使用<br>
