@@ -29,6 +29,7 @@ comments: true
   - [6.2 password hashing (with salt)](#62-password-hashing-with-salt)
   - [6.3 Proof of work](#63-proof-of-work)
 - [7. Trust(证书)](#7-trust证书)
+- [8. 外传: RSA challenge-response](#8-外传-rsa-challenge-response)
 
 ## 前言<br>
 常见的密码算法编写可看[Re 常见加解密算法识别与加解密脚本](https://wsxk.github.io/ctf_common_re/)<br>
@@ -180,3 +181,30 @@ hash也应用在区块链当中充当工作证明<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240714105015.png)
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240714105028.png)
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240714105047.png)
+
+
+## 8. 外传: RSA challenge-response<br>
+**RSA challenge-response 是一种基于 RSA 公钥密码系统的身份验证协议，用于确认通信双方的身份。**<br>
+这个协议通过挑战和应答的方式来验证身份，确保只有拥有正确私钥的一方才能通过验证。<br>
+```
+以下是 RSA challenge-response 认证的基本流程：
+
+密钥生成：
+每个参与方（客户端和服务器）都有一对 RSA 密钥对（公钥和私钥）。
+公钥是公开的，任何人都可以获取。私钥是保密的，只有密钥的拥有者知道。
+
+挑战生成：
+服务器生成一个随机数或字符串，称为挑战（challenge）。
+这个挑战是一个一次性随机数，确保每次认证都是唯一的，防止重放攻击。
+
+挑战加密：
+服务器将挑战发送给客户端。
+客户端使用其私钥对挑战进行加密，生成应答（response）。
+
+应答发送：
+客户端将加密后的应答发送回服务器。
+
+应答验证：
+服务器使用客户端的公钥对应答进行解密。
+如果解密后的结果与最初的挑战一致，证明客户端拥有正确的私钥，认证成功。
+```
