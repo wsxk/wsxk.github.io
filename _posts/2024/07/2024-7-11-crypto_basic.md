@@ -152,7 +152,7 @@ rsa的key的生成过程如下图所示:<br>
 rsa的加密过程如下图所示:<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240713223156.png)
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240713223232.png)
-当然，RSA的逆运用可以当作就是**签名(signature)**了<br>
+当然，RSA的逆运用可以当作就是 **签名(signature)** 了<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240713223321.png)
 
 
