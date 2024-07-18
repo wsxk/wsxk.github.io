@@ -85,25 +85,10 @@ Retrieval will be done by querying the documents whose vector representations ar
 ### 15.4 RAG(using langchain)<br>
 目前掌握如下代码:<br>
 ```python
-import os
-import dotenv
-
-dotenv.load_dotenv() #从.env文件中加载环境变量，其中包括openai api key 以及 langchain api key(用作langsmith，追踪调用用的)
-os.environ["LANGCHAIN_TRACING_V2"] = "true" #允许追踪
-
-from langchain_openai import ChatOpenAI # 用openapi
-llm = ChatOpenAI(model="gpt-3.5-turbo-0125") # 选用模型
-
 import bs4
-from langchain import hub
-from langchain_chroma import Chroma
 from langchain_community.document_loaders import WebBaseLoader
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.runnables import RunnablePassthrough
-from langchain_openai import OpenAIEmbeddings
-from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-# Load, chunk and index the contents of the blog.
+# Load the contents of the blog.
 loader = WebBaseLoader(
     web_paths=("https://lilianweng.github.io/posts/2023-06-23-agent/",), # 用作知识库的网址
     bs_kwargs=dict(
@@ -115,13 +100,21 @@ loader = WebBaseLoader(
 docs = loader.load() # 加载数据
 print(docs[0].page_content[:500]) # 打印第0个网址的相关内容
 
+# chunk the contents of the blog.
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 text_splitter = RecursiveCharacterTextSplitter(
     chunk_size=1000, chunk_overlap=200, add_start_index=True
 ) # 用langchain_text_splitters中的RecursiveCharacterTextSplitter来当作文本分割器，这里每个chunk的size是1000，重叠的部分size为200（这一部分是为了能够体现块之间的上下文关联关系而设立的），add_start_index=true会把该chunk在原文中的起始位置作为metadata的一部分
 all_splits = text_splitter.split_documents(docs) #执行分割
 print(len(all_splits))
-print(all_splits[10].metadata)
+print(all_splits[0].page_content)
+print(all_splits[0].metadata)
+
+# embed、store、index the contents of the blog.
+from langchain_chroma import Chroma
+from langchain_openai import OpenAIEmbeddings
+vectorstore = Chroma.from_documents(documents=all_splits, embedding=OpenAIEmbeddings())
+
 ```
 
 ## 16. open-source-models<br>
