@@ -30,6 +30,7 @@ comments: true
   - [6.3 Proof of work](#63-proof-of-work)
 - [7. Trust(证书)](#7-trust证书)
 - [8. 外传: RSA challenge-response](#8-外传-rsa-challenge-response)
+- [9. python如何使用上述加密](#9-python如何使用上述加密)
 
 ## 前言<br>
 常见的密码算法编写可看[Re 常见加解密算法识别与加解密脚本](https://wsxk.github.io/ctf_common_re/)<br>
@@ -207,4 +208,12 @@ hash也应用在区块链当中充当工作证明<br>
 应答验证：
 服务器使用客户端的公钥对应答进行解密。
 如果解密后的结果与最初的挑战一致，证明客户端拥有正确的私钥，认证成功。
+```
+
+## 9. python如何使用上述加密<br>
+```python
+from Crypto.Cipher import AES
+from Crypto.PublicKey import RSA 
+import hashlib
+# 用上述3个库可以使用提到的加密方法
 ```
