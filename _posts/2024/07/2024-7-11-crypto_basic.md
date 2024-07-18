@@ -216,4 +216,8 @@ from Crypto.Cipher import AES
 from Crypto.PublicKey import RSA 
 import hashlib
 # 用上述3个库可以使用提到的加密方法
+# 另外附加一些bytes - int 类型互转的问题
+# 下列2个用法非常好用，在你收到网络报文，得到一串bytes表示的的secret/key等等时，可以直接用它转成整数类型，方便进行计算
+value = int.from_bytes(bytes_object,"little")
+bytes_object = value.to_bytes(256,"little")
 ```
