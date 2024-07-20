@@ -83,6 +83,7 @@ Retrieval will be done by querying the documents whose vector representations ar
 这里面的关键点在于如何**衡量向量相似度**，目前常用的方法有`余弦相似度、欧几里得距离、点积`<br>
 
 ### 15.4 RAG(using langchain)<br>
+文档在这[https://python.langchain.com/v0.2/docs/tutorials/rag/#built-in-chains](https://python.langchain.com/v0.2/docs/tutorials/rag/#built-in-chains)<br>
 目前掌握如下代码:<br>
 ```python
 import bs4
@@ -98,7 +99,7 @@ loader = WebBaseLoader(
     ),
 )
 docs = loader.load() # 加载数据
-print(docs[0].page_content[:500]) # 打印第0个网址的相关内容
+# print(docs[0].page_content[:500]) # 打印第0个网址的相关内容
 
 # chunk the contents of the blog.
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -106,15 +107,55 @@ text_splitter = RecursiveCharacterTextSplitter(
     chunk_size=1000, chunk_overlap=200, add_start_index=True
 ) # 用langchain_text_splitters中的RecursiveCharacterTextSplitter来当作文本分割器，这里每个chunk的size是1000，重叠的部分size为200（这一部分是为了能够体现块之间的上下文关联关系而设立的），add_start_index=true会把该chunk在原文中的起始位置作为metadata的一部分
 all_splits = text_splitter.split_documents(docs) #执行分割
-print(len(all_splits))
-print(all_splits[0].page_content)
-print(all_splits[0].metadata)
+# print(len(all_splits))
+# print(all_splits[0].page_content)
+# print(all_splits[0].metadata)
 
 # embed、store、index the contents of the blog.
 from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
-vectorstore = Chroma.from_documents(documents=all_splits, embedding=OpenAIEmbeddings())
+from dotenv import load_dotenv
+load_dotenv() # 加载环境变量，包括openai的apikey 以及 langchain的apikey
+vectorstore = Chroma.from_documents(documents=all_splits, embedding=OpenAIEmbeddings())# 用openAIembeddings模型来对splits做embedding
+# print(vectorstore)
 
+# retrieve 
+retriever = vectorstore.as_retriever(search_type="similarity",search_kwargs={"k":6}) # 用vectorstore的as_retriever方法来生成一个retriever，这里的retriever是基于相似度的，k=6表示每次检索返回6个结果
+retrieved_docs = retriever.invoke("what are the approaches to Task Decomposition?")
+# print(len(retrieved_docs)) # 返回检索到的文档数量
+# print("-------------------")
+# print(retrieved_docs)
+# print("-------------------")
+# print(retrieved_docs[0].metadata)
+# print(retrieved_docs[0].page_content)
+# print("-------------------")
+
+# generation
+from langchain_openai import ChatOpenAI  
+llm = ChatOpenAI(model="gpt-3.5-turbo-0125") # 选择openai的模型
+from langchain import hub
+prompt = hub.pull("rlm/rag-prompt") # 获得一个prompt模板
+# print(prompt)
+# example_messages = prompt.invoke(
+#     {"context": "filler context", "question": "filler question"}
+# ).to_messages()
+# print(example_messages) # 填充模板内容
+
+from langchain_core.output_parsers  import StrOutputParser
+from langchain_core.runnables import RunnablePassthrough
+
+def format_docs(docs):
+    return "\n\n".join(doc.page_content for doc in docs)
+
+rag_chain = (
+    {"context": retriever | format_docs, "question": RunnablePassthrough()} # retriever | format_docs passes the question through the retriever, generating Document objects, and then to format_docs to generate strings; # RunnablePassthrough() passes through the input question unchanged.
+    | prompt
+    | llm  # The last steps of the chain are llm, which runs the inference.
+    | StrOutputParser() # StrOutputParser(), which just plucks the string content out of the LLM's output message
+)
+print(rag_chain)
+for chunk in rag_chain.stream("What is Task Decomposition?"):
+    print(chunk, end="", flush=True)
 ```
 
 ## 16. open-source-models<br>
@@ -161,7 +202,6 @@ AI 代理是生成式 AI 领域中一个非常令人兴奋的领域。这种兴�
 ```
 
 ## 待办<br>
-1. 用`langchain`体验一波`RAG`的使用<br>
-2. 体验hugging face<br>
-3. 体验一波`langchain agents`<br>
-4. `fine-tuning`某个模型<br>
+1. 体验hugging face<br>
+2. 体验一波`langchain agents`<br>
+3. `fine-tuning`某个模型<br>
