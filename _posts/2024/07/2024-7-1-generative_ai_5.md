@@ -161,6 +161,8 @@ for chunk in rag_chain.stream("What is Task Decomposition?"):
 ## 16. open-source-models<br>
 anyway，在huggingface上使用一些开源模型就对了，省钱又省事~<br>
 [https://huggingface.co/chat](https://huggingface.co/chat)
+`hugging face`网页里有很多开源的模型和数据集可供使用，**氪金后更能体验先进的一站式服务！可以说是ai界的github了~**<br>
+
 
 ## 17. ai-agents<br>
 AI 代理是生成式 AI 领域中一个非常令人兴奋的领域。这种兴奋有时会带来术语及其应用的混淆。为了使事情简单化并涵盖大多数涉及 AI 代理的工具，我们将使用以下定义：<br>
@@ -202,6 +204,5 @@ AI 代理是生成式 AI 领域中一个非常令人兴奋的领域。这种兴�
 ```
 
 ## 待办<br>
-1. 体验hugging face<br>
-2. 体验一波`langchain agents`<br>
-3. `fine-tuning`某个模型<br>
+1. 体验一波`langchain agents`<br>
+2. `fine-tuning`某个模型<br>
