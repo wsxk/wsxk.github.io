@@ -9,8 +9,10 @@ comments: true
 
 - [1. why pwntools+tmux?](#1-why-pwntoolstmux)
 - [2. 安装教程](#2-安装教程)
-- [3. 使用教程](#3-使用教程)
+- [3. pwntools+tmux联合使用教程](#3-pwntoolstmux联合使用教程)
 - [4. tmux快捷键](#4-tmux快捷键)
+  - [4.1 指导文档](#41-指导文档)
+- [5. pwntools使用方法](#5-pwntools使用方法)
 
 
 ## 1. why pwntools+tmux?<br>
@@ -27,7 +29,7 @@ pip install pwntools
 sudo apt install tmux 
 ```
 
-## 3. 使用教程<br>
+## 3. pwntools+tmux联合使用教程<br>
 开启命令行后，使用如下命令:<br>
 ```shell
 tmux
@@ -49,5 +51,19 @@ p.interactive()
 可以看到，使用`gdb.attach(io)`后，直接从当前`terminal`分成2个，方便调试。<br>
 
 ## 4. tmux快捷键<br>
-`tmux`情境下,使用命令前都需要打出`ctrl+b`作为前缀，为了切换键盘输入，你需要使用`ctrl+b o`<br>
+`tmux`情境下,使用命令前都需要打出`ctrl+b`作为前缀，这里列出比较常用的几个:<br>
+```
+ctrl+b o : 切换同一个session下的不同pane
+
+tmux detach: 脱离会话，但是会话不会消失
+tmux kill-server： 删除所有会话
+```
+
+### 4.1 指导文档<br>
 [https://matpool.com/supports/doc-tmux-matpool/](https://matpool.com/supports/doc-tmux-matpool/)里有大量的`tmux命令教程`<br>
+
+## 5. pwntools使用方法<br>
+在pwntools下**下断点**可以这么用<br>
+```python
+gdb.attach(io,"b *$rebase(0x27C3)")
+```
