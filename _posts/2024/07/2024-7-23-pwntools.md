@@ -1,25 +1,31 @@
 ---
 layout: post
 tags: [pwn]
-title: "pwntools+tmux"
+title: "pwntools+tmux & gdb+pwndbg"
 date: 2024-7-23
 author: wsxk
 comments: true
 ---
 
-- [1. why pwntools+tmux?](#1-why-pwntoolstmux)
-- [2. 安装教程](#2-安装教程)
-- [3. pwntools+tmux联合使用教程](#3-pwntoolstmux联合使用教程)
-- [4. tmux快捷键](#4-tmux快捷键)
-  - [4.1 指导文档](#41-指导文档)
-- [5. pwntools使用方法](#5-pwntools使用方法)
+- [1. pwntools+tmux](#1-pwntoolstmux)
+  - [1.1 pwntools\&tmux 安装教程](#11-pwntoolstmux-安装教程)
+  - [1.2 pwntools+tmux联合使用教程](#12-pwntoolstmux联合使用教程)
+  - [1.3 tmux快捷键](#13-tmux快捷键)
+  - [1.4 pwntools使用技巧](#14-pwntools使用技巧)
+- [2. gdb+pwndbg](#2-gdbpwndbg)
+  - [2.1 gdb调试程序命令](#21-gdb调试程序命令)
+  - [2.2 gdb常见命令](#22-gdb常见命令)
+  - [2.3 gdb script用法](#23-gdb-script用法)
+  - [2.4 gdb多线程调试命令](#24-gdb多线程调试命令)
+  - [2.5 gdb命令参考文档](#25-gdb命令参考文档)
+  - [2.6 pwndbg使用技巧](#26-pwndbg使用技巧)
 
 
-## 1. why pwntools+tmux?<br>
+## 1. pwntools+tmux<br>
 在用`pwntools`进行`ctf pwn`题目调试时，通常会利用类似`gdb.attach(p)`的代码来调试，通常情况下，这回弹出另一个命令行<br>
 **但是你用tmux来进行调试，它会把一个命令行划分成2个pane，可以同时操作，界面美观还方便**<br>
 
-## 2. 安装教程<br>
+### 1.1 pwntools&tmux 安装教程<br>
 对于`pwntools`而言，只需执行如下命令即可。<br>
 ```
 pip install pwntools
@@ -29,7 +35,7 @@ pip install pwntools
 sudo apt install tmux 
 ```
 
-## 3. pwntools+tmux联合使用教程<br>
+### 1.2 pwntools+tmux联合使用教程<br>
 开启命令行后，使用如下命令:<br>
 ```shell
 tmux
@@ -47,10 +53,11 @@ gdb.attach(io)
 
 p.interactive()
 ```
+**在执行了tmux命令的terminal下执行python3 test.py(上述脚本名称)，即可看到如下视图**<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240723215924.png)
 可以看到，使用`gdb.attach(io)`后，直接从当前`terminal`分成2个，方便调试。<br>
 
-## 4. tmux快捷键<br>
+### 1.3 tmux快捷键<br>
 `tmux`情境下,使用命令前都需要打出`ctrl+b`作为前缀，这里列出比较常用的几个:<br>
 ```
 ctrl+b o : 切换同一个session下的不同pane
@@ -58,12 +65,140 @@ ctrl+b o : 切换同一个session下的不同pane
 tmux detach: 脱离会话，但是会话不会消失
 tmux kill-server： 删除所有会话
 ```
-
-### 4.1 指导文档<br>
+**指导文档:**<br>
 [https://matpool.com/supports/doc-tmux-matpool/](https://matpool.com/supports/doc-tmux-matpool/)里有大量的`tmux命令教程`<br>
 
-## 5. pwntools使用方法<br>
+### 1.4 pwntools使用技巧<br>
 在pwntools下**下断点**可以这么用<br>
 ```python
 gdb.attach(io,"b *$rebase(0x27C3)")
 ```
+
+## 2. gdb+pwndbg<br>
+gdb的可用命令实在是太多了，有很多重要的command，但是你不用就会忘记<br>
+所以需要记录一下（之后我好翻哈哈哈）<br>
+### 2.1 gdb调试程序命令<br>
+
+|命令| 作用|
+|-|-|
+|gdb program| 调试程序|
+
+
+### 2.2 gdb常见命令<br>
+
+|命令| 作用|
+|-|-|
+|run arg| 不设置断点，直接运行程序|
+|start arg| 设置断点在main，并运行至main函数|
+|starti arg| 设置断点在_start，并运行至_start函数|
+|attach pid| 附加一个正在运行的程序|
+|core PATH| 调试程序的dump文件|
+|continue (c)| 继续执行程序直到断点|
+|info registers| 输出所有寄存器的值|
+|print (p) $rdi| 输出rdi寄存器的值，也可以通过p/x $rdi打印十六进制|
+|x/nuf address| 查看内存的值，n是数量，u是类型，即b(1 byte)/h(2 bytes)/w(4 bytes)/g(8 bytes), f是格式，即x(十六进制),d(十进制),s(string),i(instruction),address可以是绝对地址，寄存器值，或计算表达式|
+|disassemble(disas) main| 反汇编main函数的值|
+|set disassembly-flavor intel| 设置反汇编的形式为intel|
+|stepi(si) num| 步进，会进入函数调用，num表示步数|
+|nexti(ni) num| 步过，不会进入函数调用，num表示步数|
+|finish|完成当前函数运行|
+|break(b) *address|在地址下断点|
+|display/nuf| 每执行完一次指令后显示的内容，nuf参数与x命令相同|
+|layout regs|进入TUI（文本用户界面）模式，按ctrl+x+a返回普通模式|
+|set expr|设置某个值，比如 set $rdi=0, set *((uint64_t *) $rsp) = 0x1234, set *((uint16_t *) 0x31337000) = 0x1337|
+|call (ret type)func(arg) | 直接调用函数|
+|set unwindonsignal on| 该选项开启时，gdb在收到信号时，会尝试还原到调用信号前的状态|
+|set unwindonsignal off| 该选项关闭时，gdb在收到信号时，会停在收到信号的指令的位置，该指令已经被执行|
+|delete(d) num | 删除断点|
+|info breakpoints| 查看断点信息|
+|backtrace bt| 查看函数调用栈|
+|frame f| 查看当前栈帧|
+|print p| 打印变量|
+|info locals| 查看局部变量|
+|thread num| 切换线程|
+|until| 执行到指定行|
+|info signals| 查看信号|
+|handle signal keyword(stop/nostop print/noprint/ pass/nopass)| 处理信号|
+|watch expr| 设置写观察点|
+|rwatch expr| 设置读观察点|
+|awatch expr| 设置读写观察点|
+
+### 2.3 gdb script用法<br>
+gdb script文件的语法就是通常的gdb命令，可以使用:<br>
+```gdb 
+gdb program  -x <PATH_TO_SCRIPT>
+```
+或者:<br>
+```gdb
+gdb program -ex <COMMAND>
+```
+来运行命令，一个`gdb script`的文件可以是如下的形式：<br>
+```
+set disassembly-flavor intel
+start
+break *main+709
+commands
+  silent
+  set $local_variable = *(unsigned long long*)($rsi)
+  printf "Current value: %llx\n", $local_variable
+  continue
+end
+continuenue
+```
+另一个形式:<br>
+```
+start
+catch syscall read
+commands
+  silent
+  if ($rdi == 42)
+    set $rdi = 0
+  end
+  continue
+end
+continue
+```
+
+### 2.4 gdb多线程调试命令<br>
+
+|命令          |   作用     |
+|-        |-      |
+|info threads  |  查看线程ID |
+|thread ID(1,2...)| 根据info threads提供的ID号来切换线程|    
+|thread apply ID1 ID2 command| 可以让相应线程执行相同的命令|
+|thread apply command | 让所以线程执行相同命令 |
+|set scheduler-locking off/on/step | 设置调试线程时其他线程的状态（on是只有被调试线程会运行，off是所有线程都执行 |
+|b xxxx thread thread-num| 设置线程断点|
+
+
+### 2.5 gdb命令参考文档<br>
+[100个gdb小技巧](https://wizardforcel.gitbooks.io/100-gdb-tips/content/)<br>
+上述文档是10年前出的，已经比较老旧了，新的gdb功能就没有记录其中，有一个比较重要的更新：<br>
+`non-stop的用法`<br>
+```gdb
+set non-stop on
+set pagination off
+set target-async on
+```
+[https://www.cnblogs.com/WindSun/p/12785322.html](https://www.cnblogs.com/WindSun/p/12785322.html)<br>
+
+### 2.6 pwndbg使用技巧<br>
+
+```
+pwndbg界面下:
+
+heap: 查看当前堆情况
+
+arenas： 查看 main_arena的基本信息
+
+arena： 查看main_arena的具体变量信息
+
+fastbins: 查看fastbins里的列表
+
+vmmap： 查看程序内存映射
+
+b *$rebase(offset):非常方便！！在你运行开启了pie和aslr的程序时，不需要你自己计算偏移下断点。
+```
+
+
+
