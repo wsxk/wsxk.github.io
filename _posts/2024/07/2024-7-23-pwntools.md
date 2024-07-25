@@ -12,6 +12,7 @@ comments: true
   - [1.2 pwntools+tmux联合使用教程](#12-pwntoolstmux联合使用教程)
   - [1.3 tmux快捷键](#13-tmux快捷键)
   - [1.4 pwntools使用技巧](#14-pwntools使用技巧)
+  - [1.5 pwntools脚本常用代码](#15-pwntools脚本常用代码)
 - [2. gdb+pwndbg](#2-gdbpwndbg)
   - [2.1 gdb调试程序命令](#21-gdb调试程序命令)
   - [2.2 gdb常见命令](#22-gdb常见命令)
@@ -72,6 +73,88 @@ tmux kill-server： 删除所有会话
 在pwntools下**下断点**可以这么用<br>
 ```python
 gdb.attach(io,"b *$rebase(0x27C3)")
+```
+
+### 1.5 pwntools脚本常用代码<br>
+```python
+from pwn import *
+context.log_level="debug"
+context.terminal=["tmux","splitw","-h"]
+
+io = process(["./cts","8888"])
+p = remote("127.0.0.1","8888")
+p_sock = p.sock
+
+r = lambda s      :p.recv(s)
+ru = lambda s     :p.recvuntil(s)
+rl = lambda       :p.recvline()
+s = lambda s      :p.send(s)
+sl = lambda s     :p.sendline(s)
+sa = lambda a,s   :p.sendafter(a,s)
+sla = lambda a,s  :p.sendlineafter(a,s)
+
+def wrap_packet(op,size,content):
+    payload = b""
+    payload += p64(op)
+    payload += p64(size)
+    payload += content
+    return payload
+
+def create(size,content):
+    payload = wrap_packet(0,size,content)
+    s(payload)
+    sleep(1)
+    return
+
+def print_data(idx):
+    payload = wrap_packet(2,idx,b"")
+    s(payload)
+    sleep(1)
+    return
+
+def edit(idx,content):
+    payload = wrap_packet(3,idx,content)
+    s(payload)
+    sleep(1)
+    return
+
+def free(idx):
+    payload = wrap_packet(1,idx,b"")
+    s(payload)
+    sleep(1)
+
+def send_oob(idx):
+    payload = b""
+    payload += p64(idx)
+    p_sock.send(payload,socket.MSG_OOB)
+
+main_addr = r(16)[:14]
+main_addr = int(main_addr,10)
+log.info("get main_addr: {}".format(hex(main_addr)))
+
+gdb.attach(io)
+pause()
+for i in range(8):
+    create(0x200,b"a"*0x1ff)
+create(0x10,b"z"*0xf) # 8 
+for i in range(8):
+    free(7-i)
+    sleep(3)
+pause()
+for i in range(8):
+    create(0x200,b"")
+pause()
+
+for i in range(8):
+    print_data(i)
+    ru(b"a"*0x1ef)
+    pause()
+
+# free(8)
+# sleep(3)
+# send_oob(0)
+
+p.interactive()
 ```
 
 ## 2. gdb+pwndbg<br>
