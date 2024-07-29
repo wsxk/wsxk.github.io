@@ -16,7 +16,6 @@ date: 2024-7-1
 - [16. open-source-models](#16-open-source-models)
 - [17. ai-agents](#17-ai-agents)
 - [18. Fine Tuning](#18-fine-tuning)
-- [待办](#待办)
 
 
 ## 前言<br>
@@ -172,6 +171,7 @@ AI 代理是生成式 AI 领域中一个非常令人兴奋的领域。这种兴�
 开源项目`LangChain agent`就是其中之一，其工作原理如下：<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240629225555.png)
 
+`langchain agent`的大致原理可以看:[https://python.langchain.com/v0.2/docs/concepts/#agents](https://python.langchain.com/v0.2/docs/concepts/#agents)<br>
 
 ## 18. Fine Tuning<br>
 微调模型，即用新的数据集训练预训练好的模型，调整模型参数<br>
@@ -202,7 +202,5 @@ AI 代理是生成式 AI 领域中一个非常令人兴奋的领域。这种兴�
 3. 运行微调作业的训练环境
 4. 部署微调模型的托管环境
 ```
+体验模型微调就留待后续吧~<br>
 
-## 待办<br>
-1. 体验一波`langchain agents`<br>
-2. `fine-tuning`某个模型<br>
