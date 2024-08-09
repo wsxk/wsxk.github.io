@@ -27,6 +27,8 @@ comments: true
 上图中，因为一个编程失误，导致**用户输入(data)被作为代码(code)执行**。<br>
 
 ## 2. 编写shellcode<br>
+`shellcode`之所以叫`shellcode`，是因为**利用的目标就是达成任意命令执行**,而一个经典的攻击模式就是启动`shell`:`execve("/bin/sh", NULL, NULL)`<br>
+
 
 ## 3. debugging shellcode<br>
 
