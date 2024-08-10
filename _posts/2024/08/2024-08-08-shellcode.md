@@ -61,6 +61,20 @@ cat shellcode-raw | strace /vulnerable_process
 gdb /vulnerable_process
 (gdb) r < shellcode-raw
 ```
+这些命令在编写`shellcode`时是非常有用的，下面还有一些好用的工具可供选择！<br>
+```
+1. pwntools (https://github.com/Gallopsled/pwntools), a library for writing exploits (and shellcode).
+
+2. rappel (https://github.com/yrp604/rappel) lets you explore the effects of instructions.
+easily installable via https://github.com/zardus/ctf-tools  
+
+3. amd64 opcode listing: http://ref.x86asm.net/coder64.html 
+
+4. Several gdb plugins exist to make exploit debugging easier!
+https://github.com/scwuaptx/Pwngdb
+https://github.com/pwndbg/pwndbg
+https://github.com/longld/peda 
+```
 
 ## 3. debugging shellcode<br>
 
