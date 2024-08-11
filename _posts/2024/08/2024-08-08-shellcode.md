@@ -77,6 +77,16 @@ https://github.com/longld/peda
 ```
 
 ## 3. debugging shellcode<br>
+如果想以高层次的信息来debug，可以用:<br>
+```
+gcc -nostdlib -static shellcode.s -o shellcode.elf
+strace ./shellcode.elf
+```
+来追踪。<br>
+如果想要每条汇编的执行，可以用：<br>
+```
+gdb ./shellcode-elf
+```
 
 ## 4. Forbidden Bytes<br>
 
