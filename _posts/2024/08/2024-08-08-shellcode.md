@@ -13,10 +13,8 @@ comments: true
 - [4. Forbidden Bytes](#4-forbidden-bytes)
   - [4.1 常见的限制](#41-常见的限制)
   - [4.2 创造性地构造shellcode!](#42-创造性地构造shellcode)
-- [5. Common Gotchas](#5-common-gotchas)
-- [6. Cross-Architecture shellcode](#6-cross-architecture-shellcode)
-- [7. Data Execution Prevention](#7-data-execution-prevention)
-- [8. shellcode program](#8-shellcode-program)
+- [5. Data Execution Prevention](#5-data-execution-prevention)
+- [6. shellcode program](#6-shellcode-program)
 
 
 ## 1. 介绍: shellcode是什么<br>
@@ -106,16 +104,35 @@ gdb ./shellcode-elf
 |DEL (0x7f)| protocol-specific (telnet, VT100, etc)|
 
 ### 4.2 创造性地构造shellcode!<br>
+直接看例子：展示如何构造神奇shellcode！<br>
+
+|filter| bad| good|
+| :-----------:| :--------------:|:-------------:|
+|no NULLs| mov rax, 0 (48c7c0**00000000**)|xor rax, rax (4831C0)|
+|no NULLs| mov rax, 5 (48c7c005**000000**)|xor rax, rax; mov al, 5 (4831C0B005)|
+|no newlines| mov rax, 10 (48c7c0**0a**000000)|mov rax, 9; inc rax (48C7C00900000048FFC0)|
+|no NULLs| mov rbx, 0x67616c662f "/flag" (48BB2F666C6167**000000**)|mov ebx, 0x67616c66; shl rbx, 8; mov bl, 0x2f (BB666C616748C1E308B32F)|
+|printables| mov rax, rbx (48**89d8**)|push rbx; pop rax (5358, "SX")|
+
+如果约束太多，导致你很难用同义的shellcode绕过，**如果你的shellcode的内存映射是可写的**，需要记住：**code==data**<br>
+比如绕过一个`int 3的检查`<br>
+```
+inc BYTE PTR [rip]
+	.byte 0xcb
+```
+测试用编译命令:`gcc -Wl,-N --static -nostdlib -o test test.s
+`<br>
+如果约束太复杂了，很难做有用的操作，一个可选的办法是**multi-stage shellcode**，即分阶段注入shellcode<br>
+```
+1. read(0, rip, 1000).
+2. 写入你想写的任何东西，当然这里也要求是映射的代码段是可写的
+```
+还有一些情况，你的shellcode可能被压缩/加密/分类，需要你自己思考如何写shellcode！<br>
+
+## 5. Data Execution Prevention<br>
 
 
-
-## 5. Common Gotchas<br>
-
-## 6. Cross-Architecture shellcode<br>
-
-## 7. Data Execution Prevention<br>
-
-## 8. shellcode program<br>
+## 6. shellcode program<br>
 使用如下命令进行编译:<br>
 ```
 gcc -nostdlib -static shellcode.s -o shellcode.elf
