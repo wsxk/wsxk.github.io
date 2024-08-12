@@ -11,6 +11,8 @@ comments: true
 - [2. 编写shellcode](#2-编写shellcode)
 - [3. debugging shellcode](#3-debugging-shellcode)
 - [4. Forbidden Bytes](#4-forbidden-bytes)
+  - [4.1 常见的限制](#41-常见的限制)
+  - [4.2 创造性地构造shellcode!](#42-创造性地构造shellcode)
 - [5. Common Gotchas](#5-common-gotchas)
 - [6. Cross-Architecture shellcode](#6-cross-architecture-shellcode)
 - [7. Data Execution Prevention](#7-data-execution-prevention)
@@ -89,6 +91,21 @@ gdb ./shellcode-elf
 ```
 
 ## 4. Forbidden Bytes<br>
+编写shellcode的时候不总是一帆风顺，即使你碰到了可以写入shellcode1的漏洞，在利用漏洞之前，可能程序对输入做了限制，这里就需要一些其他的`trick`<br>
+### 4.1 常见的限制<br>
+某些字符在某些函数下会被截断，导致shellcode被截断:<br>
+| Byte (Hex Value)      | Problematic Methods |
+| :-----------: | :-----------: |
+| Null byte \0 (0x00)      | strcpy       |
+| Newline \n (0x0a)   | scanf gets getline fgets     |
+|Carriage return \r (0x0d)| scanf|
+|Space (0x20)| scanf |
+|Tab \t (0x09)| scanf |
+|DEL (0x7f)| protocol-specific (telnet, VT100, etc)|
+
+### 4.2 创造性地构造shellcode!<br>
+
+
 
 ## 5. Common Gotchas<br>
 
