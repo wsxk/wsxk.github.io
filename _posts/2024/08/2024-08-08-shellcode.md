@@ -95,6 +95,7 @@ gdb ./shellcode-elf
 编写shellcode的时候不总是一帆风顺，即使你碰到了可以写入shellcode1的漏洞，在利用漏洞之前，可能程序对输入做了限制，这里就需要一些其他的`trick`<br>
 ### 4.1 常见的限制<br>
 某些字符在某些函数下会被截断，导致shellcode被截断:<br>
+
 | Byte (Hex Value)      | Problematic Methods |
 | :-----------: | :-----------: |
 | Null byte \0 (0x00)      | strcpy       |
