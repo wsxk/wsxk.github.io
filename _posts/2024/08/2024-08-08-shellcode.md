@@ -16,7 +16,7 @@ comments: true
 - [5. Data Execution Prevention](#5-data-execution-prevention)
   - [5.1 Remaining Injection Points - de-protecting memory](#51-remaining-injection-points---de-protecting-memory)
   - [5.2 Remaining Injection Points - JIT](#52-remaining-injection-points---jit)
-- [6. shellcode writing](#6-shellcode-writing)
+- [6. shellcode instance](#6-shellcode-instance)
 
 
 ## 1. 介绍: shellcode是什么<br>
@@ -183,7 +183,8 @@ etc...
 
 **jit技术使用得很普遍，像java和大多数解释型语言(luajit,pypy,etc)**<br>
 
-## 6. shellcode writing<br>
+
+## 6. shellcode instance<br>
 使用如下命令进行编译:<br>
 ```
 gcc -nostdlib -static shellcode.s -o shellcode.elf
