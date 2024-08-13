@@ -14,7 +14,9 @@ comments: true
   - [4.1 常见的限制](#41-常见的限制)
   - [4.2 创造性地构造shellcode!](#42-创造性地构造shellcode)
 - [5. Data Execution Prevention](#5-data-execution-prevention)
-- [6. shellcode program](#6-shellcode-program)
+  - [5.1 Remaining Injection Points - de-protecting memory](#51-remaining-injection-points---de-protecting-memory)
+  - [5.2 Remaining Injection Points - JIT](#52-remaining-injection-points---jit)
+- [6. shellcode writing](#6-shellcode-writing)
 
 
 ## 1. 介绍: shellcode是什么<br>
@@ -130,9 +132,58 @@ inc BYTE PTR [rip]
 还有一些情况，你的shellcode可能被压缩/加密/分类，需要你自己思考如何写shellcode！<br>
 
 ## 5. Data Execution Prevention<br>
+`Data Execution Prevention`是`shellcode mitigation`的一种方法，其核心思想是**存放数据的内存区域不允许执行**<br>
+现在介绍其最出名的一种技术:`the "No-eXecute" bit`<br>
+现代的架构开始支持内存权限了:<br>
+```
+PROT_READ : allows the process to read memory
+PROT_WRITE : allows the process to write memory
+PROT_EXEC : allows the process to execute memory
+```
+`the "No-eXecute" bit`的灵感来自于：**正常情况下，所有的代码都是放在elf文件中的.text段里，stack和heap不需要执行权限**<br>
+所以存放在栈和堆里的代码无法被执行，shellcode需要被执行，这时候要怎么办呢？<br>
+### 5.1 Remaining Injection Points - de-protecting memory<br>
+这种方法要求能够执行`mprotect()`来赋予内存可执行的权限，这样在内存上的代码就可以被执行了！<br>
+这种方法需要做两步:<br>
+1. Trick the program into mprotect(PROT_EXEC)ing our shellcode.
+2. Jump to the shellcode.
 
+如何完成第一步呢？通常的办法是使用`ROP(Return Oriented Programming)`,其他办法就要具体问题具体分析了。<br>
 
-## 6. shellcode program<br>
+### 5.2 Remaining Injection Points - JIT<br>
+`JIT(Just in Time Compilation)`通常需要生成（并频繁的重新生成）可执行的代码，所以：<br>
+`jit`生成代码的内存页需要有如下特性:<br>
+```
+Pages must be writable for code generation.
+Pages must be executable for execution.
+Pages must be writable for code re-generation.
+```
+那么为了能够安全的实行上述目标，需要做如下操作:<br>
+```
+mmap(PROT_READ|PROT_WRITE)
+write the code
+mprotect(PROT_READ|PROT_EXEC)
+execute
+mprotect(PROT_READ|PROT_WRITE)
+update code
+etc...
+```
+这么做虽然安全，但是执行速度太慢了。而`jit`要求要快！
+所以通常`jit`是不会像上面那样做的，所以可以通过使用`jit`技术的程序中用到的具有`rwx`权限的内存来写入shellcode！<br>
+当然，如果真的有`jit`像上述描述的方法那样来保护的话，还有其他方法注入shellcode:**`JIT spraying`**<br>
+原理如下:<br>
+```
+1. Make constants in the code that will be JITed:
+	var evil = "%90%90%90%90%90";
+
+2. The JIT engine will mprotect(PROT_WRITE), compile the code into memory, then mprotect(PROT_EXEC). Your constant is now present in executable memory.
+
+3. Use a vulnerability to redirect execution into the constant. # 这里的问题在于重定向到这个内存页后，因为数据都是0x90（nop），执行时会发生滑坡，直到碰到你真正要执行的代码！这么做的原因其实是可以提高执行shellcode的可能性，因为我们不知道实际上我们注入的shellcode被放置在内存的哪个位置
+```
+
+**jit技术使用得很普遍，像java和大多数解释型语言(luajit,pypy,etc)**<br>
+
+## 6. shellcode writing<br>
 使用如下命令进行编译:<br>
 ```
 gcc -nostdlib -static shellcode.s -o shellcode.elf
