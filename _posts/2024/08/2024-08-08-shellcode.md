@@ -195,7 +195,7 @@ gcc -nostdlib -static shellcode.s -o shellcode.elf
 objcopy --dump-section .text=shellcode.raw shellcode.elf
 ```
 汇编代码如下:<br>
-```asm
+```
 .global _start
 _start:
 .intel_syntax noprefix
@@ -275,7 +275,7 @@ call_shellcode:
 **用mov的话，是做不到的，但是用push/pop操作，就有可能！**<br>
 因为相比于`mov`,`push/pop`所需的字节数更少！<br>
 
-```asm
+```
       Address      |                      Bytes                    |          Instructions
 ------------------------------------------------------------------------------------------
 0x000000002436f000 | 6a 31                                         | push 0x31
@@ -291,7 +291,7 @@ call_shellcode:
 在你想读的文件名字太长怎么办？使用`ln -s /flag f`创建软链接！<br>
 代码展示如下:<br>
 
-```asm
+```
 .global _start
 _start:
 .intel_syntax noprefix
