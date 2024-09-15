@@ -12,6 +12,7 @@ comments: true
   - [2.1 Trusting the Developer](#21-trusting-the-developer)
   - [2.2 Mixing Control Information and Data](#22-mixing-control-information-and-data)
   - [2.3 Mixing Data and Metadata](#23-mixing-data-and-metadata)
+  - [2.4 Initialization and Cleanup](#24-initialization-and-cleanup)
 
 
 ## 1. introduction<br>
@@ -43,3 +44,12 @@ IndexError: list index out of range
 ### 2.3 Mixing Data and Metadata<br>
 主要体现在字符串上。<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240915091327.png)
+
+### 2.4 Initialization and Cleanup<br>
+c不会帮你自动初始化一个变量的值，当然，也不会帮你清理值。<br>
+```c
+int a; //a的值未知，取决于栈中的值，不会初始化
+
+char * b = malloc(20);
+free(b); // free后，内存中的值也不会自动清除
+```
