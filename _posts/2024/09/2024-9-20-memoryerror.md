@@ -13,6 +13,7 @@ comments: true
   - [2.2 Mixing Control Information and Data](#22-mixing-control-information-and-data)
   - [2.3 Mixing Data and Metadata](#23-mixing-data-and-metadata)
   - [2.4 Initialization and Cleanup](#24-initialization-and-cleanup)
+- [3. Memory errors: hazard](#3-memory-errors-hazard)
 
 
 ## 1. introduction<br>
@@ -52,4 +53,18 @@ int a; //a的值未知，取决于栈中的值，不会初始化
 
 char * b = malloc(20);
 free(b); // free后，内存中的值也不会自动清除
+```
+
+## 3. Memory errors: hazard<br>
+在现有一个内存破坏漏洞的情况下，我们可以做到如下的事情:<br>
+```
+1. Memory that doesn't influence anything. (Boring)
+
+2. Memory that is used in a value to influence mathematical operations, conditional jumps, etc (such as the win variable).
+
+3. Memory that is used as a read pointer (or offset), allowing us to force the program to access arbitrary memory.
+
+4. Memory that is used as a write pointer (or offset), allowing us to force the program to overwrite arbitrary memory.
+
+5. Memory that is used as a code pointer (or offset), allowing us to redirect program execution!
 ```
