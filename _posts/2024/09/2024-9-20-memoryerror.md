@@ -73,3 +73,4 @@ free(b); // free后，内存中的值也不会自动清除
 
 ## 4. Memory errors: cause<br>
 ### 4.1 Cause: Classic Buffer Overflow<br>
+非常经典的溢出问题。c语言并不会隐式得跟踪buffer的大小，所以简单的`overwrite`是很常见的。
