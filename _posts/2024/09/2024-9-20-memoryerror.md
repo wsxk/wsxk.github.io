@@ -14,6 +14,8 @@ comments: true
   - [2.3 Mixing Data and Metadata](#23-mixing-data-and-metadata)
   - [2.4 Initialization and Cleanup](#24-initialization-and-cleanup)
 - [3. Memory errors: hazard](#3-memory-errors-hazard)
+- [4. Memory errors: cause](#4-memory-errors-cause)
+  - [4.1 Cause: Classic Buffer Overflow](#41-cause-classic-buffer-overflow)
 
 
 ## 1. introduction<br>
@@ -68,3 +70,6 @@ free(b); // free后，内存中的值也不会自动清除
 
 5. Memory that is used as a code pointer (or offset), allowing us to redirect program execution!
 ```
+
+## 4. Memory errors: cause<br>
+### 4.1 Cause: Classic Buffer Overflow<br>
