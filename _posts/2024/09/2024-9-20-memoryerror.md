@@ -15,7 +15,10 @@ comments: true
   - [2.4 Initialization and Cleanup](#24-initialization-and-cleanup)
 - [3. Memory errors: hazard](#3-memory-errors-hazard)
 - [4. Memory errors: cause](#4-memory-errors-cause)
-  - [4.1 Cause: Classic Buffer Overflow](#41-cause-classic-buffer-overflow)
+  - [4.1 Classic Buffer Overflow](#41-classic-buffer-overflow)
+  - [4.2 Signedness Mixups](#42-signedness-mixups)
+  - [4.3 Integer Overflows](#43-integer-overflows)
+  - [4.4 Off-by-one Errors](#44-off-by-one-errors)
 
 
 ## 1. introduction<br>
@@ -72,5 +75,52 @@ free(b); // free后，内存中的值也不会自动清除
 ```
 
 ## 4. Memory errors: cause<br>
-### 4.1 Cause: Classic Buffer Overflow<br>
+### 4.1 Classic Buffer Overflow<br>
 非常经典的溢出问题。c语言并不会隐式得跟踪buffer的大小，所以简单的`overwrite`是很常见的。
+
+### 4.2 Signedness Mixups<br>
+标准c语言库中使用`unsigned int`来表示`size`，例如`read, memcmp, strncpy中的最后一个参数`，但是我们通常使用的整数为`int`类型<br>
+```c
+int main() {
+  int size;
+  char buf[16];
+  scanf("%i", &size);
+  if (size > 16) exit(1);  //输入-1，跳过步骤
+  read(0, buf, size); // 读取2^32-1个字节
+}
+```
+为什么这会是一个问题呢，主要在于汇编层面对于有符号和无符号整形的条件跳转指令检验不同<br>
+```
+1. 0xffffffff == -1, 0xfffffffe == -2, etc
+
+2. signedness mostly matters during conditional jumps
+
+3. cmp eax, 16; jae too_big
+    unsigned comparison
+    eax = 0xffffffff will result in checking 0xffffffff > 16 and a jump
+
+4. cmp eax, 16; jge too_big
+    signed comparison
+    eax = 0xffffffff will result in checking -1 > 16, and no jump
+```
+**注意，在用gdb/strace调试这些指令时，可能会出现和程序正常执行时截然不同的结果**<br>
+
+### 4.3 Integer Overflows<br>
+整形溢出问题通常发生在计算size的时候。
+```c
+int main() {
+  unsigned int size;
+  scanf("%i", &size);
+  char *buf = alloca(size+1);//如果输入为2**31 -1， size+1 = 0
+  int n = read(0, buf, size);
+  buf[n] = '\0';
+}
+```
+
+### 4.4 Off-by-one Errors<br>
+`off-by-one`通常发生在如下场景:<br>
+```c
+	int a[3] = { 1, 2, 3 };
+	for (int i = 0; i <= 3; i++) a[i] = 0;
+```
+`off-by-one`只允许一字节的溢出，取决于场景，可能会造成恐怖后果。<br>
