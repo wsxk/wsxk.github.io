@@ -19,6 +19,8 @@ comments: true
   - [4.2 Signedness Mixups](#42-signedness-mixups)
   - [4.3 Integer Overflows](#43-integer-overflows)
   - [4.4 Off-by-one Errors](#44-off-by-one-errors)
+- [5. Memory errors protection: Stack Canaries](#5-memory-errors-protection-stack-canaries)
+  - [5.1 bypass Stack Canaries](#51-bypass-stack-canaries)
 
 
 ## 1. introduction<br>
@@ -124,3 +126,43 @@ int main() {
 	for (int i = 0; i <= 3; i++) a[i] = 0;
 ```
 `off-by-one`只允许一字节的溢出，取决于场景，可能会造成恐怖后果。<br>
+
+
+## 5. Memory errors protection: Stack Canaries<br>
+为了对抗缓冲区溢出到程序的返回地址，研究人员们引入了`stack canaries`<br>
+`stack canaries`主要做的是两件事:<br>
+```
+1. In function prologue, write random value at the end of the stack frame.
+函数开头，在栈帧的末尾填入随机值
+
+2. In function epilogue, make sure this value is still intact.
+函数结尾，校验这个值是否是完整的
+```
+
+### 5.1 bypass Stack Canaries<br>
+`stack canaries`真的是一个非常有效的防护手段，但是仍然有一些情境下可以绕过这个防护<br>
+
+```
+1. Leak the canary (using another vulnerability).
+使用其他漏洞来泄露canary
+
+2. Brute-force the canary (for forking processes).
+对于类似
+int main() {
+    char buf[16];
+    while (1) {
+        if (fork()) { wait(0); }
+        else { read(0, buf, 128); return; }
+    }
+}
+的代码，能够爆破canary的值（8字节也只需要爆破256*8次）
+
+3. jumping the canary (if the situation allows).
+跳过canary完成返回地址的覆写，主要针对以下场景
+int main() {
+    char buf[16];
+    int i;
+    for (i = 0; i < 128; i++) read(0, buf+i, 1);
+}
+取决于程序的布局，你可以通过修改i值来绕过canary的写入，直接写入返回地址
+```
