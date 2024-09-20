@@ -21,6 +21,9 @@ comments: true
   - [4.4 Off-by-one Errors](#44-off-by-one-errors)
 - [5. Memory errors protection: Stack Canaries](#5-memory-errors-protection-stack-canaries)
   - [5.1 bypass Stack Canaries](#51-bypass-stack-canaries)
+- [6. Memory errors protection: ASLR](#6-memory-errors-protection-aslr)
+  - [6.1 bypass ASLR](#61-bypass-aslr)
+  - [6.2 Disabling ASLR for local testing](#62-disabling-aslr-for-local-testing)
 
 
 ## 1. introduction<br>
@@ -165,4 +168,45 @@ int main() {
     for (i = 0; i < 128; i++) read(0, buf+i, 1);
 }
 取决于程序的布局，你可以通过修改i值来绕过canary的写入，直接写入返回地址
+```
+
+## 6. Memory errors protection: ASLR<br>
+`ASLR(Address Space Layout Randomrization,地址空间布局随机化)`也是内存破坏的常见防御手段。<br>
+其核心思想在于**黑客们通常聚焦于把破坏指针，使其指向其他位置，那么要指向其他位置，就需要知道其他位置的内存地址**<br>
+如果我们随机化程序的地址空间排布，要想攻击，顶多制造程序崩溃，想要控制程序的执行权限就变得困难了。<br>
+
+### 6.1 bypass ASLR<br>
+有一些场景下可以绕过`ASLR`：<br>
+```
+Method 1: Leak
+The addresses still (mostly) have to be in memory so that the program can find its own assets.
+Let's leak them out!
+
+Method 2: YOLO
+Program assets are page-aligned.
+Let's overwrite just the page offset!
+Requires some brute-forcing.
+核心原理是系统中pages都是0x1000对齐的，程序段的空间一般都在一个page范围内，我们可以操纵前2个字节的偏移，来跳转到程序的其他位置。  这种情况下爆破只需爆破16位，还是很好爆的
+
+Method 3 (situational): brute-force
+int main() {
+    char buf[16];
+    while (1) {
+        if (fork()) { wait(0); }
+        else { read(0, buf, 128); return; }
+    }
+}
+就比较难爆破，基本不现实
+```
+
+### 6.2 Disabling ASLR for local testing<br>
+调试的时候我们不希望有`ASLR`,有办法可以禁用它。<br>
+```
+In pwntools:
+pwn.process("./vulnerable_proram", aslr=False)
+
+gdb will disable ASLR by default if has permissions to do so. NOTE: for SUID binaries, remove the SUID bit before using gdb (chmod or cp).
+
+You can spin up a shell whose (non-setuid) children will all have ASLR disabled:
+# setarch x86_64 -R /bin/bash
 ```
