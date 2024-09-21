@@ -14,7 +14,7 @@ comments: true
   - [2.3 Mixing Data and Metadata](#23-mixing-data-and-metadata)
   - [2.4 Initialization and Cleanup](#24-initialization-and-cleanup)
 - [3. Memory errors: hazard](#3-memory-errors-hazard)
-- [4. Memory errors: cause](#4-memory-errors-cause)
+- [4. Memory errors: cause of corruption](#4-memory-errors-cause-of-corruption)
   - [4.1 Classic Buffer Overflow](#41-classic-buffer-overflow)
   - [4.2 Signedness Mixups](#42-signedness-mixups)
   - [4.3 Integer Overflows](#43-integer-overflows)
@@ -79,7 +79,7 @@ free(b); // free后，内存中的值也不会自动清除
 5. Memory that is used as a code pointer (or offset), allowing us to redirect program execution!
 ```
 
-## 4. Memory errors: cause<br>
+## 4. Memory errors: cause of corruption<br>
 ### 4.1 Classic Buffer Overflow<br>
 非常经典的溢出问题。c语言并不会隐式得跟踪buffer的大小，所以简单的`overwrite`是很常见的。
 
