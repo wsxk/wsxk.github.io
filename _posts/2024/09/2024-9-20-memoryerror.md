@@ -24,6 +24,10 @@ comments: true
 - [6. Memory errors protection: ASLR](#6-memory-errors-protection-aslr)
   - [6.1 bypass ASLR](#61-bypass-aslr)
   - [6.2 Disabling ASLR for local testing](#62-disabling-aslr-for-local-testing)
+- [7. Memory errors: Causes of Disclosure](#7-memory-errors-causes-of-disclosure)
+  - [7.1 Buffer Overread](#71-buffer-overread)
+  - [7.2 Termination Problems](#72-termination-problems)
+  - [7.3 Uninitialized Data](#73-uninitialized-data)
 
 
 ## 1. introduction<br>
@@ -210,3 +214,50 @@ gdb will disable ASLR by default if has permissions to do so. NOTE: for SUID bin
 You can spin up a shell whose (non-setuid) children will all have ASLR disabled:
 # setarch x86_64 -R /bin/bash
 ```
+
+## 7. Memory errors: Causes of Disclosure<br>
+内存问题通常还会造成**信息泄露**，泄露原因如下:<br>
+
+### 7.1 Buffer Overread<br>
+要输出的内容超过了buffer的容量:<br>
+```c
+int main(int argc, char **argv, char **envp)
+{
+    char small_buffer[16] = {0};
+    write(1, small_buffer, 128);
+}
+```
+
+### 7.2 Termination Problems<br>
+在`C`语言中，`string`没有显式得size存在在内存中，取而代之的是`string`的末尾有`\x00`作为终止符。<br>
+人们经常忘记有终止符的存在:<br>
+```c
+	int main() {
+char name[10] = {0};
+char flag[64];
+read(open("/flag", 0), flag, 64);
+		printf("Name: ");
+		read(0, name, 10);
+		printf("Hello %s!\n", name);
+	}
+//这里读入10个字节均不为\x00时，会导致把flag的内容也输出
+```
+
+### 7.3 Uninitialized Data<br>
+`c`语言在声明变量时，不会显示的清0<br>
+```c
+//Recall that C will not clean up for you!
+	int main() { foo(); bar(); }
+	void foo() { char foo_buffer[64]; read(open("/flag", 0), foo_buffer, 64); }
+	void bar() { char bar_buffer[64]; write(1, bar_buffer, 64); }
+
+// Alert! Compiler optimizations can ruin your day:
+int main() { foo(); bar(); }
+void foo() {
+char foo_buffer[64];
+read(open("/flag", 0), foo_buffer, 64);
+memset(foo_buffer, 0, 64); //在使用编译器优化时，memset可能会被优化掉！
+}
+void bar() { char bar_buffer[64]; write(1, bar_buffer, 64); }
+```
+
