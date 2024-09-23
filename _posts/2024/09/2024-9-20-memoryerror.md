@@ -111,8 +111,9 @@ int main() {
 4. cmp eax, 16; jge too_big
     signed comparison
     eax = 0xffffffff will result in checking -1 > 16, and no jump
+//使用ida进行逆向分析时，可以关注汇编指令来看进行的是有符号比较还是无符号比较，F5反编译出来的容易骗过我们
 ```
-**注意，在用gdb/strace调试这些指令时，可能会出现和程序正常执行时截然不同的结果**<br>
+**注意，在用gdb/strace调试这些指令时，可能会出现和程序正常执行时截然不同的结果，比如如果read(0,buf,-1)，正常系统中是可以执行的，但是strace/gdb都会报错**<br>
 
 ### 4.3 Integer Overflows<br>
 整形溢出问题通常发生在计算size的时候。
