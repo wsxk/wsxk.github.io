@@ -192,8 +192,7 @@ Program assets are page-aligned.
 Let's overwrite just the page offset!
 Requires some brute-forcing.
 核心原理是系统中pages都是0x1000对齐的，程序段的空间一般都在一个page范围内，我们可以操纵前2个字节的偏移，来跳转到程序的其他位置。  这种情况下爆破只需爆破16位，还是很好爆的
-如果要跳转的地址和返回地址在同一个page，根本不需要爆破
-如果要跳转的地址和返回地址差了若干个page（16 page以内），只需爆破4位！
+其实低12位的地址是不需要爆破的（因为0x1000对齐的策略），实际上只需要爆破4位即可
 
 Method 3 (situational): brute-force
 int main() {
