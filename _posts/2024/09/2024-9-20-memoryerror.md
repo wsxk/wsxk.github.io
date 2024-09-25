@@ -173,6 +173,7 @@ int main() {
     for (i = 0; i < 128; i++) read(0, buf+i, 1);
 }
 取决于程序的布局，你可以通过修改i值来绕过canary的写入，直接写入返回地址
+这种情况下，在越界到i的位置时，填入返回地址相对于buf的偏移，你就可以绕过canary来写返回地址了。此时再结合alsr的page align原理，爆破你想跳转的地址！
 ```
 
 ## 6. Memory errors protection: ASLR<br>
