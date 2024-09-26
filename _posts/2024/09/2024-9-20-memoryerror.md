@@ -153,6 +153,8 @@ int main() {
 ```
 1. Leak the canary (using another vulnerability).
 使用其他漏洞来泄露canary
+首先，同一个进程的canary通常是一样的
+注意，canary的最低字节为0，这算是防止泄露的一种措施
 
 2. Brute-force the canary (for forking processes).
 对于类似
@@ -243,7 +245,10 @@ read(open("/flag", 0), flag, 64);
 		read(0, name, 10);
 		printf("Hello %s!\n", name);
 	}
-//这里读入10个字节均不为\x00时，会导致把flag的内容也输出
+//这里读入10个字节均不为\x00时，会导致把flag的内容也输出,非常明显的信息泄露问题
+//当然这是最简单的情景，通过mmap把flag映射到内存A，而输入映射到另一个内存B，这A和B以及中间的内存都是可读写的，就可以完成信息泄露
+// 注意点1： mmap 分配的page最小为4096
+//注意点2： 一开始mmap的page A通常会在某个地址a，而后mmap的page B通常会在地址b（b和a不相连），随后page C 会在 b-0x1000, page D 会在 b-0x2000....以此类推 这是一个很重要的点
 ```
 
 ### 7.3 Uninitialized Data<br>
