@@ -246,9 +246,9 @@ read(open("/flag", 0), flag, 64);
 		printf("Hello %s!\n", name);
 	}
 //这里读入10个字节均不为\x00时，会导致把flag的内容也输出,非常明显的信息泄露问题
-//当然这是最简单的情景，通过mmap把flag映射到内存A，而输入映射到另一个内存B，这A和B以及中间的内存都是可读写的，就可以完成信息泄露
+//还有一种情景是：通过mmap把flag映射到内存A，而输入映射到另一个内存B，这A和B以及中间的内存都是可读写的，就可以完成信息泄露
 // 注意点1： mmap 分配的page最小为4096
-//注意点2： 一开始mmap的page A通常会在某个地址a，而后mmap的page B通常会在地址b（b和a不相连），随后page C 会在 b-0x1000, page D 会在 b-0x2000....以此类推 这是一个很重要的点
+// 注意点2： 一开始mmap的page A通常会在某个地址a，而后mmap的page B通常会在地址b（b和a不相连），随后page C 会在 b-0x1000, page D 会在 b-0x2000....以此类推 这是一个很重要的点
 ```
 
 ### 7.3 Uninitialized Data<br>
@@ -268,4 +268,5 @@ memset(foo_buffer, 0, 64); //在使用编译器优化时，memset可能会被优
 }
 void bar() { char bar_buffer[64]; write(1, bar_buffer, 64); }
 ```
+总之，在这种未初始化场景时，我们可以尝试偷取`canary`和`程序地址`<br>
 
