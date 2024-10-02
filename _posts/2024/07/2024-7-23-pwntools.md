@@ -11,8 +11,9 @@ comments: true
   - [1.1 pwntools\&tmux 安装教程](#11-pwntoolstmux-安装教程)
   - [1.2 pwntools+tmux联合使用教程](#12-pwntoolstmux联合使用教程)
   - [1.3 tmux快捷键](#13-tmux快捷键)
-  - [1.4 pwntools使用技巧](#14-pwntools使用技巧)
+  - [1.4 pwntools启动gdb并下断点](#14-pwntools启动gdb并下断点)
   - [1.5 pwntools脚本常用代码](#15-pwntools脚本常用代码)
+  - [1.6 pwntools生成shellcode](#16-pwntools生成shellcode)
 - [2. gdb+pwndbg](#2-gdbpwndbg)
   - [2.1 gdb调试程序命令](#21-gdb调试程序命令)
   - [2.2 gdb常见命令](#22-gdb常见命令)
@@ -69,7 +70,7 @@ tmux kill-server： 删除所有会话
 **指导文档:**<br>
 [https://matpool.com/supports/doc-tmux-matpool/](https://matpool.com/supports/doc-tmux-matpool/)里有大量的`tmux命令教程`<br>
 
-### 1.4 pwntools使用技巧<br>
+### 1.4 pwntools启动gdb并下断点<br>
 在pwntools下**下断点**可以这么用<br>
 ```python
 gdb.attach(io,"b *$rebase(0x27C3)")
@@ -183,6 +184,18 @@ send_oob(9)
 
 p.interactive()
 ```
+
+### 1.6 pwntools生成shellcode<br>
+最好还是看看官方文档：[https://pwntools-docs-zh.readthedocs.io/zh-cn/dev/shellcraft.html](https://pwntools-docs-zh.readthedocs.io/zh-cn/dev/shellcraft.html)<br>
+```python
+from pwn import *
+context.arch='amd64' # 设置架构
+sh = shellcraft.amd64.linux.cat("/challenge/toddlerone_level1.0",1)
+sh_asm = asm(sh)
+print(sh_asm) #shellcode的字节码
+# b'H\xb8\x01\x01\x01\x01\x01\x01\x01\x01PH\xb8.gm`f\x01\x01\x01H1\x04$j\x02XH\x89\xe71\xf6\x0f\x05A\xba\xff\xff\xff\x7fH\x89\xc6j(Xj\x01_\x99\x0f\x05'
+```
+
 
 ## 2. gdb+pwndbg<br>
 gdb的可用命令实在是太多了，有很多重要的command，但是你不用就会忘记<br>
