@@ -74,6 +74,7 @@ tmux kill-server： 删除所有会话
 在pwntools下**下断点**可以这么用<br>
 ```python
 gdb.attach(io,"b *$rebase(0x27C3)")
+p.interactive() # 保持交互，防止程序退出
 ```
 
 ### 1.5 pwntools脚本常用代码<br>
