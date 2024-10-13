@@ -73,7 +73,7 @@ tmux kill-server： 删除所有会话
 ### 1.4 pwntools启动gdb并下断点<br>
 在pwntools下**下断点**可以这么用<br>
 ```python
-gdb.attach(io,"b *$rebase(0x27C3)")
+gdb.attach(io,"b *$rebase(0x20AF)\nb *$rebase(0x21EE)")
 p.interactive() # 保持交互，防止程序退出
 ```
 
