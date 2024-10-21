@@ -9,6 +9,7 @@ comments: true
 
 - [1. sandboxing由来](#1-sandboxing由来)
 - [2. chroot](#2-chroot)
+  - [2.1 chroot使用注意事项](#21-chroot使用注意事项)
 
 ## 1. sandboxing由来<br>
 `sandboxing`，俗称`沙箱`，是一个在现在看来非常普遍前有效的安全防御措施（比如chrome浏览器里有沙箱，docker也算一种沙箱，etc）<br>
@@ -59,3 +60,18 @@ chroot("/tmp/jail");
 所以`chroot`是一个事实上的`sandboxing utility(沙盒功能组件)`<br>
 **值得注意的一点是，chroot并没有禁止系统调用，也没有其他隔离功能**<br>
 
+### 2.1 chroot使用注意事项<br>
+使用`chroot`时有很多点需要注意:<br>
+```
+1. chroot系统调用执行时需要privilege，一般情况下需要root权限，所以执行时若不是root用户，需要执行sudo
+```
+不使用root权限的代价如下：<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241021225618.png)<br>
+
+```
+2. 被执行的命令或程序，需要在被限制的目录下
+比如sudo chroot /tmp /bin/bash
+这种情况下，在/tmp/bin目录中需要有bash文件
+```
+实验结果如下:<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241021225911.png)
