@@ -8,6 +8,7 @@ comments: true
 ---
 
 - [1. sandboxing由来](#1-sandboxing由来)
+- [2. chroot](#2-chroot)
 
 ## 1. sandboxing由来<br>
 `sandboxing`，俗称`沙箱`，是一个在现在看来非常普遍前有效的安全防御措施（比如chrome浏览器里有沙箱，docker也算一种沙箱，etc）<br>
@@ -45,4 +46,16 @@ JS engine(JS解析器)漏洞、Media Codec(音频编解码器)漏洞，Imaging l
 1. 需要一系列漏洞以利用沙盒进程
 2. 需要另一系列漏洞来打破沙盒
 ```
+
+
+## 2. chroot<br>
+传统的沙盒就是`chroot`，`chroot`第一次出现在1979年的UNIX系统上，随后不久也出现在了BSD上。<br>
+**chroot修改了 '/' 对于一个进程（包括其子进程）的含义**<br>
+比如<br>
+```c
+chroot("/tmp/jail");
+//会让进程认为 '/tmp/jail'目录（操作系统中的）就是自己的'/'目录 
+```
+所以`chroot`是一个事实上的`sandboxing utility(沙盒功能组件)`<br>
+**值得注意的一点是，chroot并没有禁止系统调用，也没有其他隔离功能**<br>
 
