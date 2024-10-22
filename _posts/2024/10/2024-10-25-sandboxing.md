@@ -75,3 +75,10 @@ chroot("/tmp/jail");
 ```
 实验结果如下:<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241021225911.png)
+```
+3. 被执行程序，需要是静态编译好的，否则，需要把动态链接所需的所有库都放入jail当中
+```
+值得一提的是，如果动态库没有放好，也会报没有文件或目录的错误<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241022213844.png)
+如果你在想要的目录下放好了所有所需依赖，也可以（但是建议使用静态编译的，安逸）<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241022214620.png)
