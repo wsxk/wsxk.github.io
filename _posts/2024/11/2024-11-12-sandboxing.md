@@ -3,7 +3,7 @@ layout: post
 tags: [pwn]
 title: "sandboxing"
 author: wsxk
-date: 2024-10-25
+date: 2024-11-12
 comments: true
 ---
 
@@ -80,5 +80,6 @@ chroot("/tmp/jail");
 ```
 值得一提的是，如果动态库没有放好，也会报没有文件或目录的错误<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241022213844.png)
-如果你在想要的目录下放好了所有所需依赖，也可以（但是建议使用静态编译的，安逸）<br>
+如果你在想要的目录下放好了所有所需依赖，也可以,效果如下：<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241022214620.png)
+当然，个人建议还是使用静态程序，比较安逸，这里推荐使用**busybox**<br>
