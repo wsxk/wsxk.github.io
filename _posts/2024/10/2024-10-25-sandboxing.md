@@ -10,6 +10,7 @@ comments: true
 - [1. sandboxing由来](#1-sandboxing由来)
 - [2. chroot](#2-chroot)
   - [2.1 chroot使用注意事项](#21-chroot使用注意事项)
+- [3. seccomp](#3-seccomp)
 
 ## 1. sandboxing由来<br>
 `sandboxing`，俗称`沙箱`，是一个在现在看来非常普遍前有效的安全防御措施（比如chrome浏览器里有沙箱，docker也算一种沙箱，etc）<br>
@@ -83,3 +84,6 @@ chroot("/tmp/jail");
 如果你在想要的目录下放好了所有所需依赖，也可以,效果如下：<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241022214620.png)
 当然，个人建议还是使用静态程序，比较安逸，这里推荐使用**busybox**<br>
+
+
+## 3. seccomp<br>
