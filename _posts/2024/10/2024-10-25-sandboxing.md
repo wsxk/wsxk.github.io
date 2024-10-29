@@ -83,7 +83,8 @@ chroot("/tmp/jail");
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241022213844.png)
 如果你在想要的目录下放好了所有所需依赖，也可以,效果如下：<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241022214620.png)
-当然，个人建议还是使用静态程序，比较安逸，这里推荐使用**busybox**<br>
+当然，个人建议还是使用静态程序，比较安逸，这里推荐使用**busybox（集成了很多常见的unix命令，像ls cat这些都有）**，busybox官网[https://busybox.net/](https://busybox.net/)<br>
+
 
 
 ## 3. seccomp<br>
