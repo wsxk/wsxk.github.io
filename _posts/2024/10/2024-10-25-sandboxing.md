@@ -10,6 +10,7 @@ comments: true
 - [1. sandboxing由来](#1-sandboxing由来)
 - [2. chroot](#2-chroot)
   - [2.1 chroot使用注意事项](#21-chroot使用注意事项)
+  - [2.2 chroot效果](#22-chroot效果)
 - [3. seccomp](#3-seccomp)
 
 ## 1. sandboxing由来<br>
@@ -74,16 +75,21 @@ chroot("/tmp/jail");
 比如sudo chroot /tmp /bin/bash
 这种情况下，在/tmp/bin目录中需要有bash文件
 ```
-实验结果如下:<br>
+不在`tmp目录下放/bin/bash`实验结果如下:<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241021225911.png)
+
 ```
 3. 被执行程序，需要是静态编译好的，否则，需要把动态链接所需的所有库都放入jail当中
 ```
-值得一提的是，如果动态库没有放好，也会报没有文件或目录的错误<br>
+值得一提的是，如果动态库没有放好，也会报没有文件或目录的错误，如下图所示：<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241022213844.png)
-如果你在想要的目录下放好了所有所需依赖，也可以,效果如下：<br>
+如果你在想要的目录下放好了所有动态程序所需的依赖,效果如下：<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241022214620.png)
-当然，个人建议还是使用静态程序，比较安逸，这里推荐使用**busybox（集成了很多常见的unix命令，像ls cat这些都有）**，busybox官网[https://busybox.net/](https://busybox.net/)<br>
+当然，个人建议还是使用静态程序，比较安逸，这里推荐使用**busybox（集成了很多常见的unix命令，像ls cat这些都有）**，busybox官网[https://busybox.net/](https://busybox.net/)，可以直接在上面下载编译好的程序使用<br>
+使用busybox的图如下:<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241030194122.png)
+
+### 2.2 chroot效果<br>
 
 
 
