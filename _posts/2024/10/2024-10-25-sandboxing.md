@@ -10,7 +10,9 @@ comments: true
 - [1. sandboxing由来](#1-sandboxing由来)
 - [2. chroot](#2-chroot)
   - [2.1 chroot使用注意事项](#21-chroot使用注意事项)
-  - [2.2 chroot效果](#22-chroot效果)
+  - [2.2 chroot作用](#22-chroot作用)
+  - [2.3 chroot陷阱](#23-chroot陷阱)
+  - [2.4 chroot安全性讨论](#24-chroot安全性讨论)
 - [3. seccomp](#3-seccomp)
 
 ## 1. sandboxing由来<br>
@@ -89,8 +91,39 @@ chroot("/tmp/jail");
 使用busybox的图如下:<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241030194122.png)
 
-### 2.2 chroot效果<br>
+### 2.2 chroot作用<br>
+```
+chroot("/tmp/jail") 有2个作用:
 
+1. 对于这个进程而言，改变 "/"的含义，使其为 "/tmp/jail"
 
+2. 然后下面的一切： "/flag" 变成 "/tmp/jail/flag",对于这个进程而言，"/tmp/jail/.." 指向 "/tmp/jail"
+```
+chroot是有缺点的<br>
+```
+chroot("/tmp/jail") 不能:
+1. 关闭原本已经开启的指向其他目录（非jail目录）的文件描述符等系统资源。
+2. cd (chdir()) 来进入jail，需要显示得调用chdir("/");才行
+3. 做其他事情！
+```
+
+### 2.3 chroot陷阱<br>
+先前提到，`chroot`不会对原本已经开启的文件描述符等系统资源做限制。<br>
+```
+与  open 和 execve类似, Linux 还有 openat 和 execveat 的系统调用:
+  int open(char *pathname, int flags);
+  int openat(int dirfd, char *pathname, int flags);
+  int execve(char *pathname, char **argv, char **envp);
+  int execveat(int dirfd, char *pathname, char **argv, char **envp, int flags);
+dirfd 能表示为任何一个打开着的目录文件描述符, 或者是特殊值 AT_FDCWD(在linux代表的是当前工作目录) (注意: chroot()
+不会改变当前工作目录)!
+```
+另外，内核并不会记得程序已经在一个jail当中，也就是说，你可以通过在使用一次`chroot("/")`来跳出jail<br>
+
+### 2.4 chroot安全性讨论<br>
+当然`chroot`不安全，首先，`euid`为0(即具备root或suid)的程序可以随时跳出jail,除非`chroot`被禁用了<br>
+另外，`chroot`也没有对做`PID network IPC`的隔离，比如：<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241031214105.png)
+在知道了PID后，你可以开启其他终端来中断jail的运行。
 
 ## 3. seccomp<br>
