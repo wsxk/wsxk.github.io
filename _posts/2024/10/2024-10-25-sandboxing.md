@@ -14,6 +14,8 @@ comments: true
   - [2.3 chroot陷阱](#23-chroot陷阱)
   - [2.4 chroot安全性讨论](#24-chroot安全性讨论)
 - [3. seccomp](#3-seccomp)
+  - [3.1 seccomp示例](#31-seccomp示例)
+  - [3.2 seccomp工作原理](#32-seccomp工作原理)
 
 ## 1. sandboxing由来<br>
 `sandboxing`，俗称`沙箱`，是一个在现在看来非常普遍前有效的安全防御措施（比如chrome浏览器里有沙箱，docker也算一种沙箱，etc）<br>
@@ -127,3 +129,51 @@ dirfd 能表示为任何一个打开着的目录文件描述符, 或者是特殊
 在知道了PID后，你可以开启其他终端来中断jail的运行。
 
 ## 3. seccomp<br>
+现代的sandboxing会严格的限制进程的系统调用；这主要通过一个内核级的sandboxing机制——`seccomp`来实现<br>
+`seccomp`机制能够允许开发者写下复杂的规则来完成以下事情:<br>
+```
+1. 允许进程使用system call
+2. 禁止进程使用system call
+3. 筛选允许和不允许的系统调用
+```
+
+**另外有一点，当前进程的`seccomp`是能够被其子进程继承的！**<br>
+
+### 3.1 seccomp示例<br>
+```C
+//gcc seccomp.c -o seccomp -lseccomp
+#include <sys/sendfile.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/mman.h>
+#include <seccomp.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdint.h>
+#include <assert.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <errno.h>
+#include <time.h>
+#include <fcntl.h>
+
+int main(){
+    scmp_filter_ctx ctx;
+    ctx = seccomp_init(SCMP_ACT_ALLOW);
+    seccomp_rule_add(ctx,SCMP_ACT_KILL,SCMP_SYS(read),0);
+    seccomp_load(ctx);
+    execl("/bin/cat","cat","/flag",0);
+}
+
+```
+实际上，作为该进程的子进程`cat`无法读取flag！<br>
+用`strace`跟踪系统调用，结果如下:<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241101202842.png)
+
+### 3.2 seccomp工作原理<br>
+seccomp实际上是通过`prctl`系统调用来实现控制的，而`prctl`系统调用又依赖于`eBPF(extended Berkeley Packet Filters)`,eBPF是运行于内核态的一个”可证明安全“的虚拟机，它能在内核中插入用户想要实现的功能：<br>
+```
+1. 通常用于网络包过滤（比如iptables）
+2. 可用于实现系统调用跟踪和限制！
+```
+bpf详情可参考[https://github.com/iovisor/bcc](https://github.com/iovisor/bcc)<br>
