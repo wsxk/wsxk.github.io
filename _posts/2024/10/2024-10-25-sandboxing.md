@@ -16,6 +16,7 @@ comments: true
 - [3. seccomp](#3-seccomp)
   - [3.1 seccomp示例](#31-seccomp示例)
   - [3.2 seccomp工作原理](#32-seccomp工作原理)
+  - [3.2 escaping seccomp](#32-escaping-seccomp)
 
 ## 1. sandboxing由来<br>
 `sandboxing`，俗称`沙箱`，是一个在现在看来非常普遍前有效的安全防御措施（比如chrome浏览器里有沙箱，docker也算一种沙箱，etc）<br>
@@ -177,3 +178,6 @@ seccomp实际上是通过`prctl`系统调用来实现控制的，而`prctl`系�
 2. 可用于实现系统调用跟踪和限制！
 ```
 bpf详情可参考[https://github.com/iovisor/bcc](https://github.com/iovisor/bcc)<br>
+
+
+### 3.2 escaping seccomp<br>
