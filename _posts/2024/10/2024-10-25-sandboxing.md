@@ -16,7 +16,11 @@ comments: true
 - [3. seccomp](#3-seccomp)
   - [3.1 seccomp示例](#31-seccomp示例)
   - [3.2 seccomp工作原理](#32-seccomp工作原理)
-  - [3.2 escaping seccomp](#32-escaping-seccomp)
+- [4. escaping seccomp](#4-escaping-seccomp)
+  - [4.1 直觉](#41-直觉)
+  - [4.2 permissive policies](#42-permissive-policies)
+  - [4.3 syscall confusion](#43-syscall-confusion)
+  - [4.4 kernel vulnerabilities in the syscall handlers](#44-kernel-vulnerabilities-in-the-syscall-handlers)
 
 ## 1. sandboxing由来<br>
 `sandboxing`，俗称`沙箱`，是一个在现在看来非常普遍前有效的安全防御措施（比如chrome浏览器里有沙箱，docker也算一种沙箱，etc）<br>
@@ -180,4 +184,23 @@ seccomp实际上是通过`prctl`系统调用来实现控制的，而`prctl`系�
 bpf详情可参考[https://github.com/iovisor/bcc](https://github.com/iovisor/bcc)<br>
 
 
-### 3.2 escaping seccomp<br>
+## 4. escaping seccomp<br>
+seccomp是现代非常强力的sandbox机制，chrome/firefox浏览器的安全机制也都需要依赖seccomp！<br>
+这么强力的安全保护机制，我们要如何对其进行逃逸呢？<br>
+### 4.1 直觉<br>
+一个处于sandbox状态的进程要想做些有用的事情，就需要和特权进程进行通信；**而这意味着允许sandboxed process 使用某些特定的系统调用**<br>
+这打开了新的攻击面：<br>
+```
+1. permissive policies:授权策略
+
+2. syscall confusion：系统调用混淆
+
+3. kernel vulnerabilities in the syscall handlers： 内核漏洞
+```
+
+### 4.2 permissive policies<br>
+
+
+### 4.3 syscall confusion<br>
+
+### 4.4 kernel vulnerabilities in the syscall handlers<br>
