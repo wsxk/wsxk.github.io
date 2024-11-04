@@ -18,7 +18,7 @@ comments: true
   - [3.2 seccomp工作原理](#32-seccomp工作原理)
 - [4. escaping seccomp](#4-escaping-seccomp)
   - [4.1 直觉](#41-直觉)
-  - [4.2 permissive policies](#42-permissive-policies)
+  - [4.2 permissive policies：允许策略](#42-permissive-policies允许策略)
   - [4.3 syscall confusion](#43-syscall-confusion)
   - [4.4 kernel vulnerabilities in the syscall handlers](#44-kernel-vulnerabilities-in-the-syscall-handlers)
 
@@ -145,6 +145,7 @@ dirfd 能表示为任何一个打开着的目录文件描述符, 或者是特殊
 **另外有一点，当前进程的`seccomp`是能够被其子进程继承的！**<br>
 
 ### 3.1 seccomp示例<br>
+请看示例：<br>
 ```C
 //gcc seccomp.c -o seccomp -lseccomp
 #include <sys/sendfile.h>
@@ -191,15 +192,36 @@ seccomp是现代非常强力的sandbox机制，chrome/firefox浏览器的安全�
 一个处于sandbox状态的进程要想做些有用的事情，就需要和特权进程进行通信；**而这意味着允许sandboxed process 使用某些特定的系统调用**<br>
 这打开了新的攻击面：<br>
 ```
-1. permissive policies:授权策略
+1. permissive policies:允许策略
 
 2. syscall confusion：系统调用混淆
 
 3. kernel vulnerabilities in the syscall handlers： 内核漏洞
 ```
 
-### 4.2 permissive policies<br>
+### 4.2 permissive policies：允许策略<br>
+所谓允许策略，主要通过两个因素进行联合导致的：<br>
+```
+1. linux内核中有很多的system calls，并且他们都很复杂
+2. 开发者可能会想要避免通过许可方面的错误，导致破坏功能
+```
+这两点意味着：**开发者很可能不会对策略上做过多的限制，这可能会导致原本开发的程序功能不可用！**<br>
+🤭不知道大伙自己有没有开发过东西，这是很正常的一个心理反应，毕竟你开发就够麻烦了，还要考虑奇奇怪怪的东西<br>
+但是这会导致很多的系统调用没有被限制，而这会导致沙箱逃逸问题,举个例子：<br>
+```
+1. ptrace: 如果ptrace没有被禁用，那么沙箱进程可以通过ptrace系统调用
+来操纵一个非沙箱进程，从而导致逃逸！
 
+2. sendmsg： sendmsg可以允许进程间同步文件描述符，如果非沙箱进程中的一个进程描述符
+指向一个关键文件（沙箱进程无法访问），非沙箱进程可以通过sendmsg与沙箱进程同步该描述
+符，导致关键文件信息泄露
+
+3. prctl：prctl系统调用可能有奇怪的影响：prctl控制自身进程的一些属性，能够直接写内
+存，如果prctl没有被限制，沙箱进程可能通过一些特殊手法修改自身属性，导致逃逸。
+
+4. process_vm_writev：该系统调用允许直接访问其他进程的内存，这意味着可以从其他进程
+里面偷东西
+```
 
 ### 4.3 syscall confusion<br>
 
