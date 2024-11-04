@@ -146,7 +146,7 @@ dirfd 能表示为任何一个打开着的目录文件描述符, 或者是特殊
 
 ### 3.1 seccomp示例<br>
 请看示例：<br>
-```C
+```c
 //gcc seccomp.c -o seccomp -lseccomp
 #include <sys/sendfile.h>
 #include <sys/types.h>
