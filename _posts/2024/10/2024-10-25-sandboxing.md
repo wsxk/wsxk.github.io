@@ -224,5 +224,20 @@ seccomp是现代非常强力的sandbox机制，chrome/firefox浏览器的安全�
 ```
 
 ### 4.3 syscall confusion<br>
+正常情况下，64位系统都是兼容32位程序的！<br>
+在一些系统中(例如amd64),**一个进程是可以在32位和64位之间切换的**，这意味着操作系统需要准备32位和64位程序所需的一切！
+这当然也包括了系统调用。<br>
+然而，不同的架构的系统调用号是不同的，**这也包括相同架构的32位和64位程序**<br>
+例如：<br>
+```
+exit 在amd64的下的系统调用号为 60
+而在 x86下的系统调用号为1
+```
+在允许进程随时切换32/64位的操作系统中，沙盒的策略很有可能只关注64位，而忽视了32位！这就让攻击者有机可乘。<br>
 
 ### 4.4 kernel vulnerabilities in the syscall handlers<br>
+如果开发者很聪明，seccomp的策略很正确，那么**挖内核漏洞就变成了最终手段**<br>
+因为seccomp不可能限制全部的系统调用，可以通过挖相关触发的内核漏洞，触发沙箱逃逸。
+[https://github.com/allpaca/chrome-sbx-db](https://github.com/allpaca/chrome-sbx-db)中就记录了chrome浏览器的漏洞
+
+
