@@ -21,6 +21,7 @@ comments: true
   - [4.2 permissive policies：允许策略](#42-permissive-policies允许策略)
   - [4.3 syscall confusion](#43-syscall-confusion)
   - [4.4 kernel vulnerabilities in the syscall handlers](#44-kernel-vulnerabilities-in-the-syscall-handlers)
+  - [4.5 思考你的目标](#45-思考你的目标)
 
 ## 1. sandboxing由来<br>
 `sandboxing`，俗称`沙箱`，是一个在现在看来非常普遍前有效的安全防御措施（比如chrome浏览器里有沙箱，docker也算一种沙箱，etc）<br>
@@ -241,3 +242,5 @@ exit 在amd64的下的系统调用号为 60
 [https://github.com/allpaca/chrome-sbx-db](https://github.com/allpaca/chrome-sbx-db)中就记录了chrome浏览器的漏洞
 
 
+### 4.5 思考你的目标<br>
+大多情况下，攻击者的目标不是为了拿到shell（当然，拿到最好）<br>
