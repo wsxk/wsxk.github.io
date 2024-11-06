@@ -244,3 +244,20 @@ exit 在amd64的下的系统调用号为 60
 
 ### 4.5 思考你的目标<br>
 大多情况下，攻击者的目标不是为了拿到shell（当然，拿到最好）<br>
+以ctf比赛为例，我们的目标是为了拿flag，**即使你不能直接的与外部世界进行通信，你也可以发送烟雾信号**<br>
+```
+1. Runtime of a process (see sleep(x) system call) can convey a lot of data.
+这是一个很tricky的点，如果你想传送数据，你可以不断使用sleep来确定睡眠的时间，根据睡眠时间传送数据（比如 睡1秒就是\x01）
+
+2. Clean termination or a crash? This can convey one bit.
+遇到一个crash就是1，没有crash就是0，这样能传送1 bit 数据
+
+3. Return value of a program (exit(x)) can convey one byte.
+根据程序退出的返回值来传送数据
+```
+
+一个现实的例子是攻击者利用DNS查询机制来绕过`network egress filter(网络出口过滤器)`<br>
+```
+1. 你攻击进入了某个内网服务器，但是你不能进行网络请求，除了dns查询
+2. 你可以让它执行一个域名查询，比如 www.password.xxx.com，把password信息带出内外服务器
+```
