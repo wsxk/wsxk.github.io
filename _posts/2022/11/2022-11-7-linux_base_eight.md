@@ -14,15 +14,6 @@ comments: true
 - [references](#references)
 
 
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-C22S5YSYL7');
-</script>
 
 ## 什么是modprobe<br>
 modprobe是一个内置的linux系统命令，用于安装/卸载 LKM（loadable kernel module），它是一个内核全局变量，可以通过以下的命令进行查看：
@@ -80,3 +71,14 @@ static int call_modprobe(char *module_name, int wait)
 [https://blog.csdn.net/vevenlcf/article/details/78884672](https://blog.csdn.net/vevenlcf/article/details/78884672)<br>
 [https://blog.csdn.net/weixin_45619852/article/details/121102283](https://blog.csdn.net/weixin_45619852/article/details/121102283)<br>
 [https://www.anquanke.com/post/id/232545](https://www.anquanke.com/post/id/232545)<br>
+
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
