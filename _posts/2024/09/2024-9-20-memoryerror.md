@@ -30,6 +30,16 @@ comments: true
   - [7.3 Uninitialized Data](#73-uninitialized-data)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 ## 1. introduction<br>
 **内存破坏的起源思想：如果一个程序允许某人覆盖他们不应该覆盖的内存怎么办**<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/20240914140009.png)
