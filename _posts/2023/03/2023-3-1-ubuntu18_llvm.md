@@ -13,16 +13,6 @@ comments: true
 - [3. 安装](#3-安装)
 
 
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-C22S5YSYL7');
-</script>
-
 llvm安装还是很麻烦的（各个超大型的应用程序都这个样子<br>
 
 ## 下载之前<br>
@@ -58,3 +48,14 @@ make -j4
 make install
 ```
 可能还会遇到一些错误，基本上是缺少什么库的，根据报错安装即可。<br>
+
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
