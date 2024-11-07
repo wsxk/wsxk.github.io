@@ -13,6 +13,8 @@ AFL的安装还是比较简单的。<br>
 [https://lcamtuf.coredump.cx/afl/](https://lcamtuf.coredump.cx/afl/)<br>
 
 然后用如下命令进行解压<br>
+解压完成后即可~<br>
+
 ```shell
 tar -xvf afl-latest.tgz
 ```
