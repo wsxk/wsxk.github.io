@@ -12,15 +12,6 @@ author: wsxk
 - [exp](#exp)
 
 
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-C22S5YSYL7');
-</script>
 
 
 做的第一道musl pwn题
@@ -159,3 +150,14 @@ free掉两个（不要连在一起，连在一起会自动合并），再申请�
     io.sendlineafter("What is your prefer size? >", '0')
     #gdb.attach(io)
     io.interactive()
+
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
