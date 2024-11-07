@@ -7,6 +7,16 @@ date: 2024-10-25
 comments: true
 ---
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 - [1. sandboxing由来](#1-sandboxing由来)
 - [2. chroot](#2-chroot)
   - [2.1 chroot使用注意事项](#21-chroot使用注意事项)
