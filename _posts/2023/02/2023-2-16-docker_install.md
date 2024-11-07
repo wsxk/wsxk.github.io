@@ -12,15 +12,7 @@ comments: true
 - [references](#references)
 
 
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
 
-  gtag('config', 'G-C22S5YSYL7');
-</script>
 
 ## 安装docker<br>
 [https://docs.docker.com/engine/install/ubuntu/#set-up-the-repository](https://docs.docker.com/engine/install/ubuntu/#set-up-the-repository)
@@ -34,3 +26,14 @@ sudo chmod a+rw /var/run/docker.sock //为user增加权限
 ```
 ## references<br>
 [https://www.muzhuangnet.com/show/79356.html](https://www.muzhuangnet.com/show/79356.html)<br>
+
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
