@@ -11,15 +11,7 @@ comments: true
 - [kernel module](#kernel-module)
 
 
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
 
-  gtag('config', 'G-C22S5YSYL7');
-</script>
 
 
 ## 常用字节码<br>
@@ -84,3 +76,13 @@ void get_root_privilege(){
     (*commit_creds_ptr)((*prepare_kernel_cred_ptr)(NULL));
 }
 ```
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
