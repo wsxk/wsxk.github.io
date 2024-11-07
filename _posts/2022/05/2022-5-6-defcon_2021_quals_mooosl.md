@@ -13,6 +13,18 @@ author: wsxk
 - [exp](#exp)
 - [参考](#参考)
 
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
+
 ## 漏洞分析
 
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2022-5-6-defcon_2021_quals_mooosl/1.png)

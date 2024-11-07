@@ -38,6 +38,16 @@ date: 2024-4-21
   - [7.5 Implementing Responsible AI Practices in Chat Applications](#75-implementing-responsible-ai-practices-in-chat-applications)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 ## 3. 负责任得使用AI<br>
 ### 3.1 为什么应该优先考虑负责任的AI功能<br>
 ai有时候会吐出一些奇奇怪怪的输出。<br>

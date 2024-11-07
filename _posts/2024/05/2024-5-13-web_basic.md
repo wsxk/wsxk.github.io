@@ -24,6 +24,15 @@ comments: true
 	- [2.3 redirect](#23-redirect)
 	- [2.4 cookie](#24-cookie)
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
 
 ## 前言<br>
 简单的学习一下web前置知识吧~<br>

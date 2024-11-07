@@ -25,6 +25,17 @@ comments: true
 - [Total Training Process](#total-training-process)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
+
 ## 什么是机器学习<br>
 **机器学习，本质上是让机器自动找一个函数**<br>
 比如`ChatGPT`，就是要找一个函数，输入是`一个句子`，输出是`句子后可能跟着的句子`。<br>

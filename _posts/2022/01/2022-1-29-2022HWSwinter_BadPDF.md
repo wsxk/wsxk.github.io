@@ -11,6 +11,17 @@ author: wsxk
 - [2. babyrsa](#2-babyrsa)
 - [3. 送分题](#3-送分题)
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
+
 ## 1. BadPDF<br> 
 其实是一道misc题目（但是好玩就玩了下
 

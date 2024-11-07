@@ -20,6 +20,16 @@ comments: true
   - [4. how to use](#4-how-to-use)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 ## introduction<br>
 intel sgx是intel的一种硬件保护措施，其实是trustzone那一套<br>
 

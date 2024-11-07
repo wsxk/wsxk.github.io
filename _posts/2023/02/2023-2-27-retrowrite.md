@@ -24,6 +24,17 @@ comments: true
   - [main function](#main-function)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
+
 ## 前言<br>
 这篇文章其实是记录论文`RetroWrite: Statically Instrumenting COTS Binaries for Fuzzing and Sanitization`的内容（真·顶会论文），very牛逼<br>
 论文作者提出了一个开源框架`retrowrite`,在[https://github.com/HexHive/retrowrite](https://github.com/HexHive/retrowrite)可以找到他的代码<br>

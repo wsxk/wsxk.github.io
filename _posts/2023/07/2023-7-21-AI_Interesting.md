@@ -18,6 +18,17 @@ comments: true
   - [3. LLM cascade](#3-llm-cascade)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
+
 ## 前言<br>
 `ai`从出现后，特别是`ChatGpt`出现后，引导了许多热潮，直接导致很多有意思的AI用法的出现，有学者甚至用这些用法发了论文(anyway，这个事情是否合理就不过多讨论了，总之是发了)<br>
 总之`递归`的思想在这些神奇的使用方法中得到了良好的诠释<br>

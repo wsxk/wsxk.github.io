@@ -43,6 +43,18 @@ comments: true
     </script>
 </head>
 
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
+
 ## 一、Regression<br>
 **回归（Regression），指研究一组随机变量(Y1 ，Y2 ，…，Yi)和另一组(X1，X2，…，Xk)变量之间关系的统计分析方法，又称多重回归分析。通常Y1，Y2，…，Yi是因变量，X1、X2，…，Xk是自变量。**<br>
 我们这里研究的是`线性回归（Linear Regression）`，说人话就是，**线性回归分析是根据一个或一组自变量（X1,X2,...Xk）的变动情况预测与其相关关系的某随机变量(Y)的未来值的一种方法**<br>

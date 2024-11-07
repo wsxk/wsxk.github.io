@@ -7,6 +7,22 @@ comments: true
 author: wsxk
 ---
 
+- [拿到libc地址](#拿到libc地址)
+- [任意地址写](#任意地址写)
+- [exp](#exp)
+
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
+
 做的第一道musl pwn题
 
 只能说虽然看起来很简单，其实还是挺困难的

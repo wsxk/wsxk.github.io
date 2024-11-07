@@ -14,6 +14,16 @@ comments: true
   - [2. exp](#2-exp)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 ## 前言<br>
 `firmware-analysis-plus` 来自三个上游工具`binwalk、firmadyne、firmware-analysis-toolkit`，实不相瞒，这叁工具我都用过，有一定的功效性，但是不能其实功能不是很稳定，存在缺陷。<br>
 偶然发现了高级东西`firmware-analysis-plus`在前三个工具的基础上更新了新内容，我还是很想体验一下用法的。<br>

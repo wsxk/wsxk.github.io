@@ -17,6 +17,17 @@ comments: true
   - [为unicorn AFL添加 heap allocator](#为unicorn-afl添加-heap-allocator)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
+
 ## Unicorn<br>
 基于qemu的另一个开源项目。<br>
 现在变成了基础设施之一。像 angr，radare2都集成了Unicorn框架<br>

@@ -33,6 +33,16 @@ comments: true
 - [实践](#实践)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 ## 前言<br>
 这篇内容其实是来自于文章**AddressSanitizer: A Fast Address Sanity Checker** 的阅读笔记。<br>
 其实它可能跟`iot`关系不是很大，但是他和我做得iot相关的毕设关系很大(😀。<br>

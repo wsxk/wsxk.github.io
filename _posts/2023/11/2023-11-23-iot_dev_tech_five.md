@@ -41,6 +41,16 @@ comments: true
   - [13.6 期许下一个项目](#136-期许下一个项目)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 ## 11. 系统整台<br>
 ### 11.1 第一次整合<br>
 第一次整合的最佳时间点一般会有以下几种情形:<br>

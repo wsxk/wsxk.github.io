@@ -20,6 +20,18 @@ PS:`修改于2024-5-22`<br>
   - [4.1 x86-64模拟器hook so层函数](#41-x86-64模拟器hook-so层函数)
   - [4.2 使用 new classname() 创建的实例的hook](#42-使用-new-classname-创建的实例的hook)
 
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
+
 ## 1. frida：真机调试<br>
 ### 1.1 前置条件<br>
 有root权限的android手机: [https://wsxk.github.io/pixel2xl%E5%88%B7%E6%9C%BA/](https://wsxk.github.io/pixel2xl%E5%88%B7%E6%9C%BA/)<br>

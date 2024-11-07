@@ -18,7 +18,7 @@ author: wsxk
   - [交互](#交互)
 - [实验源码审计](#实验源码审计)
 - [说在前面，kernel pwn的目的](#说在前面kernel-pwn的目的)
-- [大前提 commit_creds、prepare_kernel_cred地址](#大前提-commit_credsprepare_kernel_cred地址)
+- [大前提 commit\_creds、prepare\_kernel\_cred地址](#大前提-commit_credsprepare_kernel_cred地址)
 - [漏洞利用](#漏洞利用)
   - [uaf漏洞利用](#uaf漏洞利用)
     - [exp](#exp)
@@ -27,6 +27,18 @@ author: wsxk
     - [exp](#exp-1)
     - [阻止措施](#阻止措施-1)
 - [启示](#启示)
+
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 
 ## 实验环境搭建
 

@@ -19,6 +19,16 @@ comments: true
   - [行宽上限不超过120](#行宽上限不超过120)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 ## 命名风格<br>
 命名风格有很多种，常见的有大驼峰，小驼峰，蛇形<br>
 **大驼峰：每个单词首字母大写，其余小写，例如 FunTest**<br>

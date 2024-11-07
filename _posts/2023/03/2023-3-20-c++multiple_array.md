@@ -19,6 +19,16 @@ date: 2023-3-20
 	- [c++ type cast](#c-type-cast-1)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 ## 多维数组<br>
 多维数组是个很抽象的东西<br>
 ```c++

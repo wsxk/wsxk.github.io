@@ -11,22 +11,33 @@ comments: true
 PS: 好学者请先学习完[linux内核基础 一](https://wsxk.github.io/linux_kernel_basic_one/)<br>
 并完成对应[习题](https://wsxk.github.io/qwb2018_core/)后学习该篇内容<br>
 
-- [direct mapping of all physical memory<br>](#direct-mapping-of-all-physical-memory)
-- [linux内核内存分配函数<br>](#linux内核内存分配函数)
-	- [kmalloc<br>](#kmalloc)
-	- [kzalloc<br>](#kzalloc)
-	- [vmalloc<br>](#vmalloc)
-	- [__get_free_pages:<br>](#__get_free_pages)
-- [task_struct<br>](#task_struct)
-- [进程内核栈<br>](#进程内核栈)
-	- [pt_regs<br>](#pt_regs)
-	- [通过task_struct寻找内核栈（32位）<br>](#通过task_struct寻找内核栈32位)
-	- [通过内核栈找task_struct（32位）<br>](#通过内核栈找task_struct32位)
-	- [64位下cpu的task_struct/内核栈索引<br>](#64位下cpu的task_struct内核栈索引)
-- [内核态和用户态转变（again）<br>](#内核态和用户态转变again)
-	- [用户态->内核态<br>](#用户态-内核态)
-	- [内核态->用户态<br>](#内核态-用户态)
-- [references<br>](#references)
+- [direct mapping of all physical memory](#direct-mapping-of-all-physical-memory)
+- [linux内核内存分配函数](#linux内核内存分配函数)
+	- [kmalloc](#kmalloc)
+	- [kzalloc](#kzalloc)
+	- [vmalloc](#vmalloc)
+	- [\_\_get\_free\_pages:](#__get_free_pages)
+- [task\_struct](#task_struct)
+- [进程内核栈](#进程内核栈)
+	- [pt\_regs](#pt_regs)
+	- [通过task\_struct寻找内核栈（32位）](#通过task_struct寻找内核栈32位)
+	- [通过内核栈找task\_struct（32位）](#通过内核栈找task_struct32位)
+	- [64位下cpu的task\_struct/内核栈索引](#64位下cpu的task_struct内核栈索引)
+- [内核态和用户态转变（again）](#内核态和用户态转变again)
+	- [用户态-\>内核态](#用户态-内核态)
+	- [内核态-\>用户态](#内核态-用户态)
+- [references](#references)
+
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
 
 ## direct mapping of all physical memory<br>
 [https://elixir.bootlin.com/linux/latest/source/Documentation/x86/x86_64/mm.rst](https://elixir.bootlin.com/linux/latest/source/Documentation/x86/x86_64/mm.rst)里提出了官方的64位linux下虚拟内存布局<br>

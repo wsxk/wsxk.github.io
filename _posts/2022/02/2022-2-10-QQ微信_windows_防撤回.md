@@ -16,12 +16,25 @@ author: wsxk
     - [最终](#最终)
 - [微信](#微信)
 
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
+
 起因是我跟我朋友聊天的时候，他撤回了东西，之后问他，他又不说，还卖关子，我特别生气
 于是搜了一下QQ的防撤回
 
 还真搜到了，关于qq防撤回的函数都在IM.dll的动态库中，我们只要修改了它的相关函数即可以让朋友闻风丧胆，看他们以后谁撤回！！！
 
 捏妈妈滴！
+
 
 
 ## 相关环境<br>

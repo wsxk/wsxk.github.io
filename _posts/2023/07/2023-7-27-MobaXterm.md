@@ -14,6 +14,17 @@ comments: true
   - [3.2 方案二](#32-方案二)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
+
 ## 1. 介绍<br>
 `MobaXterm`是一款windows下的超超超好用的交互程序，涵盖了`telnet ssh`等通信方式与远程服务器交互，并允许你使用`linux下的命令`，十分的方便<br>
 

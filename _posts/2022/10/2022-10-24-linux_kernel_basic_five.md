@@ -9,18 +9,30 @@ comments: true
 
 `更新于2022-10-26`<br>
 
-- [seq_file<br>](#seq_file)
-- [seq_file相关结构定义<br>](#seq_file相关结构定义)
-- [seq_file相关API<br>](#seq_file相关api)
-  - [seq_read执行流程<br>](#seq_read执行流程)
-  - [seq_write执行流程<br>](#seq_write执行流程)
-- [seq_file编写实例<br>](#seq_file编写实例)
-  - [(1)注册的实例代码<br>](#1注册的实例代码)
-  - [(2)实现struct file_operations proc_ops的定义<br>](#2实现struct-file_operations-proc_ops的定义)
-  - [(3)实现seq_operations结构体<br>](#3实现seq_operations结构体)
-- [PS1:single_open<br>](#ps1single_open)
-- [PS2:创建proc文件的三种方法<br>](#ps2创建proc文件的三种方法)
-- [references<br>](#references)
+- [seq\_file](#seq_file)
+- [seq\_file相关结构定义](#seq_file相关结构定义)
+- [seq\_file相关API](#seq_file相关api)
+	- [seq\_read执行流程](#seq_read执行流程)
+	- [seq\_write执行流程](#seq_write执行流程)
+- [seq\_file编写实例](#seq_file编写实例)
+	- [(1)注册的实例代码](#1注册的实例代码)
+	- [(2)实现struct file\_operations proc\_ops的定义](#2实现struct-file_operations-proc_ops的定义)
+	- [(3)实现seq\_operations结构体](#3实现seq_operations结构体)
+- [PS1:single\_open](#ps1single_open)
+- [PS2:创建proc文件的三种方法](#ps2创建proc文件的三种方法)
+- [references](#references)
+
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 
 ## seq_file<br>
 seq_file最初是为了方便内核调试（传递信息到用户态便于查看）而创建的数据结构。<br>

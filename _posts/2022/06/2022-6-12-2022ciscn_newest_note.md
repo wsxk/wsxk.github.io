@@ -94,3 +94,14 @@ add(2,p64(0)+p64(0x2d9b9+libc_base)+p64(libc_base+0x2e6c5)+p64(next(libc.search(
 
 io.interactive()
 ```
+
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>

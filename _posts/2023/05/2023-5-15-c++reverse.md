@@ -18,6 +18,17 @@ comments: true
 	- [3. 抽象类](#3-抽象类)
 	- [4. 虚继承](#4-虚继承)
 
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 ## 前言<br>
 本节对先前学习过的c++类的相关的底层实现进行学习。<br>
 **具体而言，就是c++中类机制的汇编代码实现**<br>

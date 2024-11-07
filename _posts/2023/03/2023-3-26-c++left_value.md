@@ -16,6 +16,16 @@ comments: true
 - [移动赋值运算符](#移动赋值运算符)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 ## 左值和右值<br>
 左值其实指的是**在内存中有实际存储的值，右值则是临时值**，但其实没有严格定义<br>
 另一种说法是，左值是等式左边的值，右值的等式右边的值（绝大多数情况下成立）<br>

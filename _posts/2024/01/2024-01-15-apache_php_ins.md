@@ -19,6 +19,16 @@ comments: true
 - [3. MySQL](#3-mysql)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 ## 前言<br>
 win11下安装Apache+PHP环境，以便于本地开发测试。以及做一些web题目<br>
 **注意：因为把php、apache安装在c盘中，每一次修改配置文件都需要admin权限，同时，启动网络服务也需要admin权限**<br>

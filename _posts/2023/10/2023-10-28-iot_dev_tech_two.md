@@ -35,6 +35,18 @@ date: 2023-10-28
   - [5.6 ISR写作注意事项](#56-isr写作注意事项)
   - [5.7 驱动程序调试](#57-驱动程序调试)
 
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
+
 ## 4. 上电之后：Boot Loader<br>
 ### 4.1 排查硬件是否正常执行<br>
 上电之后，要一个一个排查错误，确保程序可以正确运行<br>

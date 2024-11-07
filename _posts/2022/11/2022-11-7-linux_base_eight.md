@@ -7,11 +7,22 @@ author: wsxk
 comments: true
 ---
 
-- [什么是modprobe<br>](#什么是modprobe)
-- [modprobe和 insmod/rmmod的区别<br>](#modprobe和-insmodrmmod的区别)
-- [如何利用modprobe进行内核提权<br>](#如何利用modprobe进行内核提权)
-- [modprobe提权的利用条件<br>](#modprobe提权的利用条件)
-- [references<br>](#references)
+- [什么是modprobe](#什么是modprobe)
+- [modprobe和 insmod/rmmod的区别](#modprobe和-insmodrmmod的区别)
+- [如何利用modprobe进行内核提权](#如何利用modprobe进行内核提权)
+- [modprobe提权的利用条件](#modprobe提权的利用条件)
+- [references](#references)
+
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
 
 ## 什么是modprobe<br>
 modprobe是一个内置的linux系统命令，用于安装/卸载 LKM（loadable kernel module），它是一个内核全局变量，可以通过以下的命令进行查看：

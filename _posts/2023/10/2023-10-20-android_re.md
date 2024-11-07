@@ -23,6 +23,16 @@ date: 2023-10-20
 - [references](#references)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 ## 1. android逆向简介<br>
 总的来说，`android`逆向可以分为`java层逆向`和`native层逆向`<br>
 `java层逆向`就是很简单的，**把一个apk文件拖入Android分析工具（比如jeb、jadx）中，就可以看到java代码**<br>

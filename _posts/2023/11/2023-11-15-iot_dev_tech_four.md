@@ -31,6 +31,16 @@ comments: true
     - [10.4.1 模拟器与系统配置](#1041-模拟器与系统配置)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 ## 9. 存储器管理（II）：NAND Flash概论<br>　
 `nand flash`:很多电子产品也都以NAND作为大容量存储媒介，但是设计NAND Flash的系统是很大的挑战，原因如下：<br>
 ```

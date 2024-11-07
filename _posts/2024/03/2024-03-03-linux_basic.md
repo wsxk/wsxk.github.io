@@ -23,6 +23,16 @@ comments: true
 - [10. elf文件格式](#10-elf文件格式)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 ## 写在前面<br>
 虽然学习网络安全四年有余了，至今让你提起linux的一些关键概念，还是有些不了解linux系统中的某些关键概念，倍感羞耻<br>
 

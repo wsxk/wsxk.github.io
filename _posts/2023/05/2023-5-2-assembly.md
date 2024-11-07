@@ -16,6 +16,16 @@ comments: true
   - [IT{x{y{z}}} {cond}](#itxyz-cond)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 ## 写在前面<br>
 本章用来记录一下不常见的，各种架构下的汇编指令。<br>
 

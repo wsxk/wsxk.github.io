@@ -17,6 +17,17 @@ PS: 更新于`2023-5-31`<br>
 - [2. 统一诊断服务(uds)](#2-统一诊断服务uds)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
+
 ## 前言<br>
 高贵的上饶杯车联网安全挑战赛，我表示十分地神秘.<br>
 虽然日车不能带自己的设备，全程要有人跟着看...anyway，还是多少学了点 车联网的内容<br>

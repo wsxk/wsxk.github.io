@@ -18,6 +18,16 @@ comments: false
 - [题外话](#题外话)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 ## IOT fuzz 现状<br>
 根据先前的 [iot安全背景知识](https://wsxk.github.io/iot%E5%85%A5%E9%97%A8%E4%B8%80/),我们总结过，嵌入式设备大概分为I型，II型，III三型，其中I型和II型比较接近现有的传统`PC计算机`，起码是有分为`内核态和用户态`的，换句话说，`I型和II型嵌入式固件多少是有检测机制的(segment fault ,etc)`，这些设备其实可以用传统的`fuzz`技术来进行测试。<br>
 然而，对于`III型嵌入式固件(monolithic firmware)`而言，它是没有分成内核和用户态的，所有的程序都集成到了一个程序当中。这类程序通常没有相应的检测机制（节省空间），安装这种固件的嵌入式设备，通常资源都是有限的，对于fuzz来说，无疑是晴天霹雳。<br>

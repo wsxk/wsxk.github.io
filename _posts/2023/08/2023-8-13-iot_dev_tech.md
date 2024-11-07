@@ -20,6 +20,17 @@ title: "iot dev technology: 概论"
   - [3.7 版本控制server](#37-版本控制server)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
+
 `PS: 更新于2023-10-19`<br>
 
 ## 1. 第一个嵌入式系统<br>

@@ -21,6 +21,16 @@ comments: true
 - [harness](#harness)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 ## 前言<br>
 这是取自 `BaseSAFE: Baseband SAnitized Fuzzing through Emulation` 论文的笔记<br>
 

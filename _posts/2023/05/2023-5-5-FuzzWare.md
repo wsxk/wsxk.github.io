@@ -27,6 +27,16 @@ comments: true
   - [2. MMIO访问建模](#2-mmio访问建模)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 ## 写在前面<br>
 这边笔记是对于最近看的一篇论文`Fuzzware: Using Precise MMIO Modeling for Effective Firmware Fuzzing`的总结。<br>
 **这是一个结合了符号执行技术（angr）和模糊测试技术（fuzz）以及仿真技术（Unicorn）的产物，目的是更有效的模拟固件执行，发现更多的漏洞。使用基于符号执行引导的模型方法，但是提供了一个更细粒度的模型方法来消除fuzzer的输入开销**<br>

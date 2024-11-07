@@ -19,6 +19,17 @@ comments: true
   - [3. Chain of Thought(COT) prompting](#3-chain-of-thoughtcot-prompting)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
+
 ## 前言:对于大语言模型的期待<br>
 讲到大语言模型，除了当今比较流行的`Chatgpt`以外，还有一个重量级项目，就是`Bert`<br>
 ### 1. Chatgpt vs Bert<br>

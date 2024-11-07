@@ -12,23 +12,35 @@ comments: true
 但是如果在以后，你想要编译一个几百万行代码组成的程序，这时候要怎么办呢？光靠自己手打gcc的命令，估计一天结束你还没有编译完代码。<br>
 GNU make可以帮助你解决这个问题。GNU make允许你在一个文件（makefile）上一个大型程序的编译规则，只需要一个命令（make）就能开始自动化编译流程，极大的减少了程序员编译时的工作量。由此可见make还是很重要的！！！<br>
 
-- [make基本认识<br>](#make基本认识)
-- [make常用命令选项<br>](#make常用命令选项)
-- [make 规则<br>](#make-规则)
-  - [1.显式规则<br>](#1显式规则)
-  - [2.变量<br>](#2变量)
-  - [3.隐式规则<br>](#3隐式规则)
-  - [4.引用其他makefile<br>](#4引用其他makefile)
-  - [5.忽略错误<br>](#5忽略错误)
-  - [6.系统常量/系统变量<br>](#6系统常量系统变量)
-  - [7.伪目标<br>](#7伪目标)
-  - [8.模式匹配<br>](#8模式匹配)
-  - [9. =与:=的区别<br>](#9-与的区别)
-  - [10. make中使用shell<br>](#10-make中使用shell)
-  - [11. make中的条件判断<br>](#11-make中的条件判断)
-  - [11. make中的循环<br>](#11-make中的循环)
-  - [12. make自定义函数<br>](#12-make自定义函数)
-  - [13. make install<br>](#13-make-install)
+- [make基本认识](#make基本认识)
+- [make常用命令选项](#make常用命令选项)
+- [make 规则](#make-规则)
+  - [1.显式规则](#1显式规则)
+  - [2.变量](#2变量)
+  - [3.隐式规则](#3隐式规则)
+  - [4.引用其他makefile](#4引用其他makefile)
+  - [5.忽略错误](#5忽略错误)
+  - [6.系统常量/系统变量](#6系统常量系统变量)
+  - [7.伪目标](#7伪目标)
+  - [8.模式匹配](#8模式匹配)
+  - [9. =与:=的区别](#9-与的区别)
+  - [10. make中使用shell](#10-make中使用shell)
+  - [11. make中的条件判断](#11-make中的条件判断)
+  - [11. make中的循环](#11-make中的循环)
+  - [12. make自定义函数](#12-make自定义函数)
+  - [13. make install](#13-make-install)
+
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 
 ## make基本认识<br>
 使用make编译程序时，有关程序的编译信息都必须写在一个“配置”文件中，一般情况下是“配置”文件名称是 **makefile** 或 **Makefile** ，当你写好配置文件后，就可以直接使用 **make** 命令一键编译。<br>

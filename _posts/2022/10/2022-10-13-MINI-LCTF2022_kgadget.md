@@ -9,15 +9,27 @@ comments: true
 
 PS:请观看完[linux内核基础 二](https://wsxk.github.io/linux_kernel_basic_two/)后练习该题<br>
 
-- [题目分析<br>](#题目分析)
-- [exp<br>](#exp)
-- [遇到的坑<br>](#遇到的坑)
-  - [1.新的获取vmlinux工具<br>](#1新的获取vmlinux工具)
-  - [2.ROPgadget搜索不全<br>](#2ropgadget搜索不全)
-  - [3.gdb用法<br>](#3gdb用法)
-  - [4. ret、retf、iretq、iret<br>](#4-retretfiretqiret)
-  - [5.使用swapgs_restore_regs_and_return_to_usermode<br>](#5使用swapgs_restore_regs_and_return_to_usermode)
-- [reference<br>](#reference)
+- [题目分析](#题目分析)
+- [exp](#exp)
+- [遇到的坑](#遇到的坑)
+  - [1.新的获取vmlinux工具](#1新的获取vmlinux工具)
+  - [2.ROPgadget搜索不全](#2ropgadget搜索不全)
+  - [3.gdb用法](#3gdb用法)
+  - [4. ret、retf、iretq、iret](#4-retretfiretqiret)
+  - [5.使用swapgs\_restore\_regs\_and\_return\_to\_usermode](#5使用swapgs_restore_regs_and_return_to_usermode)
+- [reference](#reference)
+
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 
 ## 题目分析<br>
 只有`kgadget_ioctl`有用

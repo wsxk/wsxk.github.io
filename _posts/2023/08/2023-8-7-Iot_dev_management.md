@@ -23,6 +23,16 @@ comments: true
   - [5.5 SA团队的管理](#55-sa团队的管理)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 ## 写在前面<br>
 这一小节只是记录一下我看到的关于项目管理的重要东西（其实我也不是项目管理者，只是要大概了解一下）<br>
 

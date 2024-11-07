@@ -17,6 +17,16 @@ author: wsxk
 - [type hints](#type-hints)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 ## 类型转换
 
 之所以要记录这么一篇文章，是因为在做ctf题的时候，你得到了答案，往往需要做一个类型的转换（比如你算出来一个大整数，你需要把他转换成字符串可见形式），但是我在类型转换的时候经常出错，不知道python里面内置了哪些转换函数可以给我操作，我自己又不想写（太懒了），最终还是决定记一下转换的方法，让自己以后不要因为转换问题浪费时间

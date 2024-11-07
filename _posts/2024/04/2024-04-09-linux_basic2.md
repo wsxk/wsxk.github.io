@@ -18,6 +18,16 @@ comments: true
   - [11.7 程序结束](#117-程序结束)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 ## 前言<br>
 想要了解linux的基础概念，可以先看看[https://wsxk.github.io/linux_basic/](https://wsxk.github.io/linux_basic/)
 

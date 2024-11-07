@@ -22,6 +22,16 @@ comments: true
 - [实现细节](#实现细节)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 ## uSBS安装<br>
 ### step1: 安装ubuntu18<br>
 可以参考[我的这篇文章](https://wsxk.github.io/ubuntu_%E5%AE%89%E8%A3%85%E5%B8%B8%E8%A7%84%E6%93%8D%E4%BD%9C/)<br>

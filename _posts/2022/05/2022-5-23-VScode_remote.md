@@ -7,11 +7,23 @@ comments: true
 author: wsxk
 ---
 
-- [1.安装VScode插件 remote_development](#1安装vscode插件-remote_development)
-- [2.创建ssl_key](#2创建ssl_key)
+- [1.安装VScode插件 remote\_development](#1安装vscode插件-remote_development)
+- [2.创建ssl\_key](#2创建ssl_key)
 - [3.虚拟机安装ssh服务](#3虚拟机安装ssh服务)
-- [4.移动id_rsa.pub到虚拟机](#4移动id_rsapub到虚拟机)
+- [4.移动id\_rsa.pub到虚拟机](#4移动id_rsapub到虚拟机)
 - [5.连接](#5连接)
+
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 
 不知道米娜桑有没有遇到这样一个问题
 

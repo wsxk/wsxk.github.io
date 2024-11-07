@@ -28,6 +28,18 @@ comments: true
 - [总结](#总结)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
+
+
 ## 写在前面<br>
 ~~作为一名物联网安全研究员，怎么能不复现一下漏洞呢~~<br>
 然而，为了一个漏洞去买一个设备感觉还是有点那啥（倒不是说没必要，新手可能需要先试试手，不至于浪费💴）<br>

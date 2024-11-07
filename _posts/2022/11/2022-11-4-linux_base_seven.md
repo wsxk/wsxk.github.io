@@ -7,21 +7,32 @@ date: 2022-11-4
 comments: true
 ---
 
-- [userfaultfd简介<br>](#userfaultfd简介)
-- [userfaultfd流程<br>](#userfaultfd流程)
-- [userfaultfd样例<br>](#userfaultfd样例)
-  - [step 1： 创建fd<br>](#step-1-创建fd)
-  - [step 2：创建一个匿名映射<br>](#step-2创建一个匿名映射)
-  - [step 3: 注册 userfaultfd功能<br>](#step-3-注册-userfaultfd功能)
-  - [step 4： 创建 userfault monitor线程监听<br>](#step-4-创建-userfault-monitor线程监听)
-  - [完整demo<br>](#完整demo)
-- [userfaultfd的应用场景<br>](#userfaultfd的应用场景)
-  - [pre-copy<br>](#pre-copy)
-  - [post-copy<br>](#post-copy)
-- [番外 CRIU（checkpoint/restore in userspace）<br>](#番外-criucheckpointrestore-in-userspace)
-- [userfault的缺陷<br>](#userfault的缺陷)
-  - [弥补:sysctl_unprivileged_userfaultfd=0<br>](#弥补sysctl_unprivileged_userfaultfd0)
-- [references<br>](#references)
+- [userfaultfd简介](#userfaultfd简介)
+- [userfaultfd流程](#userfaultfd流程)
+- [userfaultfd样例](#userfaultfd样例)
+  - [step 1： 创建fd](#step-1-创建fd)
+  - [step 2：创建一个匿名映射](#step-2创建一个匿名映射)
+  - [step 3: 注册 userfaultfd功能](#step-3-注册-userfaultfd功能)
+  - [step 4： 创建 userfault monitor线程监听](#step-4-创建-userfault-monitor线程监听)
+  - [完整demo](#完整demo)
+- [userfaultfd的应用场景](#userfaultfd的应用场景)
+  - [pre-copy](#pre-copy)
+  - [post-copy](#post-copy)
+- [番外 CRIU（checkpoint/restore in userspace）](#番外-criucheckpointrestore-in-userspace)
+- [userfault的缺陷](#userfault的缺陷)
+  - [弥补:sysctl\_unprivileged\_userfaultfd=0](#弥补sysctl_unprivileged_userfaultfd0)
+- [references](#references)
+
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
 
 
 ## userfaultfd简介<br>

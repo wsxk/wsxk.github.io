@@ -11,18 +11,30 @@ comments: true
 PS:请在学习完 [linux内核基础一](https://wsxk.github.io/linux_kernel_basic_one/)以及[Linux内核基础二](https://wsxk.github.io/linux_kernel_basic_two/)和相应的练习后进行三的学习<br>
 
 
-- [buddy system<br>](#buddy-system)
-- [slub分配器工作原理<br>](#slub分配器工作原理)
-  - [kmem_cache<br>](#kmem_cache)
-  - [kmem_cache_cpu<br>](#kmem_cache_cpu)
-  - [kmem_cache_node<br>](#kmem_cache_node)
-  - [slub API<br>](#slub-api)
-  - [slub各个数据结构间的关系<br>](#slub各个数据结构间的关系)
-  - [slub内存分配原理/释放原理<br>](#slub内存分配原理释放原理)
-    - [分配<br>](#分配)
-    - [释放<br>](#释放)
-  - [kmalloc<br>](#kmalloc)
-- [references<br>](#references)
+- [buddy system](#buddy-system)
+- [slub分配器工作原理](#slub分配器工作原理)
+  - [kmem\_cache](#kmem_cache)
+  - [kmem\_cache\_cpu](#kmem_cache_cpu)
+  - [kmem\_cache\_node](#kmem_cache_node)
+  - [slub API](#slub-api)
+  - [slub各个数据结构间的关系](#slub各个数据结构间的关系)
+  - [slub内存分配原理/释放原理](#slub内存分配原理释放原理)
+    - [分配](#分配)
+    - [释放](#释放)
+  - [kmalloc](#kmalloc)
+- [references](#references)
+
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 
 ## buddy system<br>
 作为linux的最底层的内存管理器，详细请移步[linux内核基础一](https://wsxk.github.io/linux_kernel_basic_one/),不过多赘述<br>

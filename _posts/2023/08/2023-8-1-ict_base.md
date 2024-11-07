@@ -38,6 +38,16 @@ comments: true
   - [四. 传送网](#四-传送网)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 ## 1. ICT introduction<br>
 `ICT(Information and Communicate Technology)`，也叫做信息与通信技术<br>
 

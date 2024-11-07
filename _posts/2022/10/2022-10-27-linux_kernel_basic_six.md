@@ -7,9 +7,20 @@ author: wsxk
 comments: true
 ---
 
-- [gs/fs寄存器<br>](#gsfs寄存器)
-- [copy_from_user/copy_to_user底层原理<br>](#copy_from_usercopy_to_user底层原理)
-- [references<br>](#references)
+- [gs/fs寄存器](#gsfs寄存器)
+- [copy\_from\_user/copy\_to\_user底层原理](#copy_from_usercopy_to_user底层原理)
+- [references](#references)
+
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
 
 ## gs/fs寄存器<br>
 众所周知，在内核态和用户态之间进行转换时，需要调用`swapgs`命令来切换gs段寄存器。<br>

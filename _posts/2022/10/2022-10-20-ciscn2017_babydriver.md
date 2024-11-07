@@ -7,13 +7,25 @@ author: wsxk
 comments: true
 ---
 
-- [题目分析<br>](#题目分析)
-- [漏洞利用<br>](#漏洞利用)
-  - [1.通过劫持进程cred结构体获得root<br>](#1通过劫持进程cred结构体获得root)
-  - [2.堆块隔离绕过<br>](#2堆块隔离绕过)
-  - [ptmx<br>](#ptmx)
-  - [堆块隔离绕过时存在的问题<br>](#堆块隔离绕过时存在的问题)
-- [references<br>](#references)
+- [题目分析](#题目分析)
+- [漏洞利用](#漏洞利用)
+  - [1.通过劫持进程cred结构体获得root](#1通过劫持进程cred结构体获得root)
+  - [2.堆块隔离绕过](#2堆块隔离绕过)
+  - [ptmx](#ptmx)
+  - [堆块隔离绕过时存在的问题](#堆块隔离绕过时存在的问题)
+- [references](#references)
+
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 
 ## 题目分析<br>
 关键函数如下

@@ -23,6 +23,17 @@ comments: true
   - [4.5 SystemServer进程](#45-systemserver进程)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
+
 ## 前言<br>
 该文章为[https://wsxk.github.io/android/](https://wsxk.github.io/android/)<br>
 的后续<br>

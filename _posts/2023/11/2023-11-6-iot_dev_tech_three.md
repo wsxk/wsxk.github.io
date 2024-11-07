@@ -40,6 +40,16 @@ comments: true
     - [8.5.3 Banking](#853-banking)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 ## 6. 设计硬件抽象层<br>
 请先看下图所示的架构：<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20231106214622.png)

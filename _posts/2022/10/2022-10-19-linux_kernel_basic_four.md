@@ -10,14 +10,27 @@ comments: true
 `更新于2022-10-19`<br>
 PS:请学习完前三章后观看本章<br>
 
-- [cr0<br>](#cr0)
-- [cr1<br>](#cr1)
-- [cr2<br>](#cr2)
-- [cr3<br>](#cr3)
-  - [KPTI(Kernel Page Table Isolation)<br>](#kptikernel-page-table-isolation)
-- [cr4<br>](#cr4)
-  - [SMAP/SMEP<br>](#smapsmep)
-- [references<br>](#references)
+- [cr0](#cr0)
+- [cr1](#cr1)
+- [cr2](#cr2)
+- [cr3](#cr3)
+  - [KPTI(Kernel Page Table Isolation)](#kptikernel-page-table-isolation)
+- [cr4](#cr4)
+  - [SMAP/SMEP](#smapsmep)
+- [references](#references)
+
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
+
 
 linux内核定义的控制寄存器（control register）共有5个，分别为`cr0` `cr1`
 `cr2` `cr3` `cr4`，这5个控制寄存器在内核中扮演了非常重要的角色，需要牢记<br>

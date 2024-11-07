@@ -11,13 +11,25 @@ comments: true
 PS: 所有的函数都基于新版idapython（从ida支持python3开始）<br>
 详情可以查官方文档[https://hex-rays.com/products/ida/support/idapython_docs/](https://hex-rays.com/products/ida/support/idapython_docs/)<br>
 
-- [导入库<br>](#导入库)
-- [汇编操作<br>](#汇编操作)
-- [get&patch操作<br>](#getpatch操作)
-- [段操作<br>](#段操作)
-- [函数操作<br>](#函数操作)
-- [搜索操作<br>](#搜索操作)
-- [交叉引用<br>](#交叉引用)
+- [导入库](#导入库)
+- [汇编操作](#汇编操作)
+- [get\&patch操作](#getpatch操作)
+- [段操作](#段操作)
+- [函数操作](#函数操作)
+- [搜索操作](#搜索操作)
+- [交叉引用](#交叉引用)
+
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 
 ## 导入库<br>
 开局先导入<br>

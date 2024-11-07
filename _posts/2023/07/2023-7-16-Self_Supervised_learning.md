@@ -19,6 +19,16 @@ comments: true
 - [Self-supervised extra](#self-supervised-extra)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 
 ## Supervised vs Self-supervised<br>
 所谓的`supervised learning`,指的是传统的训练方法。即**有输入，也有标准输出作为对比**<br>

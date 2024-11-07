@@ -14,6 +14,17 @@ comments: true
 - [4. Other Optimization](#4-other-optimization)
 - [5. KNN LM](#5-knn-lm)
 
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 ## 前言<br>
 话说回来,其实直觉上来说，对于一个大模型而言，参数越多，数据集越多，效果往往越好，如下图所示<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20230718135043.png)

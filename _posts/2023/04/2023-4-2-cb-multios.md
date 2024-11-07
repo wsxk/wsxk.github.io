@@ -15,6 +15,16 @@ comments: true
   - [4. testing](#4-testing)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 ## introduction<br>
 cb-multios是**评估程序分析工具/漏洞探寻工具的基准测试**<br>
 其中包含了许多内置了漏洞的，仿真的程序，可供程序分析软件程序分析工具/漏洞探寻工具进行测试，说白了就是为了测试工具的有效性，性能，等等。<br>

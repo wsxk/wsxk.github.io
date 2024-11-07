@@ -20,6 +20,17 @@ author: wsxk
   - [4.shellcode编写](#4shellcode编写)
   - [5.完整exp](#5完整exp)
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
+
 ## racecar<br>
 ### 1.运行
 拿到文件，当然是先让他跑起来看看会发生什么

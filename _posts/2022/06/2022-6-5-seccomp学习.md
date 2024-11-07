@@ -20,6 +20,17 @@ author: wsxk
 - [父进程设置的规则同样适用于子进程](#父进程设置的规则同样适用于子进程)
 - [reference](#reference)
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
+
 # 介绍
 
 为了保护系统安全，用户层的应用程序使用计算机资源需要通过系统调用，Linux即可以通过C库函数进行系统调用，但是并不是所有的系统调用都会被用到，其中有些敏感的系统调用可能会被误用，比如pwn题中经常通过system、execve 来etshell，为了防止这种情况发生沙盒应运而生，通过沙盒可以限制系统调用的使用极大提高系统安全性。

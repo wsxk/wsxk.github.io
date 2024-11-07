@@ -18,6 +18,16 @@ comments: true
 - [references](#references)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 ## 前言<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-3-25/M_7V%7EPSYXZARLHONMU%2483%25C.jpg)
 老规矩，看这篇前，建议了解一下我之前写得内容（<br>
