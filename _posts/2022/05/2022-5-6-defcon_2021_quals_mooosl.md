@@ -14,15 +14,7 @@ author: wsxk
 - [参考](#参考)
 
 
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
 
-  gtag('config', 'G-C22S5YSYL7');
-</script>
 
 
 ## 漏洞分析
@@ -288,3 +280,14 @@ heap_array是存放若干个单向链表的数组，每个单向链表里存放�
 [https://github.com/Kyle-Kyle/blog/blob/ce96da2540e940a53459e57d615de78cda5208f7/writeups/defcon21_mooosl/solve.py](https://github.com/Kyle-Kyle/blog/blob/ce96da2540e940a53459e57d615de78cda5208f7/writeups/defcon21_mooosl/solve.py)
 
 [https://github.com/cscosu/ctf-writeups/tree/master/2021/def_con_quals/mooosl](https://github.com/cscosu/ctf-writeups/tree/master/2021/def_con_quals/mooosl)
+
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
