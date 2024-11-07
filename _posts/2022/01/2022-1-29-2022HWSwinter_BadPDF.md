@@ -11,15 +11,6 @@ author: wsxk
 - [2. babyrsa](#2-babyrsa)
 - [3. 送分题](#3-送分题)
 
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-C22S5YSYL7');
-</script>
 
 
 ## 1. BadPDF<br> 
@@ -155,3 +146,15 @@ cS开头的就是重头戏：应该跟flag有关
 
     io.recvuntil('bye')
     io.interactive()
+
+
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
