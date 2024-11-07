@@ -11,6 +11,17 @@ comments: true
 - [1. 构建web server所需的system call与结构体](#1-构建web-server所需的system-call与结构体)
   - [1.1 用汇编来实现上述步骤](#11-用汇编来实现上述步骤)
 
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 ## 前言<br>
 要想构建一个简单的`web server`，最简单的办法当然是使用`python`辣，但是为了能够更清楚的了解`web server`的运行原理，在`linux`上用`assembly`是最合适的~<br>
 首先需要了解的一点是：**web server是构建在linux操作系统上的应用程序，其与外界进行互动时，需要让linux操作系统来充当中介**<br>

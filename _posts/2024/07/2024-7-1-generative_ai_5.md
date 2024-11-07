@@ -17,6 +17,15 @@ date: 2024-7-1
 - [17. ai-agents](#17-ai-agents)
 - [18. Fine Tuning](#18-fine-tuning)
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
 
 ## 前言<br>
 老规矩，请看完前面的章节，anyway其实你不看也没什么大问题~<br>

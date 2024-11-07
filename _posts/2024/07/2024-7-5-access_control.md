@@ -16,6 +16,16 @@ date: 2024-7-5
 - [4. 访问控制的类型](#4-访问控制的类型)
   - [4.1 Mandatory Access Control讲解](#41-mandatory-access-control讲解)
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 ## 前言<br>
 访问控制其实和linux中遇到的文件系统权限，apparmor是息息相关的
 自我宣传一下.jpg 😄<br>

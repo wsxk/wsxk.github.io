@@ -32,6 +32,16 @@ comments: true
 - [8. 外传: RSA challenge-response](#8-外传-rsa-challenge-response)
 - [9. python如何使用上述加密](#9-python如何使用上述加密)
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 ## 前言<br>
 常见的密码算法编写可看[Re 常见加解密算法识别与加解密脚本](https://wsxk.github.io/ctf_common_re/)<br>
 （又是一个自导自演~<br>

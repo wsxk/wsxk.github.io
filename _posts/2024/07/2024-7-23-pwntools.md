@@ -23,6 +23,16 @@ comments: true
   - [2.6 pwndbg使用技巧](#26-pwndbg使用技巧)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 ## 1. pwntools+tmux<br>
 在用`pwntools`进行`ctf pwn`题目调试时，通常会利用类似`gdb.attach(p)`的代码来调试，通常情况下，这回弹出另一个命令行<br>
 **但是你用tmux来进行调试，它会把一个命令行划分成2个pane，可以同时操作，界面美观还方便**<br>

@@ -23,6 +23,16 @@ date: 2024-6-6
 - [14. The Generative AI Application Lifecycle](#14-the-generative-ai-application-lifecycle)
 
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
 ## 前言<br>
 请看完前面的章节，anyway其实你不看也没什么大问题~<br>
 😄<br>
