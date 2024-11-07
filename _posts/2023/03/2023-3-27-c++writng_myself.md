@@ -13,6 +13,8 @@ comments: true
 array和 vector<br>
 两个都是c++的典型数据结构了，值得好好了解一下！<br>
 
+PS:`更新于2024-11-7`<br>
+
 ## array<br>
 ```c++
 #include <iostream>
