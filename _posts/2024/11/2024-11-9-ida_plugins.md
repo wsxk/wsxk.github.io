@@ -14,6 +14,7 @@ comments: true
   - [2.1 keypatch](#21-keypatch)
   - [2.2 VulFi](#22-vulfi)
   - [2.3 LazyIDA](#23-lazyida)
+  - [2.4 auto-re](#24-auto-re)
 
 
 <!-- Google tag (gtag.js) -->
@@ -52,3 +53,8 @@ VulFi是一个比较好用的二进制漏洞发现工具，实际体验下来还
 懒人IDA，主要目的是帮助你更快的做一些操作，插件下载[https://github.com/L4ys/LazyIDA](https://github.com/L4ys/LazyIDA)<br>
 其中的转换功能就比较适合我这个懒狗<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241110230149.png)
+
+### 2.4 auto-re<br>
+auto-re主要的功能是根据内部调用的api来为这个函数命名，比如
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241111075742.png)
+这个函数内部只有read这个api，auto_re就会给他命名为`au_re_read`，这个功能还是有点好用的，在分析大程序时可以批量命名。
