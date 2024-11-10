@@ -13,7 +13,7 @@ comments: true
 - [2. ida plugins](#2-ida-plugins)
   - [2.1 keypatch](#21-keypatch)
   - [2.2 VulFi](#22-vulfi)
-  - [2.3 ](#23-)
+  - [2.3 LazyIDA](#23-lazyida)
 
 
 <!-- Google tag (gtag.js) -->
@@ -48,4 +48,7 @@ ida9.0 rc1版本已经释放出来，这对安全研究人员是一个非常大�
 VulFi是一个比较好用的二进制漏洞发现工具，实际体验下来还可以，能够发现一些问题！<br>
 [https://github.com/Accenture/VulFi](https://github.com/Accenture/VulFi)
 
-### 2.3 <br>
+### 2.3 LazyIDA<br>
+懒人IDA，主要目的是帮助你更快的做一些操作，插件下载[https://github.com/L4ys/LazyIDA](https://github.com/L4ys/LazyIDA)<br>
+其中的转换功能就比较适合我这个懒狗<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241110230149.png)
