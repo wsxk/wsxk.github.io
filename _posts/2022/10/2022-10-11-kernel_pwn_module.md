@@ -7,19 +7,21 @@ date: 2022-10-11
 comments: true
 ---
 
-- [常用字节码](#常用字节码)
-- [kernel module](#kernel-module)
+- [1. 常用字节码](#1-常用字节码)
+- [2. kernel module](#2-kernel-module)
+- [3. 如何找洞?](#3-如何找洞)
+  - [3.1 LES](#31-les)
 
 
 
+PS:更新与`2024-11-11`<br>
 
-
-## 常用字节码<br>
+## 1. 常用字节码<br>
 
     iretq: 48 cf
     swapgs: 0f 01 f8
 
-## kernel module<br>
+## 2. kernel module<br>
 以目前浅薄的kernel pwn经验，总结了一套kernel pwn时会用到的基本操作，不定时更新~<br>
 ```c
 #include <sys/types.h>
@@ -76,6 +78,18 @@ void get_root_privilege(){
     (*commit_creds_ptr)((*prepare_kernel_cred_ptr)(NULL));
 }
 ```
+
+## 3. 如何找洞?<br>
+有的CTF题目会给一个ko文件（内核驱动模块），可以通过ida逆向分析来挖掘漏洞。那么，如果CTF题目只给了一个linux kernel，你又该如何应对呢？<br>
+
+### 3.1 LES<br>
+这就不得不提到一个牛逼的开源工具`LES(linux-exploit-suggester)`了，其已在github上开源：[https://github.com/The-Z-Labs/linux-exploit-suggester](https://github.com/The-Z-Labs/linux-exploit-suggester)<br>
+通过下载其脚本并运行，我们可以得知两件事:<br>
+```
+1. 当前linux kernel 可能能够利用的 cve漏洞
+2. 当前linux kernel 开启/关闭的 安全加固措施
+```
+
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
