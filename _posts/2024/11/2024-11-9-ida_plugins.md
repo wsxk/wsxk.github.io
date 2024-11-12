@@ -46,7 +46,7 @@ ida9.0 rc1版本已经释放出来，这对安全研究人员是一个非常大�
 [https://github.com/keystone-engine/keypatch](https://github.com/keystone-engine/keypatch)
 
 ### 2.2 VulFi<br>
-VulFi是一个比较好用的二进制漏洞发现工具，实际体验下来还可以，能够发现一些问题！<br>
+VulFi是一个比较好用的二进制漏洞发现工具，实际体验下来还可以，能够发现一些问题！（虽然不多）<br>
 [https://github.com/Accenture/VulFi](https://github.com/Accenture/VulFi)
 
 ### 2.3 LazyIDA<br>
