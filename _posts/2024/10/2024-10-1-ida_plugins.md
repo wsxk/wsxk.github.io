@@ -3,7 +3,7 @@ layout: post
 tags: [software_build]
 title: "ida 9.0 rc1 & plugins"
 author: wsxk
-date: 2024-11-9
+date: 2024-10-1
 comments: true
 ---
 
