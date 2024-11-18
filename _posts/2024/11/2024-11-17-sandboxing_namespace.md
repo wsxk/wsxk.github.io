@@ -8,9 +8,10 @@ comments: true
 ---
 
 - [1. 什么是 namespaces](#1-什么是-namespaces)
+  - [1.1 namespaces 系统api](#11-namespaces-系统api)
 - [namespace 和 seccomp 的差异和关联](#namespace-和-seccomp-的差异和关联)
 - [PS：docker的隔离原理](#psdocker的隔离原理)
-- [附录: namespaces系统调用使用方法](#附录-namespaces系统调用使用方法)
+- [附录: namespaces系统调用api使用方法](#附录-namespaces系统调用api使用方法)
 
 
 ## 1. 什么是 namespaces<br>
@@ -36,6 +37,41 @@ comments: true
 作为网络中的一个独立节点，而非宿主机上的进程
 ```
 
+### 1.1 namespaces 系统api<br>
+需要用到的API有三个<br>
+```c
+// 创建一个新的进程的同时，创建新的namespaces,且新进程会被附加到新namespaces中
+// 注意：父进程仍然在原来的namespaces中
+int clone(int (*fn)(void *), void *child_stack,
+       int flags, void *arg, ...
+       /* pid_t *ptid, void *newtls, pid_t *ctid */ );
+
+/*
+fn：指的是新进程运行的函数指针
+child_stack: 子进程使用的栈空间指针
+flags ：使用哪些CLONE_*标志位，不同标准位代表不同类型的namespaces
+arg ： 传入用户的参数
+*/
+```
+
+```c
+//创建一个新的命名空间，并将当前进程附加到新的namespaces中，flags与clone的flags一致
+int unshare(int flags);
+```
+
+```c
+//将当前进程附加到已有的namespaces中
+int setns(int fd, int nstype);
+
+/*
+fd: 我们要加入的namespaces的文件描述符，通常是/proc/[pid]/ns下面的文件描述符
+nstype： 让调用者检查fd指向的文件描述符是否符合实际要求，填0则不检查
+*/
+```
+文件描述符查看的例子：<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241119000111.png)
+
+
 ## namespace 和 seccomp 的差异和关联<br>
 `namespace`用于限制进程可调用的系统资源，`seccomp`用于限制进程可以执行的系统调用；一定要说的话**seccomp的优先级大于namespace,毕竟namespace的使用依赖于执行系统调用（system calls）**<br>
 
@@ -56,5 +92,6 @@ comments: true
 **有的时候理解原理思路 跟 落地实践 是两码事，纸上得来终觉浅，须知此事要躬行，古人诚不欺我**<br>
 要想学好网络安全，实践是必不可少的.以后还是要专注于实践。<br>
 
-## 附录: namespaces系统调用使用方法<br>
+## 附录: namespaces系统调用api使用方法<br>
 可以参考[https://blog.csdn.net/huchao_lingo/article/details/140448672](https://blog.csdn.net/huchao_lingo/article/details/140448672)文章，写的挺好的，yysy<br>
+里面还有针对namespace各个参数的案例代码，可以运行感受一下<br>
