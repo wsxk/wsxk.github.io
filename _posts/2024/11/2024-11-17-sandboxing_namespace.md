@@ -26,6 +26,7 @@ comments: true
 
 2. IPC: 进程间通信的三种方式：共享内存、消息队列、信号量。这让容器内无法见到宿
 主机的进程间通信的状态。（可通过ipcmk -Q创建队列，ipcs -q查看队列 ipcrm -Q key删除队列）
+反过来，宿主机也无法看到容器内新建的队列
 
 3. PID: 创建独立的PID namespace，同一个进程在不同的namespace下可以有不同的pid。
 另外，因为linux内核为所有的PID namespace维护了一个树状结构，树顶就是linux内
