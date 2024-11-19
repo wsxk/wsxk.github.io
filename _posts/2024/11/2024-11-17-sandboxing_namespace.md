@@ -9,6 +9,7 @@ comments: true
 
 - [1. 什么是 namespaces](#1-什么是-namespaces)
   - [1.1 namespaces 系统api](#11-namespaces-系统api)
+  - [1.2 namespaces使用前提](#12-namespaces使用前提)
 - [namespace 和 seccomp 的差异和关联](#namespace-和-seccomp-的差异和关联)
 - [PS：docker的隔离原理](#psdocker的隔离原理)
 - [附录: namespaces系统调用api使用方法](#附录-namespaces系统调用api使用方法)
@@ -20,21 +21,27 @@ comments: true
 总而言之，`namespaces`是linux kernel提供的用来隔离进程可用内核资源的机制。通过`namespaces`可以让进程只看到跟自己相关的一部分内核资源。<br>
 从上述的`man`可以得知，当前`namespaces`只允许隔离7种类型的linux内核资源<br>
 ```
-1. cgroup: 
+1. UTS：提供主机名和域名的隔离，这样一个容器就可以拥有独立的主机名和域名，能够
+作为网络中的一个独立节点，而非宿主机上的进程
 
-2. IPC: 进程间通信的三种方式：共享内存、消息队列、信号量。但是容器里的进程间通
-信，对于宿主机而言，其实是具有相同的 PID namespace的进程间通信，这里创建的是
+2. IPC: 进程间通信的三种方式：共享内存、消息队列、信号量。这让容器内无法见到宿
+主机的进程间通信的状态。（可通过ipcmk -Q创建队列，ipcs -q查看队列 ipcrm -Q key删除队列）
 
-3. Network:
+3. PID: 创建独立的PID namespace，同一个进程在不同的namespace下可以有不同的pid。
+另外，因为linux内核为所有的PID namespace维护了一个树状结构，树顶就是linux内
+核默认创建的root namespace，我们创建的新PID namespace被成为child namespace
+因此，pid namespace是有等级的，所属父节点可以看到子节点的进程，并通过发送信号
+等方式影响子节点
+换句话说，通常情况下容器内创建的进程，在宿主机是可以观测到并杀死的，反之不行。
+此时如果ps -aux还是可以看到所有的进程，这说明隔离不完全（没有隔离/proc文件系统）
 
-4. Mount:
+4. Network:
 
-5. PID:
+5. Mount:
 
 6. User:
 
-7. UTS：提供主机名和域名的隔离，这样一个容器就可以拥有独立的主机名和域名，能够
-作为网络中的一个独立节点，而非宿主机上的进程
+7. cgroup: 
 ```
 
 ### 1.1 namespaces 系统api<br>
@@ -71,6 +78,8 @@ nstype： 让调用者检查fd指向的文件描述符是否符合实际要求�
 文件描述符查看的例子：<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241119000111.png)
 
+### 1.2 namespaces使用前提<br>
+需要有`root`权限<br>
 
 ## namespace 和 seccomp 的差异和关联<br>
 `namespace`用于限制进程可调用的系统资源，`seccomp`用于限制进程可以执行的系统调用；一定要说的话**seccomp的优先级大于namespace,毕竟namespace的使用依赖于执行系统调用（system calls）**<br>
@@ -95,3 +104,40 @@ nstype： 让调用者检查fd指向的文件描述符是否符合实际要求�
 ## 附录: namespaces系统调用api使用方法<br>
 可以参考[https://blog.csdn.net/huchao_lingo/article/details/140448672](https://blog.csdn.net/huchao_lingo/article/details/140448672)文章，写的挺好的，yysy<br>
 里面还有针对namespace各个参数的案例代码，可以运行感受一下<br>
+举个例子:<br>
+```c
+
+#define _GNU_SOURCE
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <stdio.h>
+#include <sched.h>
+#include <signal.h>
+#include <unistd.h>
+ 
+ 
+#define STACK_SIZE (1024*1024)
+ 
+static char child_stack[STACK_SIZE];
+char* const child_args[] = {
+	"/bin/bash",
+	NULL
+};
+ 
+int child_main(void* args){
+	printf("in child process!\n");
+	sethostname("changed namespace", 12);
+	execv(child_args[0], child_args);
+	return 1;
+}
+ 
+int main(){
+	printf("program begin: \n");
+	int child_pid = clone(child_main, child_stack + STACK_SIZE, SIGCHLD|CLONE_NEWUTS, NULL);
+	waitpid(child_pid, NULL, 0);
+	printf("quit\n");
+	return 0;
+}
+```
+
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241119221847.png)
