@@ -36,13 +36,19 @@ comments: true
 换句话说，通常情况下容器内创建的进程，在宿主机是可以观测到并杀死的，反之不行。
 此时如果ps -aux还是可以看到所有的进程，这说明隔离不完全（没有隔离/proc文件系统）
 
-4. Network:
+4. Mount:创建一个mount namespace，通过隔离文件系统挂载点来隔离文件系统，在
+执行mount("proc","/proc","proc",0,NULL);后（对应参数的含义分别是
+挂载的源为proc文件系统，挂载到/proc目录下，挂载的类型是proc）
+ps -aux将无法看到其他进程的信息，退出该进程后需要sudo mount -t proc proc /proc进行复原
 
-5. Mount:
+5. User:一个普通用户的进程通过clone()创建新的进程在新user namespace中可以拥
+有不同的用户和用户组。这意味着一个进程在容器外属于一个没有特殊权限的普通用户，
+但是它创建的容器进程却属于拥有所有权限的超级用户，这个技术为容器提供了极大的自由。
 
-6. User:
+6. Network: 能够隔离网络设备，栈，端口，等等
 
-7. cgroup: 
+7. cgroup:  能够限制被隔离的namespace中，使被隔离的namespace中的进程，对CPU
+的使用率，内存使用量，磁盘IO速率，网络带宽等等进行限制！
 ```
 
 ### 1.1 namespaces 系统api<br>
@@ -107,7 +113,6 @@ nstype： 让调用者检查fd指向的文件描述符是否符合实际要求�
 里面还有针对namespace各个参数的案例代码，可以运行感受一下<br>
 举个例子:<br>
 ```c
-
 #define _GNU_SOURCE
 #include <sys/types.h>
 #include <sys/wait.h>
