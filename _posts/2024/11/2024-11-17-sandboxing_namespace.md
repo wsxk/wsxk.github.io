@@ -1,19 +1,21 @@
 ---
 layout: post
 tags: [pwn]
-title: "sandboxing —— namespace"
+title: "sandboxing —— namespaces"
 author: wsxk
 date: 2024-11-17
 comments: true
 ---
 
 - [1. 什么是 namespaces](#1-什么是-namespaces)
-  - [1.1 namespaces 系统api](#11-namespaces-系统api)
-  - [1.2 namespaces使用前提](#12-namespaces使用前提)
 - [2. 运用namespaces构建container](#2-运用namespaces构建container)
+  - [2.1 namespaces使用前提](#21-namespaces使用前提)
+  - [2.2 运用linux cmds构建container](#22-运用linux-cmds构建container)
 - [3. namespaces 和 seccomp 的差异和关联](#3-namespaces-和-seccomp-的差异和关联)
 - [4. PS：docker的隔离原理](#4-psdocker的隔离原理)
-- [5. 附录: namespaces API使用方法](#5-附录-namespaces-api使用方法)
+- [5. 附录: C/C++: namespaces API使用方法](#5-附录-cc-namespaces-api使用方法)
+  - [5.1 namespaces 系统api](#51-namespaces-系统api)
+  - [5.2 A example](#52-a-example)
 
 
 ## 1. 什么是 namespaces<br>
@@ -51,8 +53,38 @@ ps -aux将无法看到其他进程的信息，退出该进程后需要sudo mount
 7. cgroup:  能够限制被隔离的namespace中，使被隔离的namespace中的进程，对CPU
 的使用率，内存使用量，磁盘IO速率，网络带宽等等进行限制！
 ```
+namespaces用途广泛，我们应该如何使用呢？<br>
 
-### 1.1 namespaces 系统api<br>
+## 2. 运用namespaces构建container<br>
+### 2.1 namespaces使用前提<br>
+需要有`root`权限，毕竟需要隔离系统资源<br>
+
+### 2.2 运用linux cmds构建container<br>
+要想完整得运用`namespaces`构建容器，需要用到很多涉及linux kernel底层机制的命令，比如`mount`，正好总结一下这些命令背后的原理以及如何使用<br>
+
+
+## 3. namespaces 和 seccomp 的差异和关联<br>
+`namespace`用于限制进程可调用的系统资源，`seccomp`用于限制进程可以执行的系统调用；一定要说的话**seccomp的优先级大于namespace,毕竟namespace的使用依赖于执行系统调用（system calls）**<br>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
+
+
+## 4. PS：docker的隔离原理<br>
+尚未证实的说法，据说`docker = chroot + namespace + seccomp`<br>
+话又说回来，即使是这么简单的思路，实践起来也很困难，不然世上也就不会仅docker一家独大了。<br>
+**有的时候理解原理思路 跟 落地实践 是两码事，纸上得来终觉浅，须知此事要躬行，古人诚不欺我**<br>
+要想学好网络安全，实践是必不可少的.以后还是要专注于实践。<br>
+
+## 5. 附录: C/C++: namespaces API使用方法<br>
+### 5.1 namespaces 系统api<br>
 需要用到的API有三个<br>
 ```c
 // 创建一个新的进程的同时，创建新的namespaces,且新进程会被附加到新namespaces中
@@ -86,34 +118,8 @@ nstype： 让调用者检查fd指向的文件描述符是否符合实际要求�
 文件描述符查看的例子：<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241119000111.png)
 
-### 1.2 namespaces使用前提<br>
-需要有`root`权限<br>
+### 5.2 A example<br>
 
-## 2. 运用namespaces构建container<br>
-要想完整得运用`namespaces`构建容器，需要用到很多涉及linux kernel底层机制的命令，比如`mount`，正好总结一下这些命令背后的原理以及如何使用<br>
-
-
-## 3. namespaces 和 seccomp 的差异和关联<br>
-`namespace`用于限制进程可调用的系统资源，`seccomp`用于限制进程可以执行的系统调用；一定要说的话**seccomp的优先级大于namespace,毕竟namespace的使用依赖于执行系统调用（system calls）**<br>
-
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-C22S5YSYL7');
-</script>
-
-
-## 4. PS：docker的隔离原理<br>
-尚未证实的说法，据说`docker = chroot + namespace + seccomp`<br>
-话又说回来，即使是这么简单的思路，实践起来也很困难，不然世上也就不会仅docker一家独大了。<br>
-**有的时候理解原理思路 跟 落地实践 是两码事，纸上得来终觉浅，须知此事要躬行，古人诚不欺我**<br>
-要想学好网络安全，实践是必不可少的.以后还是要专注于实践。<br>
-
-## 5. 附录: namespaces API使用方法<br>
 可以参考[https://blog.csdn.net/huchao_lingo/article/details/140448672](https://blog.csdn.net/huchao_lingo/article/details/140448672)文章，写的挺好的，yysy<br>
 里面还有针对namespace各个参数的案例代码，可以运行感受一下<br>
 举个例子:<br>
