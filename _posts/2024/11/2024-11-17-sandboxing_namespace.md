@@ -58,9 +58,23 @@ namespaces用途广泛，我们应该如何使用呢？<br>
 ## 2. 运用namespaces构建container<br>
 ### 2.1 namespaces使用前提<br>
 需要有`root`权限，毕竟需要隔离系统资源<br>
+要想完整得运用`namespaces`构建容器，需要用到很多涉及linux kernel底层机制的命令，比如`unshare`命令和`mount`命令，正好总结一下这些命令背后的原理以及如何使用<br>
+```shell
+## 以下命令都需要sudo权限执行
+
+unshare: unshare linux命令允许创建一个子进程，该子进程可以拥有与父进程不同的
+namespace
+
+mount： mount命令用于将物理设备（通常是磁盘）的文件系统挂载到linux的根目录/下
+，这样我们可以直接访问该设备中的内容
+```
+但是这么说其实很抽象看，举个例子：`linux`系统存在某个磁盘设备当中，启动linux kernel前的准备工作就不说了，到linux启动时，**它会把它所在磁盘的文件系统挂载到/目录下，这样它就具备了存放数据的能力。** 此后linux kernel会创建/dev目录并搜索所有可以访问的设备，并把它们抽象成设备文件放在/dev目录下。**这个/dev目录下自然包括了linux本身所在的磁盘设备（/dev/sda）**<br>
+
 
 ### 2.2 运用linux cmds构建container<br>
-要想完整得运用`namespaces`构建容器，需要用到很多涉及linux kernel底层机制的命令，比如`mount`，正好总结一下这些命令背后的原理以及如何使用<br>
+首先，使用`sudo unshare -m bash`创建一个子进程，这个子进程有跟父进程不同的`mount namespace`，注意，虽然此时子进程跟父进程有不同的`mount namespace`，但是两个`mount namespace`的内容是一样的（拷贝），但是此时，在子进程中执行命令`mount --bind /bin/ $PWD/a`命令后，就会发现不同的地方:<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241122201621.png)
+可以看到，使用mount命令将已有的目录挂载到另一个目录下，但是非该namespace的程序无法看见这个内容。<br>
 
 
 ## 3. namespaces 和 seccomp 的差异和关联<br>
