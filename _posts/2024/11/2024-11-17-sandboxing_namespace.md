@@ -112,6 +112,7 @@ mount： mount命令用于将物理设备（通常是磁盘）的文件系统挂
 ## 3. 运用chroot/pivot_root改变根目录<br>
 ### 3.1 chroot改变/目录<br>
 ```shell
+sudo unshare -m -n -p --fork --mount-proc bash
 mkdir bin usr lib lib64 proc
 sudo mount --bind /bin ./bin
 sudo mount --bind /usr ./usr/
@@ -132,9 +133,28 @@ sudo chroot .
 现代容器通常都使用`pivot_root`而不是`chroot`。<br>
 它的用法如下：<br>
 ```shell
+sudo unshare -m -n -p --fork --mount-proc bash
+mkdir bin usr lib lib64 proc old_root
 
+sudo mount --bind $PWD $PWD  #必须这么做
+sudo mount --bind /bin ./bin
+sudo mount --bind /usr ./usr/
+sudo mount --bind /lib ./lib
+sudo mount --bind /lib64 ./lib64
+sudo mount --bind /proc ./proc
+
+pivot_root $PWD $PWD/old_root/  #old_root为保存原有根节点的目录
+cd /
 ```
-
+进入后，就把`old_root unmounted`掉！<br>
+```shell
+umount -l old_root
+rm -rf old_root
+```
+至此，一个容器诞生了！<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241123193637.png)
+**当然，还是要强调一遍，宿主机可以看到容器内的进程pid（和容器内的pid号不同），所以宿主机可以控制容器进程**<br>
+接下来再用`seccomp`限制一下系统调用(防止逃逸)，一个类似docker的容器就彻底完成！<br>
 
 ## 4. chroot/pivot_root和namespaces 和 seccomp 的差异和关联<br>
 `chroot/pivot_root`用于改变容器中的根目录,`namespace`用于隔离进程可调用的系统资源，`seccomp`用于限制进程可以执行的系统调用；一定要说的话**seccomp的优先级大于namespace,毕竟namespace的使用依赖于执行系统调用（system calls）**<br>
