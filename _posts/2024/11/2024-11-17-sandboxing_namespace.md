@@ -80,7 +80,21 @@ mount： mount命令用于将物理设备（通常是磁盘）的文件系统挂
 我们创建了c目录，两个进程都可以看到这个目录。<br>
 **但是，如果在mount过的 a目录中创建内容，情况则有所不同**<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241123100500.png)
+现在了解完，再来一个有趣的例子。<br>
+执行这个shell命令:`sudo unshare -m -n -p --fork --mount-proc bash`<br>
+```
+-m 创建 mount namespace， --mount-proc就是把/proc重新挂载，不这样做 ps -aux
+仍然能看到所有进程~
 
+-n 创建 network namespace
+
+-p 创建 pid namespace， 这个选项要跟--fork一起用，不然有神秘问题
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241123101931.png)
+已经有容器的感觉了~<br>
+
+**另外，之前提到过pid namespace的等级制度，高等级的pid namespace可以看到低级pid namespace里运行的进程.在docker里也是一样的**<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241123102430.png)
 
 ## 3. namespaces 和 seccomp 的差异和关联<br>
 `namespace`用于限制进程可调用的系统资源，`seccomp`用于限制进程可以执行的系统调用；一定要说的话**seccomp的优先级大于namespace,毕竟namespace的使用依赖于执行系统调用（system calls）**<br>
