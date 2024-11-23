@@ -75,6 +75,11 @@ mount： mount命令用于将物理设备（通常是磁盘）的文件系统挂
 首先，使用`sudo unshare -m bash`创建一个子进程，这个子进程有跟父进程不同的`mount namespace`，注意，虽然此时子进程跟父进程有不同的`mount namespace`，但是两个`mount namespace`的内容是一样的（拷贝），但是此时，在子进程中执行命令`mount --bind /bin/ $PWD/a`命令后，就会发现不同的地方:<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241122201621.png)
 可以看到，使用mount命令将已有的目录挂载到另一个目录下，但是非该namespace的程序无法看见这个内容。<br>
+**注意，mount namespaces不同，但是这两个进程仍然共享同一个文件系统，下面这个例子可以举证**<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241123100311.png)
+我们创建了c目录，两个进程都可以看到这个目录。<br>
+**但是，如果在mount过的 a目录中创建内容，情况则有所不同**<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241123100500.png)
 
 
 ## 3. namespaces 和 seccomp 的差异和关联<br>
