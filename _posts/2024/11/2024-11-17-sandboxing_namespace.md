@@ -11,12 +11,25 @@ comments: true
 - [2. 运用namespaces构建container](#2-运用namespaces构建container)
   - [2.1 namespaces使用前提](#21-namespaces使用前提)
   - [2.2 运用linux cmds构建container](#22-运用linux-cmds构建container)
-- [3. namespaces 和 seccomp 的差异和关联](#3-namespaces-和-seccomp-的差异和关联)
-- [4. PS：docker的隔离原理](#4-psdocker的隔离原理)
+- [3. 运用chroot/pivot\_root改变根目录](#3-运用chrootpivot_root改变根目录)
+  - [3.1 chroot改变/目录](#31-chroot改变目录)
+  - [3.2 pivot\_root改变根目录](#32-pivot_root改变根目录)
+- [4. chroot/pivot\_root和namespaces 和 seccomp 的差异和关联](#4-chrootpivot_root和namespaces-和-seccomp-的差异和关联)
+  - [4.1 PS：docker的隔离原理](#41-psdocker的隔离原理)
 - [5. 附录: C/C++: namespaces API使用方法](#5-附录-cc-namespaces-api使用方法)
   - [5.1 namespaces 系统api](#51-namespaces-系统api)
   - [5.2 A example](#52-a-example)
 
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
 
 ## 1. 什么是 namespaces<br>
 `namespaces`的简介可以通过linux命令 `man namespaces`来了解<br>
@@ -96,22 +109,38 @@ mount： mount命令用于将物理设备（通常是磁盘）的文件系统挂
 **另外，之前提到过pid namespace的等级制度，高等级的pid namespace可以看到低级pid namespace里运行的进程.在docker里也是一样的**<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241123102430.png)
 
-## 3. namespaces 和 seccomp 的差异和关联<br>
-`namespace`用于限制进程可调用的系统资源，`seccomp`用于限制进程可以执行的系统调用；一定要说的话**seccomp的优先级大于namespace,毕竟namespace的使用依赖于执行系统调用（system calls）**<br>
+## 3. 运用chroot/pivot_root改变根目录<br>
+### 3.1 chroot改变/目录<br>
+```shell
+mkdir bin usr lib lib64 proc
+sudo mount --bind /bin ./bin
+sudo mount --bind /usr ./usr/
+sudo mount --bind /lib ./lib
+sudo mount --bind /lib64 ./lib64
+sudo mount --bind /proc ./proc
 
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+sudo chroot .
+```
+结果如下：<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241123182602.png)
+但是众所周知，chroot并不安全，不了解的可以看[https://wsxk.github.io/sandboxing_namespace/](https://wsxk.github.io/sandboxing_namespace/)<br>
 
-  gtag('config', 'G-C22S5YSYL7');
-</script>
+### 3.2 pivot_root改变根目录<br>
+**chroot的作用是改变当前进程及其子进程的根目录，可以随时逃逸**<br>
+**但是pivot_root，它能够改变当前进程所在的mount namespaces空间中所有进程的 根文件系统挂载点**<br>
+它的作用非常强力，如果说chroot是给进程带了个眼罩，pivot_root就是更换了系统的根基！<br>
+现代容器通常都使用`pivot_root`而不是`chroot`。<br>
+它的用法如下：<br>
+```shell
+
+```
 
 
-## 4. PS：docker的隔离原理<br>
-尚未证实的说法，据说`docker = chroot + namespace + seccomp`<br>
+## 4. chroot/pivot_root和namespaces 和 seccomp 的差异和关联<br>
+`chroot/pivot_root`用于改变容器中的根目录,`namespace`用于隔离进程可调用的系统资源，`seccomp`用于限制进程可以执行的系统调用；一定要说的话**seccomp的优先级大于namespace,毕竟namespace的使用依赖于执行系统调用（system calls）**<br>
+
+### 4.1 PS：docker的隔离原理<br>
+`docker = namespace+ pivot_root + seccomp`**这个加法也代表了执行的先后顺序**<br>
 话又说回来，即使是这么简单的思路，实践起来也很困难，不然世上也就不会仅docker一家独大了。<br>
 **有的时候理解原理思路 跟 落地实践 是两码事，纸上得来终觉浅，须知此事要躬行，古人诚不欺我**<br>
 要想学好网络安全，实践是必不可少的.以后还是要专注于实践。<br>
