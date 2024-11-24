@@ -156,6 +156,15 @@ rm -rf old_root
 **当然，还是要强调一遍，宿主机可以看到容器内的进程pid（和容器内的pid号不同），所以宿主机可以控制容器进程**<br>
 接下来再用`seccomp`限制一下系统调用(防止逃逸)，一个类似docker的容器就彻底完成！<br>
 
+此时，要想从外部宿主机进入容器，可以使用如下命令:<br>
+```shell
+nsenter --mount=/proc/6388/ns/mnt /bin/bash
+## 6388为你实际运用unshare创建容器的 /bin/bash pid！
+## 通过这种方式我们就能从宿主机进入容器内部！docker也是这么干的
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241124110607.png)
+
+
 ## 4. chroot/pivot_root和namespaces 和 seccomp 的差异和关联<br>
 `chroot/pivot_root`用于改变容器中的根目录,`namespace`用于隔离进程可调用的系统资源，`seccomp`用于限制进程可以执行的系统调用；一定要说的话**seccomp的优先级大于namespace,毕竟namespace的使用依赖于执行系统调用（system calls）**<br>
 
