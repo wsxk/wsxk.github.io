@@ -138,7 +138,7 @@ chroot("/tmp/jail") 不能:
 dirfd 能表示为任何一个打开着的目录文件描述符, 或者是特殊值 AT_FDCWD(在linux代表的是当前工作目录) (注意: chroot()
 不会改变当前工作目录)!
 ```
-另外，内核并不会记得程序已经在一个jail当中，也就是说，你可以通过在使用一次`chroot("/")`来跳出jail<br>
+另外，内核并不会记得程序已经在一个jail当中，也就是说，你可以通过在使用一次`chroot("/")`来跳出jail(当然这要求进程有CAP_SYS_CHROOT权限，通常就是root)<br>
 
 ### 2.4 chroot安全性讨论<br>
 当然`chroot`不安全，首先，`euid`为0(即具备root或suid)的程序可以随时跳出jail,除非`chroot`被禁用了<br>
