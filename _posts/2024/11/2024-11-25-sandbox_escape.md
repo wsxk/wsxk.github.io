@@ -16,6 +16,9 @@ comments: true
     - [2.1.2 只允许("linkat", "open", "read", "write", "sendfile")](#212-只允许linkat-open-read-write-sendfile)
     - [2.1.3 只允许("fchdir", "open", "read", "write", "sendfile")](#213-只允许fchdir-open-read-write-sendfile)
     - [2.1.4 只允许("chdir", "chroot", "mkdir", "open", "read", "write", "sendfile")](#214-只允许chdir-chroot-mkdir-open-read-write-sendfile)
+- [附录：利用chroot之前打开的目录/文件描述符 —— 手法](#附录利用chroot之前打开的目录文件描述符--手法)
+  - [附录A：程序本身在chroot之前已打开目录/文件描述符](#附录a程序本身在chroot之前已打开目录文件描述符)
+  - [附录B：bash tricks](#附录bbash-tricks)
 
 
 # 1. chroot 逃逸<br>
@@ -249,7 +252,19 @@ point_path:
 .string "../../"
 ```
 
+# 附录：利用chroot之前打开的目录/文件描述符 —— 手法<br>
+## 附录A：程序本身在chroot之前已打开目录/文件描述符<br>
+这种情况就比较好说，重点是记住内核中文件描述符一般是顺序递增的，`0 代表标准输入，1代表标准输出，2代表标准错误，程序另外打开的文件的文件描述符依次是3 4 5...`<br>
+如果程序自己就开好了，直接利用就完事了。<br>
 
+## 附录B：bash tricks<br>
+核心思路是在允许chroot前，利用/bin/bash自己创建一个文件描述符，让chroot的程序继承父进程的文件描述符。<br>
+```shell
+exec 3>/flag #文件描述符3绑定/flag文件,只写模式； 实际上 exec 3<>/flag也可以，表示读写模式绑定文件
+exec 4</ #文件描述符4绑定/目录  ; 因为目录不能写，只能读，因此只能用<
+
+cat shellcode.raw | /path/to/your/program
+```
 
 
 <!-- Google tag (gtag.js) -->
