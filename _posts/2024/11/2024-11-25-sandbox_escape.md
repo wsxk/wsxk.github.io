@@ -16,6 +16,7 @@ comments: true
     - [2.1.2 只允许("linkat", "open", "read", "write", "sendfile")](#212-只允许linkat-open-read-write-sendfile)
     - [2.1.3 只允许("fchdir", "open", "read", "write", "sendfile")](#213-只允许fchdir-open-read-write-sendfile)
     - [2.1.4 只允许("chdir", "chroot", "mkdir", "open", "read", "write", "sendfile")](#214-只允许chdir-chroot-mkdir-open-read-write-sendfile)
+    - [2.1.5 只允许("read", "exit")](#215-只允许read-exit)
   - [2.2 利用syscall confusion实现逃逸](#22-利用syscall-confusion实现逃逸)
     - [2.2.1 只限制x64，不限制x86](#221-只限制x64不限制x86)
 - [附录：利用chroot之前打开的目录/文件描述符 —— 手法](#附录利用chroot之前打开的目录文件描述符--手法)
@@ -253,6 +254,11 @@ test_path:
 point_path:
 .string "../../"
 ```
+
+### 2.1.5 只允许("read", "exit")<br>
+这种情况就比较搞了。只能利用exit的退出的返回值来泄露flag信息<br>
+
+
 
 ## 2.2 利用syscall confusion实现逃逸<br>
 细节请看[https://wsxk.github.io/sandboxing/](https://wsxk.github.io/sandboxing/)<br>
