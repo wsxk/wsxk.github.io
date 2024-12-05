@@ -17,6 +17,7 @@ comments: true
     - [2.1.3 只允许("fchdir", "open", "read", "write", "sendfile")](#213-只允许fchdir-open-read-write-sendfile)
     - [2.1.4 只允许("chdir", "chroot", "mkdir", "open", "read", "write", "sendfile")](#214-只允许chdir-chroot-mkdir-open-read-write-sendfile)
     - [2.1.5 只允许("read", "exit")](#215-只允许read-exit)
+    - [2.1.6 只允许("read", "nanosleep")](#216-只允许read-nanosleep)
   - [2.2 利用syscall confusion实现逃逸](#22-利用syscall-confusion实现逃逸)
     - [2.2.1 只限制x64，不限制x86](#221-只限制x64不限制x86)
 - [附录：利用chroot之前打开的目录/文件描述符 —— 手法](#附录利用chroot之前打开的目录文件描述符--手法)
@@ -289,6 +290,19 @@ for i in range(57):
 print(flag)
 ```
 
+### 2.1.6 只允许("read", "nanosleep")<br>
+这种情况可以根据睡眠的时间来获取信息，虽然很抽象，但真的可行！<br>
+```c
+struct timespec {
+    time_t tv_sec;  // 秒数 (seconds)
+    long   tv_nsec; // 纳秒数 (nanoseconds), 范围：0 ~ 999,999,999
+};
+
+int nanosleep(const struct timespec *req, struct timespec *rem);
+
+//req：指向一个timespec结构体，其结构为
+//rem: 睡眠被中断时用来存储剩下的时间，可以直接填NULL
+```
 
 ## 2.2 利用syscall confusion实现逃逸<br>
 细节请看[https://wsxk.github.io/sandboxing/](https://wsxk.github.io/sandboxing/)<br>
