@@ -21,6 +21,7 @@ comments: true
     - [2.1.7 只允许("read")](#217-只允许read)
   - [2.2 利用syscall confusion实现逃逸](#22-利用syscall-confusion实现逃逸)
     - [2.2.1 只限制x64，不限制x86](#221-只限制x64不限制x86)
+- [3. 父子进程+ seccomp 逃逸](#3-父子进程-seccomp-逃逸)
 - [附录：利用chroot之前打开的目录/文件描述符 —— 手法](#附录利用chroot之前打开的目录文件描述符--手法)
   - [附录A：程序本身在chroot之前已打开目录/文件描述符](#附录a程序本身在chroot之前已打开目录文件描述符)
   - [附录B：bash tricks](#附录bbash-tricks)
@@ -493,6 +494,9 @@ int 0x80
 file_path:
 .string "flag"
 ```
+
+# 3. 父子进程+ seccomp 逃逸<br>
+该场景下，子进程只能跟父进程进行通信，且运用seccomp导致子进程只能使用`("read","write","exit")`这3个系统调用，我们应该如何实现逃逸<br>
 
 
 # 附录：利用chroot之前打开的目录/文件描述符 —— 手法<br>
