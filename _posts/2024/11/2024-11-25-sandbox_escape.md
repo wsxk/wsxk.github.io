@@ -25,6 +25,8 @@ comments: true
 - [4. namespace +pivot\_root 逃逸](#4-namespace-pivot_root-逃逸)
   - [4.1 pivot\_root后未删除old目录](#41-pivot_root后未删除old目录)
   - [4.2 mount的目录在所有命名空间中共享](#42-mount的目录在所有命名空间中共享)
+  - [4.3 没有隔离pid namespace](#43-没有隔离pid-namespace)
+  - [4.4 利用pivot\_root之前打开的目录/文件描述符实现逃逸](#44-利用pivot_root之前打开的目录文件描述符实现逃逸)
 - [附录：利用chroot之前打开的目录/文件描述符 —— 手法](#附录利用chroot之前打开的目录文件描述符--手法)
   - [附录A：程序本身在chroot之前已打开目录/文件描述符](#附录a程序本身在chroot之前已打开目录文件描述符)
   - [附录B：bash tricks](#附录bbash-tricks)
@@ -536,9 +538,20 @@ buffer:
 # 4. namespace +pivot_root 逃逸<br>
 ## 4.1 pivot_root后未删除old目录<br>
 通常，在使用`pivot_root`会要求创建`old`目录来挂载旧文件系统，如果创建容器后没有删除`old`目录，将导致用户通过`old`目录访问宿主机文件系统。<br>
+**解决办法：umount2("/old", MNT_DETACH)**
 
 ## 4.2 mount的目录在所有命名空间中共享<br>
 如果你通过例如`mount("/old/bin", "/bin", NULL, MS_BIND, NULL)`将`/old/bin`的内容挂载到`/bin`中，实际上这两个目录共享同一个文件系统的内容，因此，如果是**宿主机-虚拟机-容器**的布局中，你进入虚拟机然而是普通用户，创建的容器具有root权限且虚拟机和容器的文件系统共享，你可以通过`chmod +s xxx`来提升你在虚拟机中的用户权限~<br>
+**解决办法：挂载目录后，再挂载一次，mount(NULL, "/proc", NULL, MS_REMOUNT|MS_RDONLY|MS_BIND, NULL)，设置为只读即可**<br>
+
+## 4.3 没有隔离pid namespace<br>
+在只创建了`mount namespace`的场景下，可以直接通过如下命令获取信息:<br>
+`cat /proc/1/root/flag`即可获得flag！<br>
+**/proc/1/root 是一个特殊的符号链接（symlink），位于 Linux 的 /proc 伪文件系统中。它指向了进程号为 1 的进程（通常是 init 或 systemd）所看到的 根目录（root filesystem）。**<br>
+**解决办法，创建pid namespace即可**<br>
+
+## 4.4 利用pivot_root之前打开的目录/文件描述符实现逃逸<br>
+同2.1节<br>
 
 
 # 附录：利用chroot之前打开的目录/文件描述符 —— 手法<br>
