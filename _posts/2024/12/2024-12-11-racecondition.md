@@ -8,9 +8,10 @@ comments: true
 ---
 
 - [1. 什么是race condition](#1-什么是race-condition)
+- [2. races in filesystem](#2-races-in-filesystem)
 
 
-## 1. 什么是race condition<br>
+# 1. 什么是race condition<br>
 在古早时期，CPU是单核的，但是你想在这颗CPU上运行多个进程，这意味着:<br>
 ```
 用户感受到两个进程同时运行，但是实际上
@@ -34,9 +35,10 @@ comments: true
 4. B change # 讲道理此时不应该执行B，但是B还是能被执行，导致C的内容被改变了2次
 ```
 这就是`race condition`!<br>
-**要想利用race condition，我们需要在应用的薄弱环节，精细地影响其状态才行**<br>
+**要想利用race condition，我们需要在应用的薄弱时期，精细地影响其状态才行**<br>
 
-
+# 2. races in filesystem<br>
+ 
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
