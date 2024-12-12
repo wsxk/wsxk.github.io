@@ -9,6 +9,7 @@ comments: true
 
 - [1. 什么是race condition](#1-什么是race-condition)
 - [2. races in filesystem](#2-races-in-filesystem)
+  - [2.1 races in filesystem 原理](#21-races-in-filesystem-原理)
 
 
 # 1. 什么是race condition<br>
@@ -40,6 +41,9 @@ comments: true
 书接上回，攻击者通过改变程序运行的状态，而程序假设它的状态没有改变,导致`race condition`<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241212221549.png)
 为了利用`race condition`,攻击者需要能够影响所说的环境，**Races in filesystem**就是一个很常见的例子。<br>
+## 2.1 races in filesystem 原理<br>
+文件系统是攻击者能够经常影响的程序环境的一部分。<br>
+利用文件系统实施攻击，本质上是在进程运行时，操控进程运行所需的文件达到利用`race condition`的目的。<br>
 
 
 
