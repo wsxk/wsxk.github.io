@@ -60,9 +60,9 @@ int main(int argc, char **argv) {
 ```
 具体利用步骤:
 1. gcc fs1.c -o fs1
-2. 启动一个terminal，运行 for i in $(seq 1 2000); do ./fs1 asdf; done | tee output
-3. 再启动一个terminal， 运行 while /bin/true; do cp -v catflag asdf; done
-4. 运行 sort output | uniq -c 查看运行次数  
+2. 启动一个terminal， 运行 while /bin/true; do cp -v catflag asdf; done
+3. 再启动一个terminal，运行 for i in $(seq 1 2000); do ./fs1 asdf; done | tee output
+   运行 sort output | uniq -c 查看运行次数  
 ```
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241213210133.png)
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241213211751.png)
@@ -83,7 +83,19 @@ int main(int argc, char **argv) {
 这概率小太多了，因此，我们需要提高成功率的方法！<br>
 
 ### 2.2.1 方法一: nice<br>
+`nice`命令和`nice system call`允许用户设置进程在`linux kernel`调度器中的优先级。<br>
+`linux kernel scheduler`的优先级从高到低 为-20~19，优先级越高的进程，能够获得cpu资源的比例就越高<br>
+`ionice`的用法和`nice`差不多，只不过它设置的是进程的io调度优先级<br>
 
+用法如下:<br>
+```
+1. 启动一个terminal， 运行 while /bin/true; do cp -v catflag asdf; done
+2. 再启动一个terminal，运行 for i in $(seq 1 2000); do nice -n 19 ./fs2 asdf; done | tee output
+   运行sort output | uniq -c
+```
+
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241214001123.png)
+可以看到，概率还是命中次数差不多提升了一倍。<br>
 
 
 
