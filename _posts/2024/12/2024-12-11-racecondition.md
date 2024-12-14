@@ -12,6 +12,7 @@ comments: true
   - [2.1 races in filesystem 原理](#21-races-in-filesystem-原理)
   - [2.2 提高rece condition成功概率的方法](#22-提高rece-condition成功概率的方法)
     - [2.2.1 方法一: nice](#221-方法一-nice)
+    - [2.2.2 方法二: Path Complexity](#222-方法二-path-complexity)
 - [3. processes and threades](#3-processes-and-threades)
 
 
@@ -80,12 +81,13 @@ int main(int argc, char **argv) {
 //这段代码的空窗期比2.1提到的小得多，主要原因是/bin/sh执行时需要加载很多system call
 ```
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241213211831.png)
-这概率小太多了，因此，我们需要提高成功率的方法！<br>
+这概率小太多了，因此，我们需要提高空窗期的方法！<br>
 
 ### 2.2.1 方法一: nice<br>
 `nice`命令和`nice system call`允许用户设置进程在`linux kernel`调度器中的优先级。<br>
 `linux kernel scheduler`的优先级从高到低 为-20~19，优先级越高的进程，能够获得cpu资源的比例就越高<br>
-`ionice`的用法和`nice`差不多，只不过它设置的是进程的io调度优先级<br>
+`ionice`的用法和`nice`差不多，只不过它设置的是进程的io调度优先级，优先级从高到低是0~7，<br>
+**这种方法的思路就是通过降低进程在系统中被执行的优先级，从而提高空窗期**<br>
 
 用法如下:<br>
 ```
@@ -93,10 +95,30 @@ int main(int argc, char **argv) {
 2. 再启动一个terminal，运行 for i in $(seq 1 2000); do nice -n 19 ./fs2 asdf; done | tee output
    运行sort output | uniq -c
 ```
-
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241214001123.png)
 可以看到，概率还是命中次数差不多提升了一倍。<br>
+`ionice也有差不多的效果`<br>
+```
+for i in $(seq 1 2000); do ionice -n 7 ./fs2 asdf; done | tee output
+sort output | uniq -c
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241214102238.png)
+两者结合，使用效果更佳:<br>
+```
+for i in $(seq 1 2000); do nice -n 19 ionice -n 7 ./fs2 asdf; done | tee output
+sort output | uniq -c
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241214102358.png)
 
+### 2.2.2 方法二: Path Complexity<br>
+`filesystem race`涉及到文件系统访问，但是 不是所有的文件系统访问都是想等的<br>
+```
+cat my_file 比
+cat a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w/x/y/z/my_file
+快得多！
+因为内核需要花时间进入这些目录！
+```
+**这给了我们一个灵感：即可以传超级长路径来降低程序访问文件的速度,从而提高空窗期(需要注意，linux的路径限制最长为4096字节)**<br>
 
 
 # 3. processes and threades<br>
