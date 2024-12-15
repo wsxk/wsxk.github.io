@@ -121,7 +121,12 @@ cat a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w/x/y/z/my_file
 因为内核需要花时间进入这些目录！
 ```
 **这给了我们一个灵感：即可以传超级长路径来降低程序访问文件的速度,从而提高空窗期(需要注意，linux的路径限制最长为4096字节)**<br>
-
+**另外，我们还可以通过符号链接来延长路径**<br>
+```
+for i in $(seq 1 2000); do ./fs2 a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w/s/y/z/link/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w/s/y/z/link/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w/s/y/z/link/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w/s/y/z/link/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w/s/y/z/link/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w/s/y/z/link/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w/s/y/z/link/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w/s/y/z/link/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w/s/y/z/link/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w/s/y/z/link/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w/s/y/z/link/asdf ; done | tee output
+sort output | uniq -c
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241215152509.png)
 
 # 3. processes and threades<br>
 
