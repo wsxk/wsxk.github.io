@@ -14,6 +14,8 @@ comments: true
     - [2.2.1 方法一: nice](#221-方法一-nice)
     - [2.2.2 方法二: Path Complexity](#222-方法二-path-complexity)
 - [3. processes and threades](#3-processes-and-threades)
+- [4. Races in memory](#4-races-in-memory)
+- [5. Signals and reentrancy](#5-signals-and-reentrancy)
 
 
 # 1. 什么是race condition<br>
@@ -123,6 +125,10 @@ cat a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w/x/y/z/my_file
 
 # 3. processes and threades<br>
 
+
+# 4. Races in memory<br>
+
+# 5. Signals and reentrancy<br>
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
