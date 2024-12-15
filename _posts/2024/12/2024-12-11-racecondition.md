@@ -13,6 +13,7 @@ comments: true
   - [2.2 提高rece condition成功概率的方法](#22-提高rece-condition成功概率的方法)
     - [2.2.1 方法一: nice](#221-方法一-nice)
     - [2.2.2 方法二: Path Complexity](#222-方法二-path-complexity)
+  - [2.3 mitigation](#23-mitigation)
 - [3. processes and threades](#3-processes-and-threades)
 - [4. Races in memory](#4-races-in-memory)
 - [5. Signals and reentrancy](#5-signals-and-reentrancy)
@@ -127,6 +128,20 @@ for i in $(seq 1 2000); do ./fs2 a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w/s
 sort output | uniq -c
 ```
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241215152509.png)
+随着路径变长，成功的概率还能提高！<br>
+这种`race condition`也导致了**TOCTOU(Time of check to Time of use)问题**<br>
+
+## 2.3 mitigation<br>
+这种`races condition`是有缓解措施的<br>
+```
+1. Safer programming practices (O_NOFOLLOW, mkstemp(), etc).
+O_NOFOLLOW为open函数一个标志，表明不能打开符号链接的文件。
+mkstemp() 是一种安全地创建临时文件的标准 C 函数。它会生成一个唯一的文件名并原子性地创建文件，同时避免了潜在的竞争条件（race condition）
+
+2. Symlink protections in /tmp
+a. root cannot follow symlinks in /tmp that are owned by other users
+b. specifically made to prevent these sorts of issues
+```
 
 # 3. processes and threades<br>
 
