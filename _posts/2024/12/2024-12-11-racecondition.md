@@ -16,6 +16,7 @@ comments: true
   - [2.3 mitigation](#23-mitigation)
 - [3. processes and threades](#3-processes-and-threades)
   - [3.1 进程和线程介绍](#31-进程和线程介绍)
+  - [3.2 创建thread](#32-创建thread)
 - [4. Races in memory](#4-races-in-memory)
 - [5. Signals and reentrancy](#5-signals-and-reentrancy)
 
@@ -176,6 +177,10 @@ b. specifically made to prevent these sorts of issues
    -thread id
    -security properties(uid,gid,properties)
 ```
+
+## 3.2 创建thread<br>
+
+
 
 # 4. Races in memory<br>
 
