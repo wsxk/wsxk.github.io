@@ -15,6 +15,7 @@ comments: true
     - [2.2.2 方法二: Path Complexity](#222-方法二-path-complexity)
   - [2.3 mitigation](#23-mitigation)
 - [3. processes and threades](#3-processes-and-threades)
+  - [3.1 进程和线程介绍](#31-进程和线程介绍)
 - [4. Races in memory](#4-races-in-memory)
 - [5. Signals and reentrancy](#5-signals-and-reentrancy)
 
@@ -144,7 +145,37 @@ b. specifically made to prevent these sorts of issues
 ```
 
 # 3. processes and threades<br>
-进程有123
+## 3.1 进程和线程介绍<br>
+进程有属于它自己的空间:<br>
+```
+1. virtual memory
+   -stack
+   -heap
+   -etc
+
+2. registers
+
+3. file descriptors
+
+4. Process ID
+
+5. Security properties
+   -uid
+   -gid
+   -seccomp rules
+```
+一个进程可以有多个线程（至少有一个，运行main函数），线程:<br>
+```
+1. 线程们会共享:
+   -virtual memory
+   -file descriptors
+
+2. 线程们会独自拥有:
+   -registers
+   -stack
+   -thread id
+   -security properties(uid,gid,properties)
+```
 
 # 4. Races in memory<br>
 
