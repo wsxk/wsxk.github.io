@@ -192,11 +192,12 @@ int main(){
     pthread_create(&thread1,NULL,pthread_main,1);
     pthread_create(&thread2,NULL,pthread_main,2);
     printf("Main thread: PID %d, TID %d, UID %d\n",getpid(),gettid(),getuid());
-    pthread_join(thread1,NULL);
+    pthread_join(thread1,NULL);//主进程等待thread1结束才会退出
     pthread_join(thread2,NULL);
 }
 ```
-
+由下图可以看到，不同线程的执行顺序并不能得到保证。<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202024-12-17%20221301.png)
 # 4. Races in memory<br>
 
 # 5. Signals and reentrancy<br>
