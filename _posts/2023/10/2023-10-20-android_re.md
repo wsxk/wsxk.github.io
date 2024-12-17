@@ -62,9 +62,23 @@ date: 2023-10-20
 ## 4. native层逆向<br>
 `java层想要调用native层的函数，其实so文件中是有迹可循的,即被调用的函数必须被JNI注册`<br>
 **JNI注册方法分为静态注册和动态注册，静态注册的方法可以在IDA的函数窗口或者导出表中直接找到，比较简单。动态注册的方法需要分析JNI_OnLoad函数**<br>
+
 ### 4.1 静态注册<br>
 静态注册的方法可以在IDA的函数窗口或者导出表中直接找到，比较简单<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/20231029001749.png)
+静态注册的函数格式如下:<br>
+```c
+#ifdef __cplusplus
+extern "C" {
+#endif
+JNIEXPORT void JNICALL Java_com_frank_ffmpeg_FFmpegCmd_hello(JNIEnv *env, jclass thiz, jint num) {
+}
+#ifdef __cplusplus
+}
+#endif
+```
+`JavaVM` 是虚拟机在 JNI 层的代表，一个进程只有一个 `JavaVM`，所有的线程共用一个 `JavaVM`。`JavaVM` 是一个全局变量，一个进程只有一个 `JavaVM` 对象。<br>
+`JNIEnv` 是一个线程相关的结构体，该结构体代表了 Java 在本线程的运行环境 。`JNIEnv` 是一个线程拥有一个，不同线程的 `JNIEnv` 彼此独立。
 
 ### 4.2 动态注册<br>
 动态注册的方法需要分析JNI_OnLoad函数<br>
@@ -231,3 +245,4 @@ print("done!")
 ## references<br>
 [https://curz0n.github.io/2021/05/10/android-so-reverse/#0x00-%E5%89%8D%E8%A8%80](https://curz0n.github.io/2021/05/10/android-so-reverse/#0x00-%E5%89%8D%E8%A8%80)<br>
 [https://ctf-wiki.org/android/basic_reverse/static/so-example/](https://ctf-wiki.org/android/basic_reverse/static/so-example/)<br>
+[https://blog.csdn.net/freeking101/article/details/106044591](https://blog.csdn.net/freeking101/article/details/106044591)<br>

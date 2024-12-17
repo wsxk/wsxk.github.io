@@ -153,13 +153,9 @@ b. specifically made to prevent these sorts of issues
    -stack
    -heap
    -etc
-
 2. registers
-
 3. file descriptors
-
 4. Process ID
-
 5. Security properties
    -uid
    -gid
@@ -170,17 +166,36 @@ b. specifically made to prevent these sorts of issues
 1. 线程们会共享:
    -virtual memory
    -file descriptors
-
 2. 线程们会独自拥有:
    -registers
    -stack
    -thread id
-   -security properties(uid,gid,properties)
+   -security properties(uid,gid,seccomp rules)
 ```
 
 ## 3.2 创建thread<br>
 
+```c
+#include <stdio.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <stdlib.h>
+#include <string.h>
 
+void * pthread_main(int arg){
+    printf("Thread %d,PID %d,TID %d,UID %d\n",arg,getpid(),gettid(),getuid());
+}
+
+int main(){
+    printf("hello world!");
+    pthread_t thread1, thread2;
+    pthread_create(&thread1,NULL,pthread_main,1);
+    pthread_create(&thread2,NULL,pthread_main,2);
+    printf("Main thread: PID %d, TID %d, UID %d\n",getpid(),gettid(),getuid());
+    pthread_join(thread1,NULL);
+    pthread_join(thread2,NULL);
+}
+```
 
 # 4. Races in memory<br>
 
