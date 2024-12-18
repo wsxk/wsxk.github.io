@@ -196,8 +196,15 @@ int main(){
     pthread_join(thread2,NULL);
 }
 ```
-由下图可以看到，不同线程的执行顺序并不能得到保证。<br>
+由下图可以看到，**不同线程的执行顺序并不能得到保证。**<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202024-12-17%20221301.png)
+
+**事实上，线程创建是通过使用clone()系统调用实现的,clone()是fork()的继承者，它对于父子间共享什么内容 提供了更多的控制**<br>
+`pthread_create()库函数，使用了clone()系统调用来创建一个子进程，这个子进程用来和父进程共享内存还有其他资源`<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241218080654.png)
+事实上上回说到的容器的创建也是用到了它。<br>
+
+
 # 4. Races in memory<br>
 
 # 5. Signals and reentrancy<br>
