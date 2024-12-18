@@ -17,6 +17,7 @@ comments: true
 - [3. processes and threades](#3-processes-and-threades)
   - [3.1 进程和线程介绍](#31-进程和线程介绍)
   - [3.2 创建thread](#32-创建thread)
+  - [3.3 libc和syscall接口的差异](#33-libc和syscall接口的差异)
 - [4. Races in memory](#4-races-in-memory)
 - [5. Signals and reentrancy](#5-signals-and-reentrancy)
 
@@ -203,6 +204,47 @@ int main(){
 `pthread_create()库函数，使用了clone()系统调用来创建一个子进程，这个子进程用来和父进程共享内存还有其他资源`<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241218080654.png)
 事实上上回说到的容器的创建也是用到了它。<br>
+
+## 3.3 libc和syscall接口的差异<br>
+libc提供的系统调用接口，和直接调用syscall，是有差异的。<br>
+```
+setuid: 
+libc提供的setuid(a)会把所有线程的uid都设置为a；实际上syscall提供的setuid(a)只会把调用者线程的uid设置为a
+
+exit：
+libc提供的exit()实际上会调用exit_group() syscall，会结束所有线程；然而syscall提供的exit()只会结束调用者线程！
+```
+来看一个例子：<br>
+```c
+#include <stdio.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <stdlib.h>
+#include <string.h>
+
+
+void * pthread_main(int arg){
+    //if(arg == 1) syscall(105,1000);
+    if(arg == 1) setuid(1000);
+    else
+        sleep(1);
+    printf("Thread %d,PID %d,TID %d,UID %d\n",arg,getpid(),gettid(),getuid());
+}
+
+int main(){
+    printf("hello world!\n");
+    pthread_t thread1, thread2;
+    pthread_create(&thread1,NULL,pthread_main,1);
+    pthread_create(&thread2,NULL,pthread_main,2);
+    sleep(1);
+    printf("Main thread: PID %d, TID %d, UID %d\n",getpid(),gettid(),getuid());
+    pthread_join(thread1,NULL);
+    pthread_join(thread2,NULL);
+}
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241218192528.png)
+替换实际调用的函数后：<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241218192617.png)
 
 
 # 4. Races in memory<br>
