@@ -248,6 +248,8 @@ int main(){
 
 
 # 4. Races in memory<br>
+内存是线程间共享的资源，内存条件竞争在多线程程序中十分泛滥。<br>
+
 
 # 5. Signals and reentrancy<br>
 
