@@ -19,6 +19,7 @@ comments: true
   - [3.2 创建thread](#32-创建thread)
   - [3.3 libc和syscall接口的差异](#33-libc和syscall接口的差异)
 - [4. Races in memory](#4-races-in-memory)
+  - [4.1 Double Fetch](#41-double-fetch)
 - [5. Signals and reentrancy](#5-signals-and-reentrancy)
 
 
@@ -291,6 +292,26 @@ while true;do echo -ne "\x01\xff";done | ./pthread3
 4. read(0,buffer,size)
 ```
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241219220040.png)
+
+## 4.1 Double Fetch<br>
+在linux kernel中也存在`race condition`，`double fetch`就是非常典型的一种:<br>
+```c
+// user_buffer: size(4bytes) + content
+int check_safety(char *user_buffer, int maximum_size) {
+    int size;
+    copy_from_user(&size, user_buffer, sizeof(size));// 1 fetch
+    return size <= maximum_size;
+}
+
+static long device_ioctl(struct file *file, unsigned int cmd, unsigned long user_buffer) {
+    int size;
+    char buffer[16];
+    if (!check_safety(user_buffer, 16)) return;
+    copy_from_user(&size, user_buffer, sizeof(size));// 2 fetch
+    copy_from_user(buffer, user_buffer+sizeof(size), size);
+}
+```
+**在第1次fetch，和第2次fetch间，如果user_buffer的内容被修改了，就能导致race condition**<br>
 
 # 5. Signals and reentrancy<br>
 
