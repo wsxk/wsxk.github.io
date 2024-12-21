@@ -20,6 +20,7 @@ comments: true
   - [3.3 libc和syscall接口的差异](#33-libc和syscall接口的差异)
 - [4. Races in memory](#4-races-in-memory)
   - [4.1 Double Fetch](#41-double-fetch)
+  - [4.2 General data races](#42-general-data-races)
 - [5. Signals and reentrancy](#5-signals-and-reentrancy)
 
 
@@ -312,6 +313,65 @@ static long device_ioctl(struct file *file, unsigned int cmd, unsigned long user
 }
 ```
 **在第1次fetch，和第2次fetch间，如果user_buffer的内容被修改了，就能导致race condition**<br>
+
+## 4.2 General data races<br>
+`General date races`通常有着十分奇怪的影响。<br>
+参考这个代码：<br>
+```c
+#include <stdio.h>
+#include <pthread.h>
+#include <stdlib.h>
+#include <unistd.h>
+unsigned int num = 0;
+void *thread_main(int arg) {
+    while (1) {
+        num++;
+        num--;
+        if (num != 0) printf("NUM: %d\n", num);
+    }
+}
+
+main() {
+    pthread_t t1, t2;
+    pthread_create(&t1, NULL, thread_main, 0);
+    pthread_create(&t2, NULL, thread_main, 0);
+    getchar();
+    exit(0);
+}
+```
+在这种情况下，`num`会随着运行时间而增加<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241221100920.png)
+核心原因是在汇编层面，线程按照如下顺序执行了:<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241221100956.png)
+
+解决办法也是有的，就是加锁<br>
+```c
+#include <stdio.h>
+#include <pthread.h>
+#include <stdlib.h>
+#include <unistd.h>
+pthread_mutex_t lock;
+unsigned int num = 0;
+
+void *thread_main(int arg) {
+    while (1) {
+	   pthread_mutex_lock(&lock);
+      num++;
+      num--;
+      if (num != 0) printf("NUM: %d\n", num);
+      pthread_mutex_unlock(&lock); //被锁保护区域叫做临界区
+    }
+}
+main() {
+   pthread_t t1, t2;
+   pthread_create(&t1, NULL, thread_main, 0);
+   pthread_create(&t2, NULL, thread_main, 0);
+   getchar();
+   exit(0);
+}
+```
+这样即使你运行很久也不行。<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241221103257.png)
 
 # 5. Signals and reentrancy<br>
 
