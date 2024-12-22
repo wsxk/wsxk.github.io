@@ -372,6 +372,8 @@ main() {
 ```
 这样即使你运行很久也不行。<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241221103257.png)
+**目前还没有有效检测 data races的工具**<br>
+
 
 # 5. Signals and reentrancy<br>
 
