@@ -22,6 +22,8 @@ comments: true
   - [4.1 Double Fetch](#41-double-fetch)
   - [4.2 General data races](#42-general-data-races)
 - [5. Signals and reentrancy](#5-signals-and-reentrancy)
+  - [5.1 Signals](#51-signals)
+  - [5.2 Handling Signals](#52-handling-signals)
 
 
 # 1. 什么是race condition<br>
@@ -376,6 +378,24 @@ main() {
 
 
 # 5. Signals and reentrancy<br>
+## 5.1 Signals<br>
+我们能够通过使用`kill`系统调用往某个进程发送信号<br>
+```c
+int kill(pid_t pid, int sig)
+```
+而能发送的信号有很多种：<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241223191536.png)
+```
+Term: 表示收到信号的默认行为是终止进程
+Core：表示收到信号的默认行为是终止进程并生成核心转储文件
+Ign：表示收到信号的默认行为是忽略信号
+Stop：表示收到信号的默认行为是暂停进程
+Cont：表示收到信号的默认行为是恢复进程运行（如果进程被暂停了的话）
+```
+
+## 5.2 Handling Signals<br>
+我们可以通过注册信号的处理函数，来更改进程收到信号时的默认行为（**除了SIGKILL和SIGSTOP，这2个信号不能被捕获**）<br>
+
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
