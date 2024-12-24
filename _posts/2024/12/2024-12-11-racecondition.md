@@ -361,7 +361,7 @@ void *thread_main(int arg) {
       num++;
       num--;
       if (num != 0) printf("NUM: %d\n", num);
-      pthread_mutex_unlock(&lock); //被锁保护区域叫做临界区
+      pthread_mutex_unlock(&lock); //被锁保护区域叫做临界区（critical section）
     }
 }
 main() {
@@ -395,7 +395,34 @@ Cont：表示收到信号的默认行为是恢复进程运行（如果进程被�
 
 ## 5.2 Handling Signals<br>
 我们可以通过注册信号的处理函数，来更改进程收到信号时的默认行为（**除了SIGKILL和SIGSTOP，这2个信号不能被捕获**）<br>
+注册信号的处理函数如下:<br>
+```c
+sighandler_t signal(int signum, sighandler_t handler)
+int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact)
+```
+举个例子:<br>
+```c
+#include <signal.h>
 
+void signal_alarm(int s){
+    puts("ALARM!");
+    exit(42);
+}
+int main(){
+    signal(SIGALRM,signal_alarm);
+    alarm(2);
+    while(1);
+}
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241224220200.png)
+注册`signal handler`后，会产生以下结果:<br>
+```
+1. Effect： 信号会立即暂停进程执行（准确的说，是注册了signal handler的那个线程），转而调用 signal handler
+
+2. Access： 
+
+3. Capability：
+```
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
