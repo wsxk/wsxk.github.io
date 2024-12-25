@@ -24,6 +24,9 @@ comments: true
 - [5. Signals and reentrancy](#5-signals-and-reentrancy)
   - [5.1 Signals](#51-signals)
   - [5.2 Handling Signals](#52-handling-signals)
+  - [5.3 Signal 引起 race condition](#53-signal-引起-race-condition)
+  - [5.4 Reentrancy](#54-reentrancy)
+  - [5.5 safe signal practices](#55-safe-signal-practices)
 
 
 # 1. 什么是race condition<br>
@@ -419,10 +422,61 @@ int main(){
 ```
 1. Effect： 信号会立即暂停进程执行（准确的说，是注册了signal handler的那个线程），转而调用 signal handler
 
-2. Access： 
+2. Access： 我们可以发送任何信号，给任何的进程（该进程和你有一样的rUID，即使该进程的eUID=0）
 
-3. Capability：
+3. Capability：这意味着你能够让任何程序突然转移到执行signal handler
+即使这个程序正在临界区（critical section）当中。
 ```
+## 5.3 Signal 引起 race condition<br>
+参考这段代码:<br>
+```c
+int num = 0;
+void signal_handler(int signum) {
+    	num = 0;
+}
+
+int main() {
+    	signal(SIGUSR1, signal_handler);
+    	while (1) {
+            	if (num == 0) num++;
+            	num--;//如果执行到这里，程序收到了信号时，将导致num = -1！
+            	if (num != 0) printf("NUM: %d\n", num);
+    	}
+}
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241225191904.png)
+
+## 5.4 Reentrancy<br>
+signal的条件竞争问题，引出了`reentrancy(可重入性)`的概念，即**函数是可重入的，如果它在执行期间被另一个它自己的实例中断后，还能够正确的运行**<br>
+参考这段代码:<br>
+```c
+01 int tmp;
+02 void swap(int* x, int* y) { //不可重入，swap函数被中断会改变tmp的值，导致运行结果发生变化
+03     tmp = *x;
+04     *x = *y;
+05     *y = tmp;    
+06 }
+07 
+08 void call_swap() {//不可重入，因为它调用了swap
+09     int x = 1, y = 2;
+10     swap(&x, &y);
+11 }
+12
+13 int main() {//不可重入，因为它调用了call_swap
+14     signal(SIGUSR1, call_swap);
+15     call_swap();
+16 }
+```
+
+## 5.5 safe signal practices<br>
+安全signal实践，为了保证signal的正确运行，我们必须注意一件事:<br>
+**不要在signal handlers中调用不可重入的函数，这会导致signal handlers不可重入**，为什么呢？<br>
+```
+1、 注册的signal handlers可能会中断那些不可重入函数的执行过程
+2、 另一个signal handler可能会中断 你注册的signal handlers执行过程中不可重入函数的调用
+3、 在sigaction()中使用SA_NODEFER的场景，相同的signal handler允许递归的调用，可能会导致问题
+```
+注意**malloc()和free()是不可重入函数**<br>
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
