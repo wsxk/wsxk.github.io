@@ -90,7 +90,29 @@ hash
 爆破成功，GPU爆破比我想象的还牛<br>
 
 ### 2.2.2 爆破pbkdf2<br>
+```python
+from hashlib import pbkdf2_hmac
+import base64
+password = b"just?@12"
+salt = b"wsxkwsxk"
+print(base64.b64encode(salt))
 
+hash_val = pbkdf2_hmac("sha256",password,salt,10000,32)
+print(base64.b64encode(hash_val))
+# print(hash_val.hex())
+# print(salt.hex())
+# b'd3N4a3dzeGs='
+# b'XFRNdKjaNjsUanI/llJElv8WjlmWvGsVSdDE3+9WjPo='
+```
+爆破pbkdf2有点狗屎，需要用base64形式，命令格式如下:<br>
+```
+.\hashcat.exe -a 3 -w 3 -m 10900 sha256:10000:d3N4a3dzeGs=:XFRNdKjaNjsUanI/llJElv8WjlmWvGsVSdDE3+9WjPo=  ?a?a?a?a?a?a?a?a 
+
+sha256表示用的哈希
+10000表示迭代10000次
+d3N4a3dzeGs=表示salt的base64编码
+XFRNdKjaNjsUanI/llJElv8WjlmWvGsVSdDE3+9WjPo=表示hash的base64编码
+```
 
 
 <!-- Google tag (gtag.js) -->
