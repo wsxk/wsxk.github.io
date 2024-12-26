@@ -16,6 +16,7 @@ comments: true
   - [2.1 hashcat install](#21-hashcat-install)
   - [2.2 hashcat 用法](#22-hashcat-用法)
     - [2.2.1 爆破sha256](#221-爆破sha256)
+    - [2.2.2 爆破pbkdf2](#222-爆破pbkdf2)
 
 
 # 0. 写在前面<br>
@@ -87,6 +88,9 @@ hash
 ```
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20241225213147.png)
 爆破成功，GPU爆破比我想象的还牛<br>
+
+### 2.2.2 爆破pbkdf2<br>
+
 
 
 <!-- Google tag (gtag.js) -->
