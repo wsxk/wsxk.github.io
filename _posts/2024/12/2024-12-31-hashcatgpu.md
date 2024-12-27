@@ -17,6 +17,7 @@ comments: true
   - [2.2 hashcat 用法](#22-hashcat-用法)
     - [2.2.1 爆破sha256](#221-爆破sha256)
     - [2.2.2 爆破pbkdf2](#222-爆破pbkdf2)
+- [3. pwntools.pwnlib.util.iters.bruteforce](#3-pwntoolspwnlibutilitersbruteforce)
 
 
 # 0. 写在前面<br>
@@ -114,6 +115,25 @@ d3N4a3dzeGs=表示salt的base64编码
 XFRNdKjaNjsUanI/llJElv8WjlmWvGsVSdDE3+9WjPo=表示hash的base64编码
 ```
 
+# 3. pwntools.pwnlib.util.iters.bruteforce<br>
+如果没有GPU,可以用CPU多线程来尝试爆破，pwntools提供了一个很好的函数。<br>
+ 
+```python
+from pwn import *
+from pwnlib.util.iters import bruteforce
+# print(p64(0x4012D6))
+
+# define charset
+charset = string.printable
+print(charset)
+# pause()
+encrypt = b"wsx"
+def func(x):
+    return x.encode() == encrypt
+#decrypt = bruteforce(lambda x: x==encrypt,charset,length=3,method='fixed')
+decrypt = bruteforce(func,charset,length=3,method='fixed')
+print(decrypt)
+```
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
