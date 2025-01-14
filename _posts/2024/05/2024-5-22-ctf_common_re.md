@@ -19,6 +19,7 @@ comments: true
 - [5. AES](#5-aes)
   - [5.1 AES加解密脚本](#51-aes加解密脚本)
 - [6. MD5](#6-md5)
+- [7. SM4](#7-sm4)
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
@@ -237,3 +238,34 @@ md5_final(digest,&sample)
 在md5_init函数中，会出现初始化赋值`0x67452301 0xefcdab89 0x98badcfe 0x10325476`，即有可能是md5加密
 
 
+## 7. SM4<br>
+SM4也是一种对称加密算法，加解密推荐使用`gmssl`库<br>
+`pip install gmssl`<br>
+```python
+
+from gmssl import sm4
+
+# 加密
+plain = b"flag{wsxk}"
+key = b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
+sm4_enc = sm4.CryptSM4(sm4.SM4_ENCRYPT,padding_mode=sm4.PKCS7)
+sm4_enc.set_key(key,sm4.SM4_ENCRYPT)
+cipher = sm4_enc.crypt_ecb(plain)
+print(cipher)
+# b'\xcb6\x01\xe3\x9b\xd7\xe3k\xd7\xe9\x96\xddrp:\xa8'
+
+# 如下解密方式也是可以的
+# sm4_enc.set_key(key,sm4.SM4_DECRYPT)
+# plain = sm4_enc.crypt_ecb(cipher)
+# print(plain)
+# b'flag{wsxk}'
+
+# 解密
+cipher = b'\xcb6\x01\xe3\x9b\xd7\xe3k\xd7\xe9\x96\xddrp:\xa8'
+key = b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
+sm4_dec = sm4.CryptSM4(sm4.SM4_DECRYPT,padding_mode=2)  # 解密时推荐padding选2，防止神秘问题
+sm4_dec.set_key(key,sm4.SM4_DECRYPT)
+plain = sm4_dec.crypt_ecb(cipher)
+print(plain)
+# b'flag{wsxk}\x06\x06\x06\x06\x06\x06'
+```
