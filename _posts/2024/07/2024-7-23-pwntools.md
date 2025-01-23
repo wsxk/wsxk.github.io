@@ -14,6 +14,7 @@ comments: true
   - [1.4 pwntools启动gdb并下断点](#14-pwntools启动gdb并下断点)
   - [1.5 pwntools脚本常用代码](#15-pwntools脚本常用代码)
   - [1.6 pwntools生成shellcode](#16-pwntools生成shellcode)
+  - [1.7 pwntools获取系统常量](#17-pwntools获取系统常量)
 - [2. gdb+pwndbg](#2-gdbpwndbg)
   - [2.1 gdb调试程序命令](#21-gdb调试程序命令)
   - [2.2 gdb常见命令](#22-gdb常见命令)
@@ -207,6 +208,15 @@ sh = shellcraft.amd64.linux.cat("/challenge/toddlerone_level1.0",1)
 sh_asm = asm(sh)
 print(sh_asm) #shellcode的字节码
 # b'H\xb8\x01\x01\x01\x01\x01\x01\x01\x01PH\xb8.gm`f\x01\x01\x01H1\x04$j\x02XH\x89\xe71\xf6\x0f\x05A\xba\xff\xff\xff\x7fH\x89\xc6j(Xj\x01_\x99\x0f\x05'
+```
+
+### 1.7 pwntools获取系统常量<br>
+```python
+from pwn import *
+context.arch = 'amd64'
+context.os = 'linux'
+print(int(constants.SYS_stat))
+print(int(constants.O_RDONLY))
 ```
 
 
