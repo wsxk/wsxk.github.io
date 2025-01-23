@@ -90,6 +90,8 @@ p.interactive() # 保持交互，防止程序退出
 ### 1.5 pwntools脚本常用代码<br>
 ```python
 from pwn import *
+context.arch = 'amd64'
+context.os = 'linux'
 context.log_level="debug"
 context.terminal=["tmux","splitw","-h"]
 
