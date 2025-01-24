@@ -100,6 +100,7 @@ libc_path = "./libc-2.31.so"
 libc = ELF(libc_path,checksec=False)
 io = process(["./cts","8888"],env={"LD_PRELOAD":libc_path})
 p = remote("127.0.0.1","8888")
+binary = p.elf
 p_sock = p.sock
 
 r = lambda s      :p.recv(s)
