@@ -7,7 +7,7 @@ date: 2022-10-6
 comments: true
 ---
 
-PS:`修改于2024-5-22`<br>
+PS:`修改于2025-2-17`<br>
 
 - [1. frida：真机调试](#1-frida真机调试)
   - [1.1 前置条件](#11-前置条件)
@@ -51,9 +51,9 @@ pip install frida-tools
 adb devices # 查看连接的设备
 adb -s xxx push frida-server /data/local/tmp/frida-server # 将frida-server推送到标识为xxx的手机上
 adb -s xxx shell # 连接上手机，xxx是手机的编号，
-  cd /data/local/tmp 
-  chmod 777 frida-server # 给frida-server最高权限
-  ./frida-server & # 后台运行frida-server
+cd /data/local/tmp 
+chmod 777 frida-server # 给frida-server最高权限
+./frida-server & # 后台运行frida-server
 ```
 完成上述命令后，可以在pc上运用`frida-ps -U`查看手机上的进程<br>
 
