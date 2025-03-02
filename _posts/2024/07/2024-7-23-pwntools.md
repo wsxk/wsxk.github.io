@@ -336,6 +336,8 @@ pwndbg界面下:
 
 heap: 查看当前堆情况
 
+vis_heap_chunks：可视化堆块内容
+
 arenas： 查看 main_arena的基本信息
 
 arena： 查看main_arena的具体变量信息
