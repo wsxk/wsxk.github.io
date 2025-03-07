@@ -13,6 +13,8 @@ comments: true
     - [1.2.2 free](#122-free)
     - [1.2.3 safe-linking 绕过](#123-safe-linking-绕过)
     - [1.2.4 safe-linking 总结](#124-safe-linking-总结)
+- [2. glibc 2.35 safe-linking 绕过](#2-glibc-235-safe-linking-绕过)
+  - [2.1](#21)
 
 
 # 1. glibc 2.32 safe-linking<br>
@@ -59,7 +61,7 @@ tcache_put (mchunkptr chunk, size_t tc_idx)
 ```
 
 ### 1.2.3 safe-linking 绕过<br>
-在safe-linking加持下，要想获得tcache中下一个堆块的实际地址，需要知道`pos和ptr`两个值。<br>
+在safe-linking加持下，要想获得tcache中下一个堆块的实际地址，需要知道`pos和ptr`两个值,**即当前堆块的mem地址，和当前堆块的mem地址的值，得知后异或即可**<br>
 我们有没有办法得知这两个值呢？<br>
 `REVEAL_PTR`函数实现给了我们答案:<br>
 ```
@@ -79,6 +81,9 @@ safe-linking给我们带来了如下结果:<br>
 追踪调试变得困难
 ```
 
+# 2. glibc 2.35 safe-linking 绕过<br>
+## 2.1 
+
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
 <script>
@@ -88,3 +93,5 @@ safe-linking给我们带来了如下结果:<br>
 
   gtag('config', 'G-C22S5YSYL7');
 </script>
+
+
