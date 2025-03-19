@@ -10,6 +10,8 @@ date: 2025-3-19
 
 - [0. 写在前面](#0-写在前面)
 - [1. sig-database](#1-sig-database)
+  - [1.1 sig-database在ida中的使用](#11-sig-database在ida中的使用)
+- [2. Finger](#2-finger)
 - [references](#references)
 
 # 0. 写在前面<br>
@@ -20,10 +22,14 @@ date: 2025-3-19
 
 # 1. sig-database<br>
 sig-database顾名思义，是一个面向ida pro的符号存储库，其存储了绝大部分程序会使用的so的sig，我们可以直接将sig-database中的sig中下载下来，项目地址:[https://github.com/push0ebp/sig-database](https://github.com/push0ebp/sig-database)<br>
+## 1.1 sig-database在ida中的使用<br>
 下载下来后，我们可以把里面存放的sig文件，转存到`ida目录下的sig/pc目录下`。<br>
 存放完成后，在ida使用界面中点击`File->Load file-> FLIRT signature file`将so文件导入，可以一次性多导入几个，总会有几个成功的（😀<br>
 
+# 2. Finger<br>
+如果你处在联网状态下，可以考虑使用:[https://github.com/aliyunav/Finger](https://github.com/aliyunav/Finger)<br>
 
+--------------分割线-----------<br>
 发现新的好办法再继续更新<br>
 
 # references<br>
