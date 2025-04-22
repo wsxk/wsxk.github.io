@@ -232,6 +232,8 @@ print("done!")
 [https://cnblogs.com/bmjoker](https://cnblogs.com/bmjoker)<br>
 
 脱壳工具：[https://github.com/CodingGay/BlackDex](https://github.com/CodingGay/BlackDex)<br>
+blackdex也有失手的时候和神秘的问题，这里在推荐另一个工具:[https://github.com/hluwa/frida-dexdump](https://github.com/hluwa/frida-dexdump)<br>
+**frida-dexdump在脱360加固时有奇效，但是建议跟frida版本16.2.1配合使用，我在用16.7.13版本frida时出现崩溃。另外有的frida-dexdump出的dex文件无法用jadx分析 所以jeb最好还是备上**<br>
 查壳工具：[https://github.com/MagiCiAn1/APKProtectionSearch](https://github.com/MagiCiAn1/APKProtectionSearch)<br>
 
 ## 7. 反调试机制<br>
