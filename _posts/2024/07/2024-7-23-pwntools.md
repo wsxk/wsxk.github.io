@@ -22,6 +22,9 @@ comments: true
   - [2.4 gdb多线程调试命令](#24-gdb多线程调试命令)
   - [2.5 gdb命令参考文档](#25-gdb命令参考文档)
   - [2.6 pwndbg使用技巧](#26-pwndbg使用技巧)
+- [3. 小tips](#3-小tips)
+  - [3.1 strace得知程序大概做了什么](#31-strace得知程序大概做了什么)
+  - [3.2 malloc下断点查看io\_file结构体](#32-malloc下断点查看io_file结构体)
 
 
 <!-- Google tag (gtag.js) -->
@@ -350,4 +353,9 @@ b *$rebase(offset):非常方便！！在你运行开启了pie和aslr的程序时
 ```
 
 
+## 3. 小tips<br>
+### 3.1 strace得知程序大概做了什么<br>
+可以用`strace`命令查看程序运行系统调用大概运行了什么，能够推断出程序的基本功能<br>
 
+### 3.2 malloc下断点查看io_file结构体<br>
+`fopen`函数执行返回的`FILE`结构体通常都位于堆上，可以在`malloc`下断点查看返回的是什么。<br>
