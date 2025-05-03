@@ -1,0 +1,112 @@
+---
+layout: post
+tags: [pwn]
+title: "thread-heap : arenas"
+author: wsxk
+date: 2025-5-3
+comments: true
+---
+
+- [前言：信息获取是很重要的](#前言信息获取是很重要的)
+- [1. multi-thread heap布局: arenas](#1-multi-thread-heap布局-arenas)
+  - [1.1 实际例子](#11-实际例子)
+
+
+# 前言：信息获取是很重要的<br>
+[https://wsxk.github.io/exploitation/](https://wsxk.github.io/exploitation/)<br>
+里面提到强大的黑客在攻破一个系统前，最重要的步骤是信息的获取,包括外部侦查和内部侦察两部分。<br>
+包括我们之前的漏洞利用技术，如果缺少了某些关键信息，就无法完成，如:<br>
+```
+1. ROP在不知道程序的地址的情况下，是无法成功利用的
+2. heap cache poisoning 经常要求你必须知道你想让heap申请的内存的地址是哪一个
+```
+目前为止，我们已经用过很多的信息纰漏的技巧，如<br>
+```
+1. 未初始化的内存
+2. heap metadata
+3. overlapping allocations
+4. bruteforce 多线程canary
+```
+接下来，来了解一下多线程下的信息泄露，尤其是多线程下的heap布局⑧<br>
+
+# 1. multi-thread heap布局: arenas<br>
+先前学过了`race condition`这个概念，我们知道，在多线程场景下，`race condition`有相当大的危害。<br>
+## 1.1 实际例子<br>
+```c
+char *messages[16] = { 0 };
+int stored[16] = { 0 };
+
+void vuln(FILE *in, FILE *out) {
+    fprintf(out, "Welcome to the message server! Commands: malloc/scanf/printf/free/quit.\n");
+    char input[1024];
+    int idx;
+
+    while (1)
+    {
+        if (fscanf(in, "%s", input) == EOF) break;
+        if (strcmp(input, "quit") == 0) break;
+        if (fscanf(in, "%d", &idx) == EOF) break;
+
+        if (strcmp(input, "printf") == 0) {
+            if (fprintf(out, "MESSAGE: %s\n", stored[idx] ? messages[idx] : "NONE") < 0) break;
+        }
+        else if (strcmp(input, "malloc") == 0) {
+            if (!stored[idx]) messages[idx] = malloc(1024);
+            stored[idx] = 1;
+        }
+        else if (strcmp(input, "scanf") == 0) {
+            fscanf(in, "%1024s", stored[idx] ? messages[idx] : input);
+        }
+        else if (strcmp(input, "free") == 0) {
+            if (stored[idx]) free(messages[idx]);
+            stored[idx] = 0;
+        }
+        else fprintf(stderr, "INVALID COMMAND %s %#llx\n", input, *(unsigned long long*)input);
+    }
+}
+
+void *handle_connection(void *fd) {
+    FILE *in = fdopen((long)fd, "r");
+    FILE *out = fdopen((long)fd, "w");
+    setvbuf(in, NULL, _IONBF, 0);
+    setvbuf(out, NULL, _IONBF, 1);
+
+    fprintf(stderr, "Handling connection on FD %d\n", (int)fd);
+    vuln(in, out);
+    fprintf(stderr, "Closing connection on FD %d\n", (int)fd);
+
+    close((long)fd);
+    pthread_exit(0);
+}
+
+int main() {
+    int server_fd = socket(AF_INET, SOCK_STREAM, 0);
+    int option = 1;
+    setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &option, sizeof(option));
+    struct sockaddr_in server_addr;
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = INADDR_ANY;
+    server_addr.sin_port = htons(1337);
+    bind(server_fd, (struct sockaddr *) &server_addr, sizeof(server_addr));
+    listen(server_fd, 4096);
+
+    while (1) {
+        pthread_t thread;
+        long connection_fd = accept(server_fd, NULL, NULL);
+        pthread_create(&thread, NULL, handle_connection, (void *)connection_fd);
+    }
+}
+```
+在这种场景下，因为**多线程场景中，没有加锁的安全检查是无效的，因此我们可以无视安全检查，以任意顺序执行malloc，scanf，free，printf操作**<br>
+根据我们先前学过的heap知识，只要了解了程序的一些基本信息，我们就可以利用漏洞来获得程序的控制权限了。<br>
+
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C22S5YSYL7');
+</script>
