@@ -10,6 +10,7 @@ comments: true
 - [前言：信息获取是很重要的](#前言信息获取是很重要的)
 - [1. multi-thread heap布局: arenas](#1-multi-thread-heap布局-arenas)
   - [1.1 实际例子](#11-实际例子)
+  - [1.2 multi-thread: arenas](#12-multi-thread-arenas)
 
 
 # 前言：信息获取是很重要的<br>
@@ -27,7 +28,7 @@ comments: true
 3. overlapping allocations
 4. bruteforce 多线程canary
 ```
-接下来，来了解一下多线程下的信息泄露，尤其是多线程下的heap布局⑧<br>
+接下来，我们来了解一下多线程下的信息泄露，尤其是多线程下的heap布局⑧<br>
 
 # 1. multi-thread heap布局: arenas<br>
 先前学过了`race condition`这个概念，我们知道，在多线程场景下，`race condition`有相当大的危害。<br>
@@ -98,7 +99,16 @@ int main() {
 }
 ```
 在这种场景下，因为**多线程场景中，没有加锁的安全检查是无效的，因此我们可以无视安全检查，以任意顺序执行malloc，scanf，free，printf操作**<br>
-根据我们先前学过的heap知识，只要了解了程序的一些基本信息，我们就可以利用漏洞来获得程序的控制权限了。<br>
+根据我们先前学过的heap知识，只要了解了程序的一些基本信息，我们就可以利用漏洞来获得程序的控制权限了。基本信息如下：<br>
+```
+1. PIE base (binary address)
+2. ASLR base (library addresses)
+3. Stack base
+4. Heap base
+5. Canary
+```
+通常情况下，我们可以用**tcache的漏洞来泄露heap的基址，但是事实真有那么容易吗？**<br>
+## 1.2 multi-thread: arenas<br>
 
 
 <!-- Google tag (gtag.js) -->
