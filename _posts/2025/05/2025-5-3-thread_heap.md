@@ -112,8 +112,49 @@ int main() {
 ## 1.2 multi-thread: arenas<br>
 书接上文，要想利用这个漏洞，可以考虑tcache相关的泄露地址的方式，但是跟之前我们遇到的不同（之前的heap只有一个线程），这是一个多线程的程序，各个线程上的堆布局，和主线程的堆布局有一定的区别<br>
 **在多线程场景中，多线程利用中泄露的堆地址，其实是线程使用的堆，而不是寻常进程主线程使用的堆地址。**<br>
+再来看一个实际的代码案例:<br>
+```c
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+#include <pthread.h>
+#include <unistd.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <fcntl.h>
 
+void * thread_main(void * x){
+    printf("addr: %p\n",malloc(1024));
+    pthread_exit(0);
+}
 
+int main(){
+    printf("MAIN addr: %p\n",malloc(1024));
+    pthread_t t1,t2,t3,t4;
+    pthread_create(&t1,NULL,thread_main,NULL);
+    pthread_create(&t2,NULL,thread_main,NULL);
+    pthread_create(&t3,NULL,thread_main,NULL);
+    pthread_create(&t4,NULL,thread_main,NULL);
+    pthread_join(t1,NULL);
+    pthread_join(t2,NULL);
+    pthread_join(t3,NULL);
+    pthread_join(t4,NULL);
+}
+// gcc arena.c -o arena -lpthread
+//strace -f ./arena 2>&1 | grep -E "(mmap|addr)"
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250506223639.png)
+可以看到**非主线程中的堆分配地址，都是mmap得来的，且有很高的相关性，知道其中一个，就能知道其余线程的堆地址**<br>
+在了解了多线程堆的布局后，程序的基本信息就可以更新了:<br>
+```
+1. PIE base (binary address)
+2. ASLR base (library addresses)
+3. Stack base
+4. Heap base
+5. Thread-specific arenas
+6. Canary
+```
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
