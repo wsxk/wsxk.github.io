@@ -12,6 +12,8 @@ comments: true
   - [1.1 实际例子](#11-实际例子)
   - [1.2 multi-thread: arenas](#12-multi-thread-arenas)
   - [1.3 实操：泄露多线程环境下的堆地址](#13-实操泄露多线程环境下的堆地址)
+    - [1.3.1 直接使用tcache泄露地址：截断](#131-直接使用tcache泄露地址截断)
+    - [1.3.2 race condition来泄露堆地址](#132-race-condition来泄露堆地址)
 
 
 # 前言：信息获取是很重要的<br>
@@ -145,7 +147,7 @@ int main(){
 // gcc arena.c -o arena -lpthread
 //strace -f ./arena 2>&1 | grep -E "(mmap|addr)"
 ```
-![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250506223639.png)
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250507225852.png)
 可以看到**非主线程中的堆分配地址，都是mmap得来的，且有很高的相关性，知道其中一个，就能知道其余线程的堆地址**<br>
 在了解了多线程堆的布局后，程序的基本信息就可以更新了:<br>
 ```
@@ -158,7 +160,26 @@ int main(){
 ```
 ## 1.3 实操：泄露多线程环境下的堆地址<br>
 **回到1.1的代码，如果我们想要利用泄露堆地址，首先可以利用tcache机制进行泄露，这里有一个问题，从1.2的案例我们可以知道，线程堆地址中间部分是有`\x00`字符存在的，而1.1代码中的`fprintf`函数遇到`\x00`字符会截断；如果要利用这个机制泄露地址，我们需要一直申请内存，直到中间没有`\x00`字节才行**<br>
-执行1.1的代码:<br>
+### 1.3.1 直接使用tcache泄露地址：截断<br>
+```python
+from pwn import *
+context.log_level = 'debug'
+with process("./test") as p:
+    r = remote("localhost",1337)
+    r.sendline("malloc 0 malloc 1 malloc 2 free 0 free 1 free 2 malloc 3 printf 3 quit")
+    print(r.readall())
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250507230140.png)
+
+### 1.3.2 race condition来泄露堆地址<br>
+如果我们深入printf函数，我们可以知道，其原理类似于如下代码:<br>
+```
+int printf_string(the_string) {
+    int length = strlen(the_string);
+    write(1, the_string, length);
+}
+```
+因此可以利用`race condition`来泄露堆地址！<br>
 
 
 <!-- Google tag (gtag.js) -->
