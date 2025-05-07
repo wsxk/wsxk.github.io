@@ -11,6 +11,7 @@ comments: true
 - [1. multi-thread heap布局: arenas](#1-multi-thread-heap布局-arenas)
   - [1.1 实际例子](#11-实际例子)
   - [1.2 multi-thread: arenas](#12-multi-thread-arenas)
+  - [1.3 实操：泄露多线程环境下的堆地址](#13-实操泄露多线程环境下的堆地址)
 
 
 # 前言：信息获取是很重要的<br>
@@ -152,9 +153,13 @@ int main(){
 2. ASLR base (library addresses)
 3. Stack base
 4. Heap base
-5. Thread-specific arenas
+5. Thread-specific arenas  #新增
 6. Canary
 ```
+## 1.3 实操：泄露多线程环境下的堆地址<br>
+**回到1.1的代码，如果我们想要利用泄露堆地址，首先可以利用tcache机制进行泄露，这里有一个问题，从1.2的案例我们可以知道，线程堆地址中间部分是有`\x00`字符存在的，而1.1代码中的`fprintf`函数遇到`\x00`字符会截断；如果要利用这个机制泄露地址，我们需要一直申请内存，直到中间没有`\x00`字节才行**<br>
+执行1.1的代码:<br>
+
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
