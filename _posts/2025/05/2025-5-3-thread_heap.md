@@ -14,6 +14,7 @@ comments: true
   - [1.3 实操：泄露多线程环境下的堆地址](#13-实操泄露多线程环境下的堆地址)
     - [1.3.1 直接使用tcache泄露地址：截断](#131-直接使用tcache泄露地址截断)
     - [1.3.2 race condition来泄露堆地址](#132-race-condition来泄露堆地址)
+    - [1.3.3 用gdb观察地址之间的关联](#133-用gdb观察地址之间的关联)
 
 
 # 前言：信息获取是很重要的<br>
@@ -202,6 +203,9 @@ with process("./test") as p:
         print(set(r2.clean().splitlines()))
 ```
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250508223105.png)
+
+### 1.3.3 用gdb观察地址之间的关联<br>
+
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
