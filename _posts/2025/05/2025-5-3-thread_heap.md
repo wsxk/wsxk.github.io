@@ -238,6 +238,10 @@ with process("./test") as p:
         #print(set(r2.clean().splitlines()))
 ```
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250509224911.png)
+gdb调试时，还可以看到上方的libc地址:<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250510105433.png)
+其中`0x7ffff7f8db80`就是`main_arena`的地址<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250510105533.png)
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
