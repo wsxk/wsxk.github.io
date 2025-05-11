@@ -15,6 +15,7 @@ comments: true
     - [1.3.1 直接使用tcache泄露地址：截断](#131-直接使用tcache泄露地址截断)
     - [1.3.2 race condition来泄露堆地址](#132-race-condition来泄露堆地址)
     - [1.3.3 用gdb观察内存信息](#133-用gdb观察内存信息)
+- [2. multi-thread heap：利用](#2-multi-thread-heap利用)
 
 
 # 前言：信息获取是很重要的<br>
@@ -242,6 +243,9 @@ gdb调试时，还可以看到上方的libc地址:<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250510105433.png)
 其中`0x7ffff7f8db80`就是`main_arena`的地址<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250510105533.png)
+
+# 2. multi-thread heap：利用<br>
+
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
