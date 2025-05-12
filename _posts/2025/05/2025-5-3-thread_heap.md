@@ -245,7 +245,21 @@ gdb调试时，还可以看到上方的libc地址:<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250510105533.png)
 
 ### 1.3.4 multi-thread heap：利用<br>
-如何实际进行多线程漏洞呢？<br>
+如何实际进行多线程漏洞呢？因为这个漏洞利用起来其实蛮复杂的，因此可以从`primitive`的角度来进行思考:<br>
+**攻击原语指的是黑客通过一些列复杂的漏洞组合利用后，获得的可重复使用的能力**<br>
+```
+Arbitrary Read primitives allow attackers to disclose memory at an attacker-controlled address.
+
+Arbitrary Write primitives allow attackers to overwrite memory at an attacker-controlled address. Often called a write-what-where.
+
+Arbitrary Call allows attackers to redirect control flow (ex: function pointer overwrite).
+
+There are also Relative alternatives, were the attacker controls an offset to a base pointer instead of a full pointer.
+Exploit Primitives are building blocks of complex exploits.
+```
+**通常获得arbitrary read primitive和arbitrary write primitive，我们就能完成攻击了**<br>
+
+
 
 
 <!-- Google tag (gtag.js) -->
