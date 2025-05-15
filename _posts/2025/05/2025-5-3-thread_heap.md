@@ -483,6 +483,8 @@ print(f"exit: {p.poll()}")
 ```
 
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250515230131.png)
+完美收工！<br>
+
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
 <script>
