@@ -3,7 +3,7 @@ layout: post
 tags: [pwn]
 title: "glibc 2.35 thread-heap: arenas 利用手法"
 author: wsxk
-date: 2025-5-25
+date: 2025-5-20
 comments: true
 ---
 
