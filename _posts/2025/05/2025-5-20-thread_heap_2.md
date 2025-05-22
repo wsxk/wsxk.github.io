@@ -21,7 +21,7 @@ comments: true
 总之，`tcache->key`部分已经没有了价值，但是`tcache->next`部分非常有用。<br>
 
 # 1. arbitrary read<br>
-**利用arbitrary read可以任意读取.bss段（没有添加PIE）、Thread heap中的数据（前提是知道地址）**<br>
+**利用arbitrary read可以任意读取.bss段（没有添加PIE）、Thread heap、main heap中的数据（前提是知道地址）**<br>
 race的利用难度主要在于调试（个人理解）<br>
 
 ```python
