@@ -9,6 +9,7 @@ comments: true
 
 - [0. glibc 2.35与 glibc 2.31的区别](#0-glibc-235与-glibc-231的区别)
 - [1. arbitrary read](#1-arbitrary-read)
+  - [1.1 高版本内核泄露thread stack的方法](#11-高版本内核泄露thread-stack的方法)
 - [2. arbitrary write](#2-arbitrary-write)
 
 `thread heap的利用手法多数都是依靠race condition来获取任意地址读写的能力，辅以一些常见的tips即可完成利用`<br>
@@ -106,6 +107,8 @@ output = r1.clean()
 print(output)
 p.interactive()
 ```
+## 1.1 高版本内核泄露thread stack的方法<br>
+时代在变化！<br>
 
 # 2. arbitrary write<br>
 
