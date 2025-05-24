@@ -108,7 +108,8 @@ print(output)
 p.interactive()
 ```
 ## 1.1 高版本内核泄露thread stack的方法<br>
-时代在变化！<br>
+时代在变化！高版本内核（具体到多少不清楚）在创建新线程时，第一个线程的`thread stack`空间不再紧邻`libc`，我们需要其他的方法泄露`thread stack`<br>
+**核心思路是得知libc的地址后，可以在ld中搜索指向thread stack内存映射区域的指针**<br>
 
 # 2. arbitrary write<br>
 
