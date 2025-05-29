@@ -16,6 +16,7 @@ comments: true
 - [2. arbitrary write](#2-arbitrary-write)
   - [2.1 线程以return结束](#21-线程以return结束)
   - [2.2 线程以pthread\_exit()结束](#22-线程以pthread_exit结束)
+- [3. 插曲: 如果你面临着乱序的heap](#3-插曲-如果你面临着乱序的heap)
 
 `thread heap的利用手法多数都是依靠race condition来获取任意地址读写的能力，辅以一些常见的tips即可完成利用`<br>
 **任意地址读写的说法其实也适用于其他的利用手法,从这个角度来思考安全问题是很有意义的**<br>
@@ -782,6 +783,9 @@ print("leak: ",{p.readall()})
 print("exit: ",{p.poll()})
 p.interactive()
 ```
+
+# 3. 插曲: 如果你面临着乱序的heap<br>
+
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
