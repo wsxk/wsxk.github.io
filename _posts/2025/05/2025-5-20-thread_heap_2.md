@@ -786,6 +786,7 @@ p.interactive()
 
 # 3. 插曲: 如果你面临着乱序的heap<br>
 见缝插针⑧，没有直接的答案<br>
+经过实测，即使是在这种情况下，race condition也能够有效造成利用效果。<br>
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
