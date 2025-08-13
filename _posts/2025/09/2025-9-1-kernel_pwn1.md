@@ -3,7 +3,7 @@ layout: post
 tags: [kernel_pwn]
 title: "kernel security"
 author: wsxk
-date: 2025-8-15
+date: 2025-9-1
 comments: true
 ---
 
@@ -12,6 +12,7 @@ comments: true
 - [1. 内核简介](#1-内核简介)
   - [1.1 什么是操作系统内核](#11-什么是操作系统内核)
   - [1.2 内核专享的外部资源](#12-内核专享的外部资源)
+  - [1.3 privilege level](#13-privilege-level)
 
 
 PS:`kernel`，我又回来啦<br>
@@ -41,6 +42,13 @@ PS:`kernel`，我又回来啦<br>
 3. 一些特殊寄存器：
 cr3:(control register 3) ,它是指向page table的指针，用于虚拟地址和物理地址之间的转换，通常用mov指令就可以修改值，但是必须要是内核态。
 MSR_LSTAR (Model-Specific Register, Long Syscall Target Address Register)： 它定义了syscall指令应该跳往哪个函数。 通常用wrmsr和rdmsr来读写这个寄存器
+```
+
+## 1.3 privilege level<br>
+CPU通过跟踪权限等级来控制资源的访问，权限等级的图如下:<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250813202951.png)
+```
+
 ```
 
 
