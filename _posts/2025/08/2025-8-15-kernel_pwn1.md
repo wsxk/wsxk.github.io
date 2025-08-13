@@ -32,9 +32,15 @@ PS:`kernel`，我又回来啦<br>
 一些常见的外部资源如下:<br>
 ```
 1. hlt指令：只在内核态才允许执行该指令
-其作用是让 CPU 进入 halt（空闲/省电）状态，停止取指与执行，直到被“唤醒事件”打断。常用于内核的 idle 循环。
+其作用是让 CPU 进入 halt（空闲/省电）状态，停止取指与执行，直到被“唤醒事件”打断。常用于内核的 idle 循环。（idle即空闲状态）
+
+2. in 和 out指令：用于访问I/O端口空间的设备寄存器。其实就是和硬件外设交互，常用于老式设备
+（现代的pcie将设备寄存器暴露为某个物理/虚拟地址范围，用普通 mov 读写（再配合内存屏障））
 
 
+3. 一些特殊寄存器：
+cr3:(control register 3) ,它是指向page table的指针，用于虚拟地址和物理地址之间的转换，通常用mov指令就可以修改值，但是必须要是内核态。
+MSR_LSTAR (Model-Specific Register, Long Syscall Target Address Register)： 它定义了syscall指令应该跳往哪个函数。 通常用wrmsr和rdmsr来读写这个寄存器
 ```
 
 
