@@ -48,8 +48,12 @@ MSR_LSTAR (Model-Specific Register, Long Syscall Target Address Register)： 它
 CPU通过跟踪权限等级来控制资源的访问，权限等级的图如下:<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250813202951.png)
 ```
-
+Ring 3: Userspace, where we have been operating until now. Very restricted.
+Ring 2: Generally unused.
+Ring 1: Generally unused.
+Ring 0: The Kernel. Unrestricted, supervisor mode.
 ```
+可以看到虽然划分了4个层级，其实只有2个层级被使用到：ring3和ring0<br>
 
 
 <!-- Google tag (gtag.js) -->
