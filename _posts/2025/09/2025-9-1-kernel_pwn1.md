@@ -54,6 +54,10 @@ Ring 1: Generally unused.
 Ring 0: The Kernel. Unrestricted, supervisor mode.
 ```
 可以看到虽然划分了4个层级，其实只有2个层级被使用到：ring3和ring0<br>
+然而随着`VM(virtual machine)`技术的兴起，虚拟机内核不能和主机os内核有一样的权限，**在古早时期（21世纪初），虚拟机内核被放入ring 1中**，这导致了严重的性能开销，运行在虚拟机中的进程，如果想要执行 主机os配合才能完成的操作时，需要从ring3->ring1->ring0，在ring1上模拟ring0操作（或者可以说ring1陷入ring0态）带来额外开销<br>
+为了减少开销，现代引入了`ring-1`级别（即**hypervisor**），它比ring0更高，因此**当虚拟机os(guest os)产生了需要ring0的操作时，hypervisor会拦截到该操作，并把任务下发给在主机os，由其执行**<br>
+看起来拦截并转给主机os执行想比模拟ring0，性能开销小得多。<br>
+
 
 
 <!-- Google tag (gtag.js) -->
