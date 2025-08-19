@@ -13,6 +13,7 @@ comments: true
   - [1.1 什么是操作系统内核](#11-什么是操作系统内核)
   - [1.2 内核专享的外部资源](#12-内核专享的外部资源)
   - [1.3 privilege level](#13-privilege-level)
+  - [1.4 不同类型的os模型](#14-不同类型的os模型)
 
 
 PS:`kernel`，我又回来啦<br>
@@ -58,7 +59,18 @@ Ring 0: The Kernel. Unrestricted, supervisor mode.
 为了减少开销，现代引入了`ring-1`级别（即**hypervisor**），它比ring0更高，因此**当虚拟机os(guest os)产生了需要ring0的操作时，hypervisor会拦截到该操作，并把任务下发给在主机os，由其执行**<br>
 看起来拦截并转给主机os执行想比模拟ring0，性能开销小得多。<br>
 
+## 1.4 不同类型的os模型<br>
+笼统的说，os的类型有三种:<br>
+```
+monolithic kernel:宏内核，是一个单一的，统一的内核二进制文件，处理所以的操作系统层级的任务，驱动也会作为内核的一部分被加载到二进制文件中（这意味着驱动和内核都处于ring0）
+- examples: Linux, FreeBSD
 
+microkernel：微内核，理论上完美的内核（实际上要处理的消息太多了），由一个微小的"core"二进制文件提供进程间通信和与硬件基本交互，驱动程序是具有轻微特权的普通用户空间程序。
+- examples: Minux, seL4
+
+hybrid kernel：混合内核，微内核的特效与宏内核组件相结合
+- examples: Windows (NT), MacOS
+```
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
