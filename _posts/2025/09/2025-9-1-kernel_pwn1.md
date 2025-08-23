@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [kernel_pwn]
-title: "kernel security"
+title: "kernel security 1: introduction"
 author: wsxk
 date: 2025-9-1
 comments: true
@@ -15,6 +15,7 @@ comments: true
   - [1.3 privilege level](#13-privilege-level)
   - [1.4 不同类型的os模型](#14-不同类型的os模型)
   - [1.5 ring间的切换](#15-ring间的切换)
+    - [1.5.1 切换原理：以syscall为例](#151-切换原理以syscall为例)
 
 
 PS:`kernel`，我又回来啦<br>
@@ -74,7 +75,34 @@ hybrid kernel：混合内核，微内核的特效与宏内核组件相结合
 ```
 
 ## 1.5 ring间的切换<br>
+通常情况下，ring间切换指的是 `ring3<->ring0`之间的状态转换。<br>
+x86/x86-64（以 Linux 为例），`ring3<->ring0`的切换的本质是**CPU 触发特权门（IDT/GDT/MSR），把 CPL=3 切到 CPL=0**,状态转换的方法如下所示:<br>
 
+| methods                               | Description |
+| -----------                           | ----------- |
+| **系统调用,本质是软件中断（software → kernel）**      | syscall/sysret（x86-64 主流；由 `IA32_LSTAR/STAR/FM ASK MSR` 配置入口）       |
+|                                       | sysenter/sysexit（32 位“快速系统调用”）      |
+|                                       | int 0x80（32 位旧式软中断；IDT 中该门 DPL=3 允许用户触发|
+| **同步异常： 错误(faults)/陷阱(traps)** **faults & traps → kernel**  |  错误和陷阱统称为**异常**    |
+|                  | os处理指令触发fault后并修复，会重新执行该指令，缺页异常(page-fault)就依靠这个原理          |
+|                  | os处理指令触发trap后并修复，不会重新执行该指令，常见的有int 3指令       |
+| **异步中断** **（hardware IRQ / IPI / NMI → kernel）**  |  通常发生在外围设备，比如硬盘读写操作完成，系统会切换到硬盘读写的中断处理程序中执行后续操作  |
+| 体系结构提供但现代 OS 很少用/不用的“环级切换门” |  **调用门（Call Gate）**、**任务门 / 硬件任务切换（TSS Task Gate）** |
+
+### 1.5.1 切换原理：以syscall为例<br>
+在系统启动时，处于ring0状态，内核会设置**MSR_LSTAR**指向**syscall handler routine，即系统调用处理表**<br>
+系统启动后，当用户态(ring3)想要和内核交互时，可以通过系统调用(syscall)进行:<br>
+```
+1. Privilege level switches to Ring 0.
+2. Control flow jumps to value of MSR_LSTAR.
+3. Return address saved to rcx
+```
+详情可参考[https://www.felixcloutier.com/x86/syscall](https://www.felixcloutier.com/x86/syscall)<br>
+当内核处理完相应事务后，回退用户态时，通过sysret进行:<br>
+```
+1. Privilege level switches to Ring 3.
+2. Control flow jumps to rcx.
+```
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
