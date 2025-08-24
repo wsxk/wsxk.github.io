@@ -16,6 +16,8 @@ comments: true
   - [1.4 不同类型的os模型](#14-不同类型的os模型)
   - [1.5 ring间的切换](#15-ring间的切换)
     - [1.5.1 切换原理：以syscall为例](#151-切换原理以syscall为例)
+  - [1.6 内核态和用户态空间的关联](#16-内核态和用户态空间的关联)
+- [2. kernel 利用思路](#2-kernel-利用思路)
 
 
 PS:`kernel`，我又回来啦<br>
@@ -102,6 +104,23 @@ x86/x86-64（以 Linux 为例），`ring3<->ring0`的切换的本质是**CPU 触
 ```
 1. Privilege level switches to Ring 3.
 2. Control flow jumps to rcx.
+```
+
+## 1.6 内核态和用户态空间的关联<br>
+**用户态空间位于虚拟地址空间的 低地址处， 内核态空间位于虚拟地址空间的 高地址处。**<br>
+诸如系统调用，并没有改变虚拟地址的映射，只不过**内核态空间的访问需要ring0权限**<br>
+
+# 2. kernel 利用思路<br>
+总的来说，一般从3个方向考虑内核的利用:<br>
+```
+1. From the network: remotely-trigged exploits (packets of death, etc). Rare!
+几乎不存在
+
+2. From userspace: vulnerabilities in syscall and ioctl handlers (i.e., launched from inside a sandbox!)
+现在最多的手法
+
+3.From devices: launch kernel exploits from attached devices such as USB hardware (https://www.pjrc.com/teensy/)
+也比较少
 ```
 
 <!-- Google tag (gtag.js) -->
