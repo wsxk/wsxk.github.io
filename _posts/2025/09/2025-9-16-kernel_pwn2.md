@@ -11,6 +11,7 @@ comments: true
   - [1.1 自安装](#11-自安装)
   - [1.2 一键式脚本](#12-一键式脚本)
   - [1.3 kernel debug](#13-kernel-debug)
+- [获取kernel地址的方法:](#获取kernel地址的方法)
 - [特典: kernel pwn tricks:](#特典-kernel-pwn-tricks)
   - [特典一：qemu monitor模式](#特典一qemu-monitor模式)
 
@@ -36,7 +37,15 @@ pwn.college提供了一键式脚本:<br>
 ## 1.3 kernel debug<br>
 
 
-
+# 获取kernel地址的方法:<br>
+对于开启了kaslr的题目，想办法获取kernel地址是非常重要的：<br>
+```
+1. cat /proc/kallsym
+2. cat /proc/modules
+3. cat /sys/module/xxxx/sections/.text 
+4. 如果你能造成内核panic的话，打印报错信息时的r11寄存器就是内存地址
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250827195452.png)
 
 # 特典: kernel pwn tricks:<br>
 这些特典或许不能帮助我们理解kernel，但是可以帮助我们ctf题目中快速拿分！<br>
@@ -78,6 +87,7 @@ qemu-system-x86_64: Unable to write to command: Broken pipe
 ```
 
 [https://ctf-wiki.org/pwn/linux/kernel-mode/exploitation/tricks/qemu-monitor/](https://ctf-wiki.org/pwn/linux/kernel-mode/exploitation/tricks/qemu-monitor/)<br>
+
 
 
 <!-- Google tag (gtag.js) -->
