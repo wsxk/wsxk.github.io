@@ -35,7 +35,11 @@ pwn.college提供了一键式脚本:<br>
 考虑到仓库的更新时间，使用ubuntu22虚拟机会是个比较好的选择。<br>
 
 ## 1.3 kernel debug<br>
-
+kernel调试的理想条件：<br>
+```
+1. kernel携带debug symbols，即可以 b commit_creds直接下断点
+2. kaslr关闭，即每次启动kernel的地址空间没有变化，方便调试
+```
 
 # 获取kernel地址的方法:<br>
 对于开启了kaslr的题目，想办法获取kernel地址是非常重要的：<br>
