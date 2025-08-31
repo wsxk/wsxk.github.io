@@ -35,6 +35,22 @@ pwn.college提供了一键式脚本:<br>
 考虑到仓库的更新时间，使用ubuntu22虚拟机会是个比较好的选择。<br>
 
 ## 1.3 kernel debug<br>
+内核问题通常涉及到需要编写c代码并编译成静态可执行程序，然后打包进内核的文件系统中，才能执行。这样有一个问题，**每次重新编写exp时，就要关闭内核，将exp打包进文件系统，再启动内核**,太麻烦了，有一种解决办法<br>
+```
+/usr/bin/qemu-system-x86_64 \
+	-kernel linux-5.4/arch/x86/boot/bzImage \
+	-initrd $PWD/initramfs.cpio.gz \
+	-fsdev local,security_model=passthrough,id=fsdev0,path=$HOME \     #关键1
+	-device virtio-9p-pci,id=fs0,fsdev=fsdev0,mount_tag=hostshare \    #关键2
+	-nographic \
+	-monitor none \
+	-s \
+	-append "console=ttyS0 nokaslr"
+```
+关键1和关键2两个参数相当于把宿主机的`$HOME`目录挂载到来宾机的`$HOME`目录下，这样我们在宿主机上编写程序后就可以快速开始调试，节省时间:<br>
+
+
+
 kernel调试的理想条件：<br>
 ```
 1. kernel携带debug symbols，即可以 b commit_creds直接下断点
