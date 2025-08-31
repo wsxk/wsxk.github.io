@@ -48,14 +48,14 @@ pwn.college提供了一键式脚本:<br>
 	-append "console=ttyS0 nokaslr"
 ```
 关键1和关键2两个参数相当于把宿主机的`$HOME`目录挂载到来宾机的`$HOME`目录下，这样我们在宿主机上编写程序后就可以快速开始调试，节省时间:<br>
-
-
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250831103629.png)
 
 kernel调试的理想条件：<br>
 ```
 1. kernel携带debug symbols，即可以 b commit_creds直接下断点
 2. kaslr关闭，即每次启动kernel的地址空间没有变化，方便调试
 ```
+
 
 # 获取kernel地址的方法:<br>
 对于开启了kaslr的题目，想办法获取kernel地址是非常重要的：<br>
