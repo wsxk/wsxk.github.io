@@ -55,7 +55,8 @@ kernel调试的理想条件：<br>
 1. kernel携带debug symbols，即可以 b commit_creds直接下断点
 2. kaslr关闭，即每次启动kernel的地址空间没有变化，方便调试
 ```
-
+**理论上来说，我们也可以通过gdb *0x401000调试用户态进程！**<br>
+大伙感兴趣的话可以调试一下`syscall`的过程,这个过程对之后kernel的利用起到了非常大的作用<br>
 
 # 获取kernel地址的方法:<br>
 对于开启了kaslr的题目，想办法获取kernel地址是非常重要的：<br>
