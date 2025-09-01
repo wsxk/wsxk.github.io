@@ -113,6 +113,13 @@ x86/x86-64（以 Linux 为例），`ring3<->ring0`的切换的本质是**CPU 触
 
 # 2. kernel module<br>
 `A kernel module is a library that loads into the kernel`<br>
+`kernel module`通常是`.ko`结尾的文件（可以类比`.so`文件）<br>
+```
+1. .ko也是elf文件
+2. 这个文件会被加载到内核空间
+3. 拥有和内核一样的执行权限
+```
+kernel module在日常生活中是很常见的，比如**驱动（显卡驱动）、文件系统、网络功能**都是通过kernel module部署进内核的。<br>
 
 
 # 3. kernel 利用思路<br>
