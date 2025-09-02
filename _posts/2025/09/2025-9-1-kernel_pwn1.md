@@ -18,6 +18,9 @@ comments: true
     - [1.5.1 切换原理：以syscall为例](#151-切换原理以syscall为例)
   - [1.6 内核态和用户态空间的关联](#16-内核态和用户态空间的关联)
 - [2. kernel module](#2-kernel-module)
+  - [2.1 kernel module交互方式](#21-kernel-module交互方式)
+    - [2.1.1 中断(这里虽然说是中断，本质上还是一个trap)](#211-中断这里虽然说是中断本质上还是一个trap)
+    - [2.1.2 通过文件访问](#212-通过文件访问)
 - [3. kernel 利用思路](#3-kernel-利用思路)
 
 
@@ -83,14 +86,14 @@ x86/x86-64（以 Linux 为例），`ring3<->ring0`的切换的本质是**CPU 触
 
 | methods                               | Description |
 | -----------                           | ----------- |
-| **系统调用,本质是软件中断（software → kernel）**      | syscall/sysret（x86-64 主流；由 `IA32_LSTAR/STAR/FM ASK MSR` 配置入口）       |
-|                                       | sysenter/sysexit（32 位“快速系统调用”）      |
-|                                       | int 0x80（32 位旧式软中断；IDT 中该门 DPL=3 允许用户触发|
 | **同步异常： 错误(faults)/陷阱(traps)** **faults & traps → kernel**  |  错误和陷阱统称为**异常**    |
 |                  | os处理指令触发fault后并修复，会重新执行该指令，缺页异常(page-fault)就依靠这个原理          |
-|                  | os处理指令触发trap后并修复，不会重新执行该指令，常见的有int 3指令       |
+|                  | os处理指令触发trap后并修复，不会重新执行该指令，常见的有int 3指令(以下3条均属于陷入(trap)的范畴)       |
+|  | syscall/sysret（x86-64 主流；由 `IA32_LSTAR/STAR/FM ASK MSR` 配置入口）       |
+|                                       | sysenter/sysexit（32 位“快速系统调用”）      |
+|                                       | int 0x80（32 位旧式软中断；IDT 中该门 DPL=3 允许用户触发|
 | **异步中断** **（hardware IRQ / IPI / NMI → kernel）**  |  通常发生在外围设备，比如硬盘读写操作完成，系统会切换到硬盘读写的中断处理程序中执行后续操作  |
-| 体系结构提供但现代 OS 很少用/不用的“环级切换门” |  **调用门（Call Gate）**、**任务门 / 硬件任务切换（TSS Task Gate）** |
+
 
 ### 1.5.1 切换原理：以syscall为例<br>
 在系统启动时，处于ring0状态，内核会设置**MSR_LSTAR**指向**syscall handler routine，即系统调用处理表**<br>
@@ -120,6 +123,26 @@ x86/x86-64（以 Linux 为例），`ring3<->ring0`的切换的本质是**CPU 触
 3. 拥有和内核一样的执行权限
 ```
 kernel module在日常生活中是很常见的，比如**驱动（显卡驱动）、文件系统、网络功能**都是通过kernel module部署进内核的。<br>
+
+## 2.1 kernel module交互方式<br>
+### 2.1.1 中断(这里虽然说是中断，本质上还是一个trap)<br>
+kernel module是能够注册`interrupt handler(中断处理器)`来捕获一些特殊的指令，比如`int 42`<br>
+当然，hook一些已有的指令也是可行的:<br>
+```
+int3 (0xcc): normally causes a SIGTRAP, but can be hooked!
+int1 (0xf1): normally used for hardware debugging, but can be hooked
+```
+甚至我们可以注册一个非法指令`int 66`，当运行到这个指令时，会跳转到我们的kernel  module进行处理。<br>
+### 2.1.2 通过文件访问<br>
+kernel module可以通过在以下3种路径注册一个文件，这样用户态代码能够通过`open()`函数打开文件并于内核交互！<br>
+
+```
+1. /dev: mostly traditional devices (i.e., /dev/dsp for audio)
+
+2. /proc: started out in System V Unix as information about running processes. Linux expanded it into in a disastrous mess of kernel interfaces. The solution...
+
+3. /sys: non-process information interface with the kernel.
+```
 
 
 # 3. kernel 利用思路<br>
