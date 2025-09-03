@@ -143,7 +143,34 @@ kernel module可以通过在以下3种路径注册一个文件，这样用户态
 
 3. /sys: non-process information interface with the kernel.
 ```
+如果kernel module编写了某些函数，那么用户态程序就可以像操作文件一样与kernel module交互:<br>
+```c
+// 1. 文件读写
+//kernel module
+static ssize_t device_read(struct file *filp, char *buffer, size_t length, loff_t *offset)
+static ssize_t device_write(struct file *filp, const char *buf, size_t len, loff_t *off)
+//userspace
+fd = open("/dev/pwn-college", 0)
+read(fd, buffer, 128);
 
+// 2. ioctl
+//kernel module
+static long device_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_param)
+//userspace
+int fd = open("/dev/pwn-college", 0);
+ioctl(fd, COMMAND_CODE, &custom_data_structure);
+```
+
+linux命令行上如何安装/查看/删除驱动：<br>
+```
+安装： insmod mymodule.ko
+通常会调用init_module系统调用
+
+查看： lsmod
+
+删除： rmmod mymodule
+通常会调用delete_module系统调用
+```
 
 # 3. kernel 利用思路<br>
 总的来说，一般从3个方向考虑内核的利用:<br>
