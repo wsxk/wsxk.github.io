@@ -11,6 +11,10 @@ comments: true
   - [1.1 自安装](#11-自安装)
   - [1.2 一键式脚本](#12-一键式脚本)
   - [1.3 kernel debug](#13-kernel-debug)
+- [2. kernel escalation](#2-kernel-escalation)
+  - [2.1 内核标识进程权限的结构体](#21-内核标识进程权限的结构体)
+  - [2.2 获得root权限的方法](#22-获得root权限的方法)
+- [3. kernel race conditions](#3-kernel-race-conditions)
 - [获取kernel地址的方法:](#获取kernel地址的方法)
 - [特典: kernel pwn tricks:](#特典-kernel-pwn-tricks)
   - [特典一：qemu monitor模式](#特典一qemu-monitor模式)
@@ -57,6 +61,94 @@ kernel调试的理想条件：<br>
 ```
 **理论上来说，我们也可以通过gdb *0x401000调试用户态进程！**<br>
 大伙感兴趣的话可以调试一下`syscall`的过程,这个过程对之后kernel的利用起到了非常大的作用<br>
+
+# 2. kernel escalation<br>
+安全的从用户态《-》内核态传输数据的函数如下:<br>
+```c
+copy_to_user(userspace_address, kernel_address, length);
+copy_from_user(kernel_address, userspace_address, length);
+```
+但是kernel本质上也是代码，有代码就有漏洞！通常内核漏洞能够导致**内核crash，内核卡死，权限提升，干扰其他进程**等等，当然，我们关注的主要还是权限提升辣<br>
+## 2.1 内核标识进程权限的结构体<br>
+内核为每个运行的进程都保留了一个`task_struct`结构体，用于追踪进程的用户权限以及其他相关信息:<br>
+```c
+struct task_struct {
+    struct thread_info    	thread_info;
+
+    /* -1 unrunnable, 0 runnable, >0 stopped: */
+    volatile long         	state;
+
+    void                  	*stack;
+    atomic_t              	usage;
+	// ...
+    int                   	prio;
+    int                   	static_prio;
+    int                   	normal_prio;
+    unsigned int          	rt_priority;
+
+    struct sched_info     	sched_info;
+
+    struct list_head      	tasks;
+
+    pid_t                 	pid;
+    pid_t                 	tgid;
+
+    /* Process credentials: */
+
+    /* Objective and real subjective task credentials (COW): */
+    const struct cred __rcu  *real_cred;
+
+    /* Effective (overridable) subjective task credentials (COW): */
+    const struct cred __rcu  *cred;
+	// ...
+};
+
+struct cred {
+    atomic_t    usage;
+    kuid_t   	 uid;   	 /* real UID of the task */
+    kgid_t   	 gid;   	 /* real GID of the task */
+    kuid_t   	 suid;   	 /* saved UID of the task */
+    kgid_t   	 sgid;   	 /* saved GID of the task */
+    kuid_t   	 euid;   	 /* effective UID of the task */
+    kgid_t   	 egid;   	 /* effective GID of the task */
+    kuid_t   	 fsuid;   	 /* UID for VFS ops */
+    kgid_t   	 fsgid;   	 /* GID for VFS ops */
+    unsigned    securebits;    /* SUID-less security management */
+    kernel_cap_t    cap_inheritable; /* caps our children can inherit */
+    kernel_cap_t    cap_permitted;    /* caps we're permitted */
+    kernel_cap_t    cap_effective;    /* caps we can actually use */
+    kernel_cap_t    cap_bset;    /* capability bounding set */
+    kernel_cap_t    cap_ambient;    /* Ambient capability set */
+	// ...
+};
+```
+理论上，**我们只要能够操作kernel修改当前进程的cred结构体中的uid/euid为0，那么我们就能获得root权限**！<br>
+
+## 2.2 获得root权限的方法<br>
+kernel提供了两个非常有用的api:<br>
+```c
+//准备一个cred结构体，当输入为0时，它返回一个root权限的cred！
+struct cred * prepare_kernel_cred(struct task_struct *reference_task_struct)
+
+//将获得的root cred提交，进程就会获得root权限
+commit_creds(struct cred *)
+
+//即，只要运行 commit_creds(prepare_kernel_cred(0));就能获得root权限！
+//当然，内核还维护了一个初始结构体`init_cred`,即commit_creds(init_cred);也能获得root权限！
+```
+遇到获取kernel地址的问题时，可以参考章节`# 获取kernel地址的方法`<br>
+
+# 3. kernel race conditions<br>
+**条件竞争是折磨的内核的巨大问题，原因在于每个`kernel module`都是倾向于多线程的程序（因为用户态有多个程序与内核模块交互是一个很常见的事情）**<br>
+```
+1. what happens if two devices open /dev/pwn-college simultaneously?
+如果两个设备同时打开了kernel module，默认情况下是允许的！这种情况下如果你的kernel module写的不好，很有可能发生条件竞争漏洞
+
+2. what happens if make_root.ko is removed while /proc/pwn-college is open
+如果在kernel module被打开的情况下，卸载了内核模块，它们可能会在执行过程中消失或交换资源
+```
+
+
 
 # 获取kernel地址的方法:<br>
 对于开启了kaslr的题目，想办法获取kernel地址是非常重要的：<br>
