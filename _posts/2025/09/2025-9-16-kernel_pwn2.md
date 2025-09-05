@@ -15,6 +15,9 @@ comments: true
   - [2.1 内核标识进程权限的结构体](#21-内核标识进程权限的结构体)
   - [2.2 获得root权限的方法](#22-获得root权限的方法)
 - [3. kernel race conditions](#3-kernel-race-conditions)
+- [4. kernel seccomp escape](#4-kernel-seccomp-escape)
+  - [4.1 seccomp如何作用于syscall](#41-seccomp如何作用于syscall)
+  - [4.2 kernel中绕过seccomp的方法](#42-kernel中绕过seccomp的方法)
 - [获取kernel地址的方法:](#获取kernel地址的方法)
 - [特典: kernel pwn tricks:](#特典-kernel-pwn-tricks)
   - [特典一：qemu monitor模式](#特典一qemu-monitor模式)
@@ -69,6 +72,7 @@ copy_to_user(userspace_address, kernel_address, length);
 copy_from_user(kernel_address, userspace_address, length);
 ```
 但是kernel本质上也是代码，有代码就有漏洞！通常内核漏洞能够导致**内核crash，内核卡死，权限提升，干扰其他进程**等等，当然，我们关注的主要还是权限提升辣<br>
+
 ## 2.1 内核标识进程权限的结构体<br>
 内核为每个运行的进程都保留了一个`task_struct`结构体，用于追踪进程的用户权限以及其他相关信息:<br>
 ```c
@@ -148,6 +152,77 @@ commit_creds(struct cred *)
 如果在kernel module被打开的情况下，卸载了内核模块，它们可能会在执行过程中消失或交换资源
 ```
 
+
+# 4. kernel seccomp escape<br>
+`seccomp`本质上也是部署在`kernel`当中的，所以能够利用`kernel`的漏洞完成seccomp逃逸。<br>
+```c
+//回顾 ## 2.1 内核标识进程权限的结构体 章节中，task_struct有一个thread_info结构体
+struct task_struct {
+    struct thread_info    	thread_info;
+}
+
+struct thread_info {
+    unsigned long flags;	/* low level flags */
+    u32 status;		/* thread synchronous flags */
+};
+```
+`thread_info`中的`flags`变量中有一个标志位`TIF_SECCOMP`,标志是否开启了seccomp<br>
+## 4.1 seccomp如何作用于syscall<br>
+在`linux`的syscall entry中，代码如下所示:<br>
+```c
+/*
+	 * Handle seccomp.  regs->ip must be the original value.
+	 * See seccomp_send_sigsys and Documentation/userspace-api/seccomp_filter.rst.
+	 *
+	 * We could optimize the seccomp disabled case, but performance
+	 * here doesn't matter.
+	 */
+	regs->orig_ax = syscall_nr;
+	regs->ax = -ENOSYS;
+	tmp = secure_computing();
+	if ((!tmp && regs->orig_ax != syscall_nr) || regs->ip != address) {
+		warn_bad_vsyscall(KERN_DEBUG, regs,
+				  "seccomp tried to change syscall nr or ip");
+		do_exit(SIGSYS);
+	}
+```
+而`secure_computing`的函数实现如下图所示：<br>
+```c
+static inline int secure_computing(void)
+{
+	if (unlikely(test_thread_flag(TIF_SECCOMP)))//关键函数，如果TIF_SECCOMP没有被设置，说明没有seccomp机制
+		return  __secure_computing(NULL);
+	return 0;
+}
+int __secure_computing(const struct seccomp_data *sd)
+{
+	// lots of stuff, then...
+
+	this_syscall = sd ? sd->nr : syscall_get_nr(current, task_pt_regs(current));
+
+	switch (mode) {
+		case SECCOMP_MODE_STRICT:
+			__secure_computing_strict(this_syscall);  /* may call do_exit */
+			return 0;
+		case SECCOMP_MODE_FILTER:
+			return __seccomp_filter(this_syscall, sd, false);
+		default:
+			BUG();
+	}
+}
+```
+## 4.2 kernel中绕过seccomp的方法<br>
+只要在c语言中这么调用：<br>
+```c
+current_task_struct->thread_info.flags &= ~(1 << TIF_SECCOMP)
+//The kernel points the segment register gs to the current task struct.
+//所以gs寄存器指向current task struct
+```
+就能关闭seccomp机制~,具体实施措施如下:<br>
+```
+1. 通过gs寄存器访问current->thread_info.flags
+2. 清空TIF_SECCOMP 标志
+```
 
 
 # 获取kernel地址的方法:<br>
