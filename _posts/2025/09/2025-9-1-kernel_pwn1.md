@@ -26,7 +26,8 @@ comments: true
   - [3.2 虚拟内存方案](#32-虚拟内存方案)
   - [3.3 页表、页目录、页目录页表、页映射等级4](#33-页表页目录页目录页表页映射等级4)
   - [3.4 进程间隔离、虚拟机隔离](#34-进程间隔离虚拟机隔离)
-- [4. kernel 利用思路](#4-kernel-利用思路)
+- [4. kernel mitigations](#4-kernel-mitigations)
+- [5. kernel 利用思路](#5-kernel-利用思路)
 
 
 PS:`kernel`，我又回来啦<br>
@@ -235,8 +236,17 @@ linux命令行上如何安装/查看/删除驱动：<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250906132716.png)
 
 
+# 4. kernel mitigations<br>
+kernel中的安全缓解措施和用户态时遇到的类似:<br>
+```
+1. stack canaries: 保护栈的机制
+2. kaslr：内核中的地址空间布局随机化
+3. Heap/stack regions 有NX机制，即不可执行
+4. SMAP/SMEP: 开启这俩个机制后，内核态无法访问/执行 用户态的地址空间。 但是SMAP是可以被关闭的，因为有些时候内核需要读取用户态的数据(copy_from_user)
+5. kpti: 内核页表隔离，即用户态只有部分内核代码映射，而内核态会有全量的代码映射
+```
 
-# 4. kernel 利用思路<br>
+# 5. kernel 利用思路<br>
 总的来说，一般从3个方向考虑内核的利用:<br>
 ```
 1. From the network: remotely-trigged exploits (packets of death, etc). Rare!

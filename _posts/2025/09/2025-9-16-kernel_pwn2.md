@@ -18,7 +18,10 @@ comments: true
 - [4. kernel seccomp escape](#4-kernel-seccomp-escape)
   - [4.1 seccomp如何作用于syscall](#41-seccomp如何作用于syscall)
   - [4.2 kernel中绕过seccomp的方法](#42-kernel中绕过seccomp的方法)
-- [获取kernel地址的方法:](#获取kernel地址的方法)
+- [5. kernel shellcode](#5-kernel-shellcode)
+  - [5.1 如何找到kernel api地址](#51-如何找到kernel-api地址)
+  - [5.2 如何调用kernel api](#52-如何调用kernel-api)
+  - [5.3 编写seccomp逃逸相关的代码](#53-编写seccomp逃逸相关的代码)
 - [特典: kernel pwn tricks:](#特典-kernel-pwn-tricks)
   - [特典一：qemu monitor模式](#特典一qemu-monitor模式)
 
@@ -224,8 +227,10 @@ current_task_struct->thread_info.flags &= ~(1 << TIF_SECCOMP)
 2. 清空TIF_SECCOMP 标志
 ```
 
-
-# 获取kernel地址的方法:<br>
+# 5. kernel shellcode<br>
+在kernel中执行shellcode时，我们可以直接使用kernel提供的api帮我们解决问题！<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250906151639.png)
+## 5.1 如何找到kernel api地址<br>
 对于开启了kaslr的题目，想办法获取kernel地址是非常重要的：<br>
 ```
 1. cat /proc/kallsym
@@ -234,6 +239,20 @@ current_task_struct->thread_info.flags &= ~(1 << TIF_SECCOMP)
 4. 如果你能造成内核panic的话，打印报错信息时的r11寄存器就是内存地址
 ```
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250827195452.png)
+如果以上办法都不行，我们可能需要想办法去leak 地址。<br>
+## 5.2 如何调用kernel api<br>
+正常的call需要一个32位的偏移量来执行代码<br>
+我们可以执行绝对值跳转:<br>
+```asm
+mov rax, 0xffff414142424242
+call rax
+```
+## 5.3 编写seccomp逃逸相关的代码<br>
+先前提到，内核用`gs`寄存器指向当前进程的`current task struct`<br>
+在c内核开发中，我们可以用`current`速记宏来代表当前进程的`current task struct`<br>
+在shellcode中，我们要如何代表它呢？直接抄作业就行了！<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250906152928.png)
+
 
 # 特典: kernel pwn tricks:<br>
 这些特典或许不能帮助我们理解kernel，但是可以帮助我们ctf题目中快速拿分！<br>
