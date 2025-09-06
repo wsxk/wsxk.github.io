@@ -21,7 +21,12 @@ comments: true
   - [2.1 kernel module交互方式](#21-kernel-module交互方式)
     - [2.1.1 中断(这里虽然说是中断，本质上还是一个trap)](#211-中断这里虽然说是中断本质上还是一个trap)
     - [2.1.2 通过文件访问](#212-通过文件访问)
-- [3. kernel 利用思路](#3-kernel-利用思路)
+- [3. kernel memory management](#3-kernel-memory-management)
+  - [3.1 物理内存和虚拟内存](#31-物理内存和虚拟内存)
+  - [3.2 虚拟内存方案](#32-虚拟内存方案)
+  - [3.3 页表、页目录、页目录页表、页映射等级4](#33-页表页目录页目录页表页映射等级4)
+  - [3.4 进程间隔离、虚拟机隔离](#34-进程间隔离虚拟机隔离)
+- [4. kernel 利用思路](#4-kernel-利用思路)
 
 
 PS:`kernel`，我又回来啦<br>
@@ -172,7 +177,66 @@ linux命令行上如何安装/查看/删除驱动：<br>
 通常会调用delete_module系统调用
 ```
 
-# 3. kernel 利用思路<br>
+# 3. kernel memory management<br>
+## 3.1 物理内存和虚拟内存<br>
+物理内存指的是计算机架构里的`ram`，计算机也只有一块物理内存，实际的地址布局如下：<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250906113454.png)
+实际上，物理内存里只有一个区域的地址是`0x401000`，通常程序都是加载到`0x401000`的位置的，我们如何加载多个程序呢？<br>
+有一个可行的方案是`PIC(position independent code)`，就像so一样，程序可以加载到内存里的不同位置。但是这样还是有问题，多个程序都在一个地址空间里，没有隔离，一个程序A能够越界写到程序B的空间，很容易就导致两个程序都崩溃。<br>
+**为了解决隔离问题，虚拟内存方案出现了，简单的说内核会维持虚拟内存和物理内存的映射关系**，如下图所示：每个程序都有自己的虚拟内存空间，且他们映射到不同的物理内存当中<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250906120121.png)
+
+## 3.2 虚拟内存方案<br>
+最原始的虚拟内存方案，它假设每个进程只需要`4kb`内存，如下图所示:<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250906120305.png)
+即，一个进程的地址空间，在虚拟内存/物理内存都是连续的。但是如果一个程序动态分配了更多内存，这将导致规则被破坏。<br>
+为了解决程序需要更多内存的需求，新的虚拟内存方案出现了：**进程布局在物理内存中不连续，在虚拟内存连续**<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250906120702.png)
+
+## 3.3 页表、页目录、页目录页表、页映射等级4<br>
+上面提到，内核会维护每个进程虚拟地址和物理地址的映射，而维护映射的数据结构就是**页表(page table)**<br>
+```
+1. 一个页表，维护512个页表条目(page table entries),
+2. 一个条目8字节，所以一张页表需要4kb(4096字节)
+3. 另外每个条目实际指向的是大小为4096字节的物理内存区域，所以一张页表消耗4kb的内存，能够维护2mb的内存映射
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250906121751.png)
+
+然而，我们知道一个程序是远远不止2mb的，有大聪明又发明了一个概念，**页目录(page directory)**<br>
+```
+1. 一个页目录，维护512个页目录条目(page directory entries)
+2. 每个页目录条目8字节，都指向一张页表，一个页目录也需要4kb(4096字节)
+3. 那么现在，一个页目录，能够维护512*2mb=1gb的虚拟内存映射！
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250906125432.png)
+有时候`PD(页目录)中的PT(页表)条目的低12位都是0，所以可以用来设置特殊的flag标志，使PT条目指向另一个页表，而是指向一个2MB的物理内存(这样还能省1kb的内存空间)`<br>
+计算机的发展永无止境！1gb还不能满足需求怎么办！我再加一级数据结构**页目录页表(page directory page table)**<br>
+```
+1. 一个页目录页表，维护512个页目录指针
+2. 每个页目录指针8字节，都指向一张页目录，一个页目录页表也需要4kb(4096字节)
+3. 现在，一个页目录页表，能够维护512*1gb=512gb的虚拟内存映射！
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250906130819.png)
+现代的计算机，都是通过4级页表来进行物理内存的维护！**页映射等级4(Page Map Level 4)**<br>
+```
+1. 一个PML4，维护512个页目录页表指针
+2. 每个页目录页表指针8字节，指向一个页目录页表，每个PLM4也需要4kb(4096字节)
+3. 现在，一个PML4，能够维护512*512gb=256tb的虚拟内存映射！
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250906131150.png)
+为了能够方便的索引（加快索引速度），实际上的虚拟地址转换是有规律的:<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250906131542.png)
+
+## 3.4 进程间隔离、虚拟机隔离<br>
+每个进程都有一个PML4表，它放在`CR3`寄存器当中.<br>
+只能在ring0状态下，我们才能访问`CR3`寄存器<br>
+
+虚拟机的隔离就相当变态了,因为每个虚拟机都认为它能访问所有的物理内存<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250906132716.png)
+
+
+
+# 4. kernel 利用思路<br>
 总的来说，一般从3个方向考虑内核的利用:<br>
 ```
 1. From the network: remotely-trigged exploits (packets of death, etc). Rare!
