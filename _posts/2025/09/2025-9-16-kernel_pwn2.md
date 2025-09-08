@@ -251,6 +251,7 @@ call rax
 先前提到，内核用`gs`寄存器指向当前进程的`current task struct`<br>
 在c内核开发中，我们可以用`current`速记宏来代表当前进程的`current task struct`<br>
 在shellcode中，我们要如何代表它呢？直接抄作业就行了！<br>
+利用速记宏，开发一下内核代码，将其编译成二进制，查看他的汇编:<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250906152928.png)
 
 
