@@ -238,6 +238,7 @@ current_task_struct->thread_info.flags &= ~(1 << TIF_SECCOMP)
 2. cat /proc/modules
 3. cat /sys/module/xxxx/sections/.text 
 4. 如果你能造成内核panic的话，打印报错信息时的r11寄存器就是内存地址
+5. dmesg会打印内核日志，有的可能会打印出内核地址
 ```
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250827195452.png)
 如果以上办法都不行，我们可能需要想办法去leak 地址。<br>
