@@ -3,7 +3,7 @@ layout: post
 tags: [kernel_pwn]
 title: "kernel security 2: ptracticing"
 author: wsxk
-date: 2025-9-16
+date: 2025-9-15
 comments: true
 ---
 
