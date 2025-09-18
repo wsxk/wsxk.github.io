@@ -234,10 +234,17 @@ current_task_struct->thread_info.flags &= ~(1 << TIF_SECCOMP)
 ## 5.1 如何找到kernel api地址<br>
 对于开启了kaslr的题目，想办法获取kernel地址是非常重要的：<br>
 ```
+0. 内核没开启kaslr（可以通过cat /proc/cmdline确认）
+/proc/cmdline 是 procfs 里的一条只读“虚拟文件”，内容就是这次开机时 bootloader 传给内核的命令行参数（一整行，空格分隔）。拿它来判断是否带了 nokaslr、console=...、root=... 等启动参数。
+
 1. cat /proc/kallsym
+
 2. cat /proc/modules
+
 3. cat /sys/module/xxxx/sections/.text 
+
 4. 如果你能造成内核panic的话，打印报错信息时的r11寄存器就是内存地址
+
 5. dmesg会打印内核日志，有的可能会打印出内核地址
 ```
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250827195452.png)
