@@ -22,9 +22,11 @@ comments: true
   - [5.1 如何找到kernel api地址](#51-如何找到kernel-api地址)
   - [5.2 如何调用kernel api](#52-如何调用kernel-api)
   - [5.3 编写seccomp逃逸相关的代码](#53-编写seccomp逃逸相关的代码)
+  - [5.4 常见的kernel shellcode](#54-常见的kernel-shellcode)
+    - [5.4.1 权限提升](#541-权限提升)
 - [特典: kernel pwn tricks:](#特典-kernel-pwn-tricks)
   - [特典一：qemu monitor模式](#特典一qemu-monitor模式)
-  - [特点二: kernel pwn远程传文件脚本](#特点二-kernel-pwn远程传文件脚本)
+  - [特典二: kernel pwn远程传文件脚本](#特典二-kernel-pwn远程传文件脚本)
 
 
 # 1. kernel 环境搭建<br>
@@ -263,6 +265,10 @@ call rax
 利用速记宏，开发一下内核代码，将其编译成二进制，查看他的汇编:<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250906152928.png)
 
+## 5.4 常见的kernel shellcode<br>
+### 5.4.1 权限提升<br>
+先前提到，权限提升通常是执行`commit_creds(init_cred)`来完成，所以在能够在内核态下执行shellcode时，我们可以编写shellcode执行`commit_creds(init_cred)`即可完成提权。<br>
+
 
 # 特典: kernel pwn tricks:<br>
 这些特典或许不能帮助我们理解kernel，但是可以帮助我们ctf题目中快速拿分！<br>
@@ -306,7 +312,7 @@ qemu-system-x86_64: Unable to write to command: Broken pipe
 [https://ctf-wiki.org/pwn/linux/kernel-mode/exploitation/tricks/qemu-monitor/](https://ctf-wiki.org/pwn/linux/kernel-mode/exploitation/tricks/qemu-monitor/)<br>
 
 
-## 特点二: kernel pwn远程传文件脚本<br>
+## 特典二: kernel pwn远程传文件脚本<br>
 我直接超了这位佬的脚本.jpg<br>
 [https://arttnba3.cn/2021/03/03/PWN-0X00-LINUX-KERNEL-PWN-PART-I/#0x00-%E7%BB%AA%E8%AE%BA](https://arttnba3.cn/2021/03/03/PWN-0X00-LINUX-KERNEL-PWN-PART-I/#0x00-%E7%BB%AA%E8%AE%BA)<br>
 ```python
