@@ -24,6 +24,7 @@ comments: true
   - [5.3 编写seccomp逃逸相关的代码](#53-编写seccomp逃逸相关的代码)
   - [5.4 常见的kernel shellcode](#54-常见的kernel-shellcode)
     - [5.4.1 权限提升](#541-权限提升)
+    - [5.4.2 seccomp逃逸](#542-seccomp逃逸)
 - [特典: kernel pwn tricks:](#特典-kernel-pwn-tricks)
   - [特典一：qemu monitor模式](#特典一qemu-monitor模式)
   - [特典二: kernel pwn远程传文件脚本](#特典二-kernel-pwn远程传文件脚本)
@@ -281,9 +282,10 @@ __attribute__((naked,noinline)) void privilege_escalation_kernel_shellcode(){
         "ret;"
     );
 }
-// gcc -masm=intel  xxx.c -o xxx
+// gcc -fcf-protection=none -masm=intel  xxx.c -o xxx
+// -fcf-protection=none 可以去除函数开头的endbr64指令，__attribute__((naked,noinline)) 会让编译器忽略给该函数添加栈帧操作
 ```
-
+### 5.4.2 seccomp逃逸<br>
 
 # 特典: kernel pwn tricks:<br>
 这些特典或许不能帮助我们理解kernel，但是可以帮助我们ctf题目中快速拿分！<br>
