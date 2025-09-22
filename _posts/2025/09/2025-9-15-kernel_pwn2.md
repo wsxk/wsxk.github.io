@@ -287,6 +287,8 @@ __attribute__((naked,noinline)) void privilege_escalation_kernel_shellcode(){
 ```
 ### 5.4.2 seccomp逃逸<br>
 
+
+
 # 特典: kernel pwn tricks:<br>
 这些特典或许不能帮助我们理解kernel，但是可以帮助我们ctf题目中快速拿分！<br>
 ## 特典一：qemu monitor模式<br>
