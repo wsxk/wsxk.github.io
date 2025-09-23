@@ -286,6 +286,7 @@ __attribute__((naked,noinline)) void privilege_escalation_kernel_shellcode(){
 // -fcf-protection=none 可以去除函数开头的endbr64指令，__attribute__((naked,noinline)) 会让编译器忽略给该函数添加栈帧操作
 ```
 ### 5.4.2 seccomp逃逸<br>
+用#5.3节提到的方法，我们需要自己编译一个内核模块:<br>
 
 
 
