@@ -319,6 +319,7 @@ clean:
 ```
 直接执行`make`命令后，可以看到内核代码:<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250923223119.png)
+知道汇编代码后，可以利用`pwntools`的汇编模块来帮助我们生成汇编代码:<br>
 
 
 # 特典: kernel pwn tricks:<br>
