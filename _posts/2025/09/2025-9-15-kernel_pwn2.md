@@ -19,16 +19,16 @@ comments: true
   - [4.1 seccomp如何作用于syscall](#41-seccomp如何作用于syscall)
   - [4.2 kernel中绕过seccomp的方法](#42-kernel中绕过seccomp的方法)
 - [5. kernel shellcode](#5-kernel-shellcode)
-  - [5.1 如何找到kernel api地址](#51-如何找到kernel-api地址)
-  - [5.2 如何调用kernel api](#52-如何调用kernel-api)
-  - [5.3 编写seccomp逃逸相关的代码](#53-编写seccomp逃逸相关的代码)
-  - [5.4 常见的kernel shellcode](#54-常见的kernel-shellcode)
-    - [5.4.1 权限提升](#541-权限提升)
-    - [5.4.2 seccomp逃逸](#542-seccomp逃逸)
+  - [5.1 如何调用kernel api](#51-如何调用kernel-api)
+  - [5.2 编写seccomp逃逸相关的代码](#52-编写seccomp逃逸相关的代码)
+  - [5.3 常见的kernel shellcode](#53-常见的kernel-shellcode)
+    - [5.3.1 权限提升](#531-权限提升)
+    - [5.3.2 seccomp逃逸](#532-seccomp逃逸)
 - [特典: kernel pwn tricks:](#特典-kernel-pwn-tricks)
   - [特典一：qemu monitor模式](#特典一qemu-monitor模式)
-  - [特典二: kernel pwn远程传文件脚本](#特典二-kernel-pwn远程传文件脚本)
-  - [特点三： kernel pwn模板](#特点三-kernel-pwn模板)
+  - [特点二：如何找到kernel api地址](#特点二如何找到kernel-api地址)
+  - [特典三: kernel pwn远程传文件脚本](#特典三-kernel-pwn远程传文件脚本)
+  - [特点四： kernel pwn模板](#特点四-kernel-pwn模板)
 
 
 # 1. kernel 环境搭建<br>
@@ -235,40 +235,22 @@ current_task_struct->thread_info.flags &= ~(1 << TIF_SECCOMP)
 # 5. kernel shellcode<br>
 在kernel中执行shellcode时，我们可以直接使用kernel提供的api帮我们解决问题！<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250906151639.png)
-## 5.1 如何找到kernel api地址<br>
-对于开启了kaslr的题目，想办法获取kernel地址是非常重要的：<br>
-```
-0. 内核没开启kaslr（可以通过cat /proc/cmdline确认）
-/proc/cmdline 是 procfs 里的一条只读“虚拟文件”，内容就是这次开机时 bootloader 传给内核的命令行参数（一整行，空格分隔）。拿它来判断是否带了 nokaslr、console=...、root=... 等启动参数。
-
-1. cat /proc/kallsym
-
-2. cat /proc/modules
-
-3. cat /sys/module/xxxx/sections/.text 
-
-4. 如果你能造成内核panic的话，打印报错信息时的r11寄存器就是内存地址
-
-5. dmesg会打印内核日志，有的可能会打印出内核地址
-```
-![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250827195452.png)
-如果以上办法都不行，我们可能需要想办法去leak 地址。<br>
-## 5.2 如何调用kernel api<br>
+## 5.1 如何调用kernel api<br>
 正常的call需要一个32位的偏移量来执行代码<br>
 我们可以执行绝对值跳转:<br>
 ```asm
 mov rax, 0xffff414142424242
 call rax
 ```
-## 5.3 编写seccomp逃逸相关的代码<br>
+## 5.2 编写seccomp逃逸相关的代码<br>
 先前提到，内核用`gs`寄存器指向当前进程的`current task struct`<br>
 在c内核开发中，我们可以用`current`速记宏来代表当前进程的`current task struct`<br>
 在shellcode中，我们要如何代表它呢？直接抄作业就行了！<br>
 利用速记宏，开发一下内核代码，将其编译成二进制，查看他的汇编:<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250906152928.png)
 
-## 5.4 常见的kernel shellcode<br>
-### 5.4.1 权限提升<br>
+## 5.3 常见的kernel shellcode<br>
+### 5.3.1 权限提升<br>
 先前提到，权限提升通常是执行`commit_creds(init_cred)`来完成，所以在能够在内核态下执行shellcode时，我们可以编写shellcode执行`commit_creds(init_cred)`即可完成提权。<br>
 ```c
 __attribute__((naked,noinline)) void privilege_escalation_kernel_shellcode(){
@@ -286,8 +268,8 @@ __attribute__((naked,noinline)) void privilege_escalation_kernel_shellcode(){
 // gcc -fcf-protection=none -masm=intel  xxx.c -o xxx
 // -fcf-protection=none 可以去除函数开头的endbr64指令，__attribute__((naked,noinline)) 会让编译器忽略给该函数添加栈帧操作
 ```
-### 5.4.2 seccomp逃逸<br>
-用#5.3节提到的方法，我们需要自己编译一个内核模块:<br>
+### 5.3.2 seccomp逃逸<br>
+用#5.2节提到的方法，我们需要自己编译一个内核模块:<br>
 内核模块代码:<br>
 ```c
 // simple.c
@@ -319,8 +301,8 @@ clean:
 ```
 直接执行`make`命令后，可以看到内核代码:<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250923223119.png)
-**需要注意的是，实际上current->thread_info.flags不是gs:0x0的位置，我们需要手动确定其偏移：**<br>
-知道汇编代码后，可以利用`pwntools`的汇编模块来帮助我们生成汇编代码:<br>
+**需要注意的是，实际上current->thread_info.flags不是gs:0x0的位置，我们需要手动确定其偏移：可以通过`p/x &current_task`在gdb中查看偏移**<br>
+知道汇编代码后，可以利用`pwntools`的汇编模块来帮助我们生成shellcode:<br>
 
 
 # 特典: kernel pwn tricks:<br>
@@ -364,8 +346,26 @@ qemu-system-x86_64: Unable to write to command: Broken pipe
 
 [https://ctf-wiki.org/pwn/linux/kernel-mode/exploitation/tricks/qemu-monitor/](https://ctf-wiki.org/pwn/linux/kernel-mode/exploitation/tricks/qemu-monitor/)<br>
 
+## 特点二：如何找到kernel api地址<br>
+对于开启了kaslr的题目，想办法获取kernel地址是非常重要的：<br>
+```
+0. 内核没开启kaslr（可以通过cat /proc/cmdline确认）
+/proc/cmdline 是 procfs 里的一条只读“虚拟文件”，内容就是这次开机时 bootloader 传给内核的命令行参数（一整行，空格分隔）。拿它来判断是否带了 nokaslr、console=...、root=... 等启动参数。
 
-## 特典二: kernel pwn远程传文件脚本<br>
+1. cat /proc/kallsym
+
+2. cat /proc/modules
+
+3. cat /sys/module/xxxx/sections/.text 
+
+4. 如果你能造成内核panic的话，打印报错信息时的r11寄存器就是内存地址
+
+5. dmesg会打印内核日志，有的可能会打印出内核地址
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250827195452.png)
+如果以上办法都不行，我们可能需要想办法去leak 地址。<br>
+
+## 特典三: kernel pwn远程传文件脚本<br>
 我直接超了这位佬的脚本.jpg<br>
 [https://arttnba3.cn/2021/03/03/PWN-0X00-LINUX-KERNEL-PWN-PART-I/#0x00-%E7%BB%AA%E8%AE%BA](https://arttnba3.cn/2021/03/03/PWN-0X00-LINUX-KERNEL-PWN-PART-I/#0x00-%E7%BB%AA%E8%AE%BA)<br>
 ```python
@@ -400,7 +400,7 @@ while True:
 p.interactive()
 ```
 
-## 特点三： kernel pwn模板<br>
+## 特点四： kernel pwn模板<br>
 ```c
 // gcc -fcf-protection=none -masm=intel -static xxx.c -o xxx
 #include <stdio.h>
