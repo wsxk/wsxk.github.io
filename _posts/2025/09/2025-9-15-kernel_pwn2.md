@@ -24,6 +24,7 @@ comments: true
   - [5.3 常见的kernel shellcode](#53-常见的kernel-shellcode)
     - [5.3.1 权限提升](#531-权限提升)
     - [5.3.2 seccomp逃逸](#532-seccomp逃逸)
+    - [5.3.3 run\_cmd](#533-run_cmd)
 - [特典: kernel pwn tricks:](#特典-kernel-pwn-tricks)
   - [特典一：qemu monitor模式](#特典一qemu-monitor模式)
   - [特典二：如何找到kernel api地址](#特典二如何找到kernel-api地址)
@@ -363,6 +364,14 @@ f = open("./shellcode.bin","wb")
 f.write(bytes_io)
 f.close()
 ```
+
+### 5.3.3 run_cmd<br>
+`run_cmd`虽然说能在内核态下执行任意指令，但是像`/bin/sh -c '/bin/cat /flag > /tmp/flag'`的指令是不能执行的。指令无效的原因可能是分割字符串出现的问题。<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250928215553.png)
+源码如上<br>
+但是，**`/usr/bin/chmod +777 /flag`是有效的**。<br>
+
+
 
 # 特典: kernel pwn tricks:<br>
 这些特典或许不能帮助我们理解kernel，但是可以帮助我们ctf题目中快速拿分！<br>
