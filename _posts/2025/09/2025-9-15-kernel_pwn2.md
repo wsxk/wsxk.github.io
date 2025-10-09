@@ -313,6 +313,7 @@ __attribute__((naked,noinline)) void privilege_escalation_kernel_shellcode(){
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20251009230737.png)
 gdb可以通过`p {struct task_struct} ($gs_base+0x15d00)`来查看结构体:<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20251009231721.png)
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20251009233158.png)
 
 随后，可以利用`pwntools`的汇编模块来帮助我们生成shellcode:<br>
 ```python
