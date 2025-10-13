@@ -112,7 +112,7 @@ void kmem_cache_free(struct kmem_cache *cachep, void *objp);
 
 ### slub各个数据结构间的关系<br>
 借图，侵删<br>
-![http://www-x-wowotech-x-net.img.abc188.com/content/uploadfile/201803/4a471520078976.png](http://www-x-wowotech-x-net.img.abc188.com/content/uploadfile/201803/4a471520078976.png)
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/4a471520078976.png)
 
 ### slub内存分配原理/释放原理<br>
 [http://www.wowotech.net/memory_management/426.html](http://www.wowotech.net/memory_management/426.html)写的真的很好，还配有图示实例,非常有助于理解<br>
@@ -120,7 +120,7 @@ void kmem_cache_free(struct kmem_cache *cachep, void *objp);
 #### 分配<br>
 在调用kmem_cache_alloc函数后发生的事情<br>
 同样借用大佬的图，侵删
-![http://www-x-wowotech-x-net.img.abc188.com/content/uploadfile/201802/fb5c1519305301.png](http://www-x-wowotech-x-net.img.abc188.com/content/uploadfile/201802/fb5c1519305301.png)<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/fb5c1519305301.png)<br>
 > 1. 申请时，首先看`kmem_cache_cpu->page`是否存在，若不存在，进入第2步
 > > 若存在，查看`kmem_cacha_cpu->freelist`是否有空闲object
 > > > 若有空闲object，从 freelist里取出object，返回object结束。
@@ -133,7 +133,7 @@ void kmem_cache_free(struct kmem_cache *cachep, void *objp);
 > > 如果没有，申请一个新的slab(挂在node里）并返回 其中一个object
 
 #### 释放<br>
-![http://www-x-wowotech-x-net.img.abc188.com/content/uploadfile/201802/9eb91519305304.png](http://www-x-wowotech-x-net.img.abc188.com/content/uploadfile/201802/9eb91519305304.png)<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/9eb91519305304.png)<br>
 > 1. 首先查看释放的object所属的slab是否`kmem_cache_cpu->page`指向的slab
 > > 若是，直接free即可
 > > 若不是，进入第2步
