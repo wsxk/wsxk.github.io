@@ -14,9 +14,11 @@ comments: true
 
 
 # 写在前面<br>
-slab的相关文章[linux内核基础 三 slub分配器详解](https://wsxk.github.io/linux_kernel_basic_three/)其实已经写了一部分，也相当于是故地重游哩~<br>
+slab的相关文章[https://wsxk.github.io/linux_kernel_basic_one/#slab-alloctor](https://wsxk.github.io/linux_kernel_basic_one/#slab-alloctor)<br>
+以及[linux内核基础 三 slub分配器详解](https://wsxk.github.io/linux_kernel_basic_three/)其实已经写了一部分，也相当于是故地重游哩~<br>
 
 # 1. slab allocators<br>
+
 
 # 2. kernel heap protections<br>
 
