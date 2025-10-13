@@ -67,7 +67,7 @@ struct kmem_cache{
     int align;//字节对齐大小
     int reserved;
     const char * name;//sysfs文件系统显示时使用
-    struct list_head list;//系统有一个slab_caches链表，所有的slab都会挂入此链表。
+    struct list_head list;//系统有一个slab_caches链表，所有的kmem_cache都会挂入此链表。
     struct kmem_cache_node * node[MAX_NUMNODES];//slab节点 NUMA系统中每个内存控制器都有一个节点
 };
 ```
@@ -90,10 +90,37 @@ struct kmem_cache_cpu{
 kmem_cache_node用以描述一个 slab节点,由同一内存控制器下的所有cpu共享<br>
 其定于如下:
 ```c
-struct kmem_struct_node{
-    spinlock_t list_lock;//锁
-    unsigned long nr_partial;//当前 node中的partial链表中的slab数量
-    struct list_head partial; //slab节点的 slab partial链表
+struct kmem_cache_node {
+    // 每次操作数据时，都需要上锁
+    spinlock_t list_lock;
+
+    // 在slab中每个node上都有一个kmem_cache_node，用来将所有属于该kmem_cache的slab串联起来。
+    // 1、slabs_partial：链表中的slab部分object已经被使用
+    // 2、slabs_full：链表中的slab所有object都被使用
+    // 3、slabs_free：链表中的slab所有object都没有被使用
+    // 所以一个node上所有slab数，是三个链表节点和；一个kmem_cache上所有slab数，是所有node的三个链表
+    // 节点和。
+    struct list_head slabs_partial; /* partial list first, better asm code */
+    struct list_head slabs_full;
+    struct list_head slabs_free;
+    // 该node上所有slab数量
+    unsigned long total_slabs;  /* length of all slab lists */
+    // 该node上slabs_free链表slab数量
+    unsigned long free_slabs;   /* length of free slab list only */
+    // 该node上的所有slab的所有空闲object数
+    unsigned long free_objects;
+    // 该node上空闲object的最大数量限制
+    unsigned int free_limit;
+    unsigned int colour_next;   /* Per-node cache coloring */
+    // 该node上所有CPU共享的object，举例说明：
+    // 当CPU 1释放了5个objects，如果直接归还给slab，那下次当某个CPU上私有空间object不足时，
+    // 则需要从slab上申请，有可能slab页不足，需要从伙伴系统中申请，这样经过的路径很长。
+    // 通过所有CPU共享object链表，当CPU 1释放5个object后，会放入到该共享链表，当CPU 2需要3个
+    // objects时，可以直接从该共享链表中获取。所以这也是一个中间层设计。
+    struct array_cache *shared; /* shared per node */
+    struct alien_cache **alien; /* on other nodes */
+    unsigned long next_reap;    /* updated without locking */
+    int free_touched;       /* updated without locking */
 };
 ```
 
