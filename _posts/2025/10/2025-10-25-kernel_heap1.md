@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [kernel_pwn]
-title: "kernel heap 1: slab"
+title: "kernel heap 1: slab & 内核heap防御机制"
 author: wsxk
 date: 2025-10-25
 comments: true
@@ -10,7 +10,8 @@ comments: true
 - [写在前面](#写在前面)
 - [1. slab allocators](#1-slab-allocators)
   - [1.1 slab逻辑管理结构](#11-slab逻辑管理结构)
-  - [1.2 开发及观测方法](#12-开发及观测方法)
+  - [1.2 kernel申请内存方法](#12-kernel申请内存方法)
+  - [1.3 观测方法](#13-观测方法)
 - [2. kernel heap protections](#2-kernel-heap-protections)
 - [3. exploit the kernel](#3-exploit-the-kernel)
 
@@ -46,8 +47,16 @@ kmem_cache//专门维护某个大小的内核内存
 一个slab当中的object的名称叫做`slot`，下图中每个`256 bytes`都是一个`slot`<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20251014000028.png)
 
-## 1.2 开发及观测方法<br>
-这章节主要讲实战部分<br>
+## 1.2 kernel申请内存方法
+```
+void *kmalloc(size_t size, gfp_t flags) 
+// 默认情况下会在 通用目的的kmem_cahce中申请堆块，比如 kmalloc-8k
+// 如果 GFP_KERNEL_ACCOUNT被设置，此时说明这块内存是不受信任的（通常用在从用户态里获得数据），此时会从 kmalloc-cg-8k 中申请内存
+```
+
+## 1.3 观测方法<br>
+`cat /proc/slabinfo`非常有用<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20251014232119.png)
 
 
 
