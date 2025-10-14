@@ -9,7 +9,8 @@ comments: true
 
 - [写在前面](#写在前面)
 - [1. slab allocators](#1-slab-allocators)
-  - [1.1 逻辑结构](#11-逻辑结构)
+  - [1.1 slab逻辑管理结构](#11-slab逻辑管理结构)
+  - [1.2 开发及观测方法](#12-开发及观测方法)
 - [2. kernel heap protections](#2-kernel-heap-protections)
 - [3. exploit the kernel](#3-exploit-the-kernel)
 
@@ -26,7 +27,7 @@ slab的相关文章[https://wsxk.github.io/linux_kernel_basic_one/#slab-alloctor
 ```
 
 想了解slab的详细原理可以参考我的前2篇文章，我觉得我那2篇文章写的还真不赖，这里不用特地重复写了。<br>
-## 1.1 逻辑结构<br>
+## 1.1 slab逻辑管理结构<br>
 总的来说，在`kernel`中，专门维护某个特定大小的内存的结构体叫做`kmem_cache`<br>
 ```
 kmem_cache//专门维护某个大小的内核内存
@@ -44,6 +45,10 @@ kmem_cache//专门维护某个大小的内核内存
 ```
 一个slab当中的object的名称叫做`slot`，下图中每个`256 bytes`都是一个`slot`<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20251014000028.png)
+
+## 1.2 开发及观测方法<br>
+这章节主要讲实战部分<br>
+
 
 
 # 2. kernel heap protections<br>
