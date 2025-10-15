@@ -61,7 +61,7 @@ void *kmalloc(size_t size, gfp_t flags)
 
 
 # 2. kernel heap protections<br>
-
+跟用户态heap一样，内核heap也有很多很多保护机制。<br>
 
 # 3. exploit the kernel<br>
 
