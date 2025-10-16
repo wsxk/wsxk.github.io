@@ -13,6 +13,7 @@ comments: true
   - [1.2 kernel申请内存方法](#12-kernel申请内存方法)
   - [1.3 观测方法](#13-观测方法)
 - [2. kernel heap protections](#2-kernel-heap-protections)
+  - [2.1 Freelist Randomization](#21-freelist-randomization)
 - [3. exploit the kernel](#3-exploit-the-kernel)
 
 
@@ -62,6 +63,8 @@ void *kmalloc(size_t size, gfp_t flags)
 
 # 2. kernel heap protections<br>
 跟用户态heap一样，内核heap也有很多很多保护机制。<br>
+## 2.1 Freelist Randomization<br>
+
 
 # 3. exploit the kernel<br>
 
