@@ -15,7 +15,10 @@ comments: true
 ```c
 cachep = (kmem_cache *)kmem_cache_create("kheap_obj", 472LL, 0LL, 84156416LL, 0LL);//大小为472
 v6 = kmem_cache_alloc(cachep, 0x400CC0LL);//从这个kmem_cache中分配一个slot
+kmem_cache_free(cachep, filp->private_data);//释放右侧chunk，归入cahchep中。
+kmem_cache_destroy(cachep); //摧毁kmem_cache
 ```
+
 
 
 

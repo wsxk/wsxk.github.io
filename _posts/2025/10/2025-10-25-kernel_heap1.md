@@ -104,7 +104,7 @@ static inline freeptr_t freelist_ptr_encode(const struct kmem_cache *s,
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20251017202510.png)
 但是这个机制也有缺点：<br>
 这个机制实现在如下函数中:<br>
-```
+```c
 kmem_cache_create_usercopy
 __check_heap_object
 ```
