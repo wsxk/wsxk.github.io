@@ -7,10 +7,15 @@ date: 2025-11-07
 comments: true
 ---
 
+- [1. kernel heap使用范式](#1-kernel-heap使用范式)
 
 
 
-
+# 1. kernel heap使用范式<br>
+```c
+cachep = (kmem_cache *)kmem_cache_create("kheap_obj", 472LL, 0LL, 84156416LL, 0LL);//大小为472
+v6 = kmem_cache_alloc(cachep, 0x400CC0LL);//从这个kmem_cache中分配一个slot
+```
 
 
 
