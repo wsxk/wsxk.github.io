@@ -8,6 +8,7 @@ comments: true
 ---
 
 - [1. kernel heap使用范式](#1-kernel-heap使用范式)
+- [2.](#2)
 
 
 
@@ -19,7 +20,7 @@ kmem_cache_free(cachep, filp->private_data);//释放右侧chunk，归入cahchep�
 kmem_cache_destroy(cachep); //摧毁kmem_cache
 ```
 
-
+# 2. 
 
 
 
