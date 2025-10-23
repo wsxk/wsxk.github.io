@@ -11,7 +11,8 @@ comments: true
 - [2.  泄露内核地址篇](#2--泄露内核地址篇)
   - [2.1 Oops泄露kernel地址](#21-oops泄露kernel地址)
 - [3. 内核漏洞利用篇](#3-内核漏洞利用篇)
-  - [3.1 UAF](#31-uaf)
+  - [3.1 oob(out of boundry)：堆溢出](#31-oobout-of-boundry堆溢出)
+  - [3.2 UAF](#32-uaf)
 
 
 
@@ -30,7 +31,10 @@ kmem_cache_destroy(cachep); //摧毁kmem_cache
 `R10的值ffffffff82a58c20为内核地址段，R12的值0xffff8880043a7000为物理映射区域，但是实际上，它会指向kernel的heap基址！`<br>
 
 # 3. 内核漏洞利用篇<br>
-## 3.1 UAF<br>
+## 3.1 oob(out of boundry)：堆溢出<br>
+
+
+## 3.2 UAF<br>
 uaf无需多说了。
 
 
