@@ -8,7 +8,10 @@ comments: true
 ---
 
 - [1. kernel heap使用范式](#1-kernel-heap使用范式)
-- [2.  Oops泄露kernel地址](#2--oops泄露kernel地址)
+- [2.  泄露内核地址篇](#2--泄露内核地址篇)
+  - [2.1 Oops泄露kernel地址](#21-oops泄露kernel地址)
+- [3. 内核漏洞利用篇](#3-内核漏洞利用篇)
+  - [3.1 UAF](#31-uaf)
 
 
 
@@ -20,12 +23,15 @@ kmem_cache_free(cachep, filp->private_data);//释放右侧chunk，归入cahchep�
 kmem_cache_destroy(cachep); //摧毁kmem_cache
 ```
 
-# 2.  Oops泄露kernel地址<br>
+# 2.  泄露内核地址篇<br>
+## 2.1 Oops泄露kernel地址
 触发Oops后的情景如下:<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20251023001013.png)
 `R10的值ffffffff82a58c20为内核地址段，R12的值0xffff8880043a7000为物理映射区域，但是实际上，它会指向kernel的heap基址！`<br>
 
-
+# 3. 内核漏洞利用篇<br>
+## 3.1 UAF<br>
+uaf无需多说了。
 
 
 
