@@ -32,7 +32,8 @@ kmem_cache_destroy(cachep); //摧毁kmem_cache
 
 # 3. 内核漏洞利用篇<br>
 ## 3.1 oob(out of boundry)：堆溢出<br>
-
+顾名思义，其实就是在一个slot中填充多于其大小的内容，覆盖下一个slot中的其他值。<br>
+只有这个漏洞通常能够泄露下一个slot中的信息（如果有机密信息的话）<br>
 
 ## 3.2 UAF<br>
 uaf无需多说了。
