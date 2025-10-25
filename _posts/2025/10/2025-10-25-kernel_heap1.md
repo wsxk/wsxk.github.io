@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [kernel_pwn]
-title: "kernel heap 1: slab & 内核heap防御机制"
+title: "kernel heap 1: slab & 内核heap防御机制 & kernel heap利用技巧"
 author: wsxk
 date: 2025-10-25
 comments: true
@@ -17,6 +17,7 @@ comments: true
   - [2.2 Hardened Freelist](#22-hardened-freelist)
   - [2.3 Hardened Usercopy](#23-hardened-usercopy)
   - [2.4 kaslr](#24-kaslr)
+- [3. 常见的kernel heap利用技巧](#3-常见的kernel-heap利用技巧)
 
 
 # 写在前面<br>
@@ -114,6 +115,8 @@ __check_heap_object
 跟`aslr`类似。要想破解它首先需要泄露基址:<br>
 如果内核发生了**非致命性错误(oops)**，那么内核会继续运行，并打印出错信息（所有寄存器），可以通过dmesg查看泄露内容<br>
 但是如果内核发生了**致命错误（panic）**，那么内核会直接崩溃，这时候就有信息了。<br>
+
+# 3. 常见的kernel heap利用技巧<br>
 
 
 <!-- Google tag (gtag.js) -->

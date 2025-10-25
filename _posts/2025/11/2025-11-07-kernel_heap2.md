@@ -12,6 +12,7 @@ comments: true
   - [2.1 Oops泄露kernel地址](#21-oops泄露kernel地址)
 - [3. 内核漏洞利用篇](#3-内核漏洞利用篇)
   - [3.1 oom(out of memory)：堆溢出](#31-oomout-of-memory堆溢出)
+    - [3.1.1 oom绕过freelist randomization](#311-oom绕过freelist-randomization)
   - [3.2 UAF](#32-uaf)
 
 
@@ -34,6 +35,8 @@ kmem_cache_destroy(cachep); //摧毁kmem_cache
 ## 3.1 oom(out of memory)：堆溢出<br>
 顾名思义，其实就是在一个slot中填充多于其大小的内容，覆盖下一个slot中的其他值。<br>
 只有这个漏洞通常能够泄露下一个slot中的信息（如果有机密信息的话）<br>
+
+### 3.1.1 oom绕过freelist randomization<br>
 利用方法:<br>
 ```
 方法一：
