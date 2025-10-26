@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [kernel_pwn]
-title: "kernel heap 1: slab & 内核heap防御机制 & kernel heap利用技巧"
+title: "kernel heap 1: slab & 内核heap防御机制 & kernel heap常见漏洞类型"
 author: wsxk
 date: 2025-10-25
 comments: true
@@ -18,6 +18,7 @@ comments: true
   - [2.3 Hardened Usercopy](#23-hardened-usercopy)
   - [2.4 kaslr](#24-kaslr)
 - [3. 常见的kernel heap利用技巧](#3-常见的kernel-heap利用技巧)
+  - [3.1 kernel heap 漏洞](#31-kernel-heap-漏洞)
 
 
 # 写在前面<br>
@@ -117,6 +118,18 @@ __check_heap_object
 但是如果内核发生了**致命错误（panic）**，那么内核会直接崩溃，这时候就有信息了。<br>
 
 # 3. 常见的kernel heap利用技巧<br>
+## 3.1 kernel heap 漏洞<br>
+`kernel heap`的漏洞跟用户态heap漏洞如出一辙<br>
+```
+oob： 堆溢出问题，顾名思义
+uaf： use after free
+  -泄露freelist
+  -破坏metadata（freelist）
+  -任意地址读写原语
+overlapping allocations： 堆块重叠
+```
+我们能够利用这些漏洞来创造条件，帮助我们成功提权！但是仅仅识别这些漏洞还是不够的，尝试利用它们非常重要。而利用它们，就需要对linux kernel的机制有充分的了解，并掌握一些利用trick<br>
+
 
 
 <!-- Google tag (gtag.js) -->
