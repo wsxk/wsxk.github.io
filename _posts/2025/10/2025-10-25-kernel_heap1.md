@@ -79,7 +79,9 @@ void *kmalloc(size_t size, gfp_t flags)
     unsigned int *random_seq;
 #endif
 ```
-当然，因为freelist是单向链表（后进先出），黑客在申请多个slot后，能够按照他想要的顺序释放它。<br>
+被释放的slot会被放入链表的头部。<br>
+随机顺序只在初始化的时候有效。<br>
+因为freelist是单向链表（后进先出），黑客在申请多个slot后，能够按照他想要的顺序释放它。(如果知道顺序的话)<br>
 
 ## 2.2 Hardened Freelist<br>
 `Hardened Freelist`其实可以类比`tcache中的safelinking机制`,本质上就是freelist中的指针不再单纯指向另一个slot，而是再异或上两个其他值:`ptr ^ s->random ^ &ptr`,这里的&ptr指存放ptr的slot的地址<br>
@@ -96,8 +98,9 @@ static inline freeptr_t freelist_ptr_encode(const struct kmem_cache *s,
 	return (freeptr_t){.v = encoded};
 }
 ```
+当然，如果有uaf漏洞或者oob漏洞，有办法泄露其值。如何解呢？<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20251027001726.png)
 
-当然，如果有uaf漏洞或者oob漏洞，有办法泄露其值。<br>
 
 ## 2.3 Hardened Usercopy<br>
 `Hardened Usercopy`本质上就是限制从用户态传过来的数据能在内核态中存储的空间位置及其大小。<br>
