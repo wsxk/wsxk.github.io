@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [kernel_pwn]
-title: "kernel heap 2: practicing"
+title: "kernel heap 2: 内核堆利用技巧"
 author: wsxk
 date: 2025-11-07
 comments: true
@@ -9,11 +9,13 @@ comments: true
 
 - [1. kernel heap使用范式](#1-kernel-heap使用范式)
 - [2.  泄露内核地址篇](#2--泄露内核地址篇)
-  - [2.1 Oops泄露kernel地址](#21-oops泄露kernel地址)
-- [3. 内核漏洞利用篇](#3-内核漏洞利用篇)
+  - [2.1 Oops泄露kernel地址绕过kaslr](#21-oops泄露kernel地址绕过kaslr)
+- [3. 内核堆漏洞](#3-内核堆漏洞)
   - [3.1 oob(out of boundry)：堆溢出](#31-oobout-of-boundry堆溢出)
-    - [3.1.1 oom绕过freelist randomization](#311-oom绕过freelist-randomization)
   - [3.2 UAF](#32-uaf)
+  - [3.3 overlapping allocation](#33-overlapping-allocation)
+- [4. 内核堆利用技巧](#4-内核堆利用技巧)
+  - [4.1 Heap Spraying](#41-heap-spraying)
 
 
 
@@ -26,29 +28,25 @@ kmem_cache_destroy(cachep); //摧毁kmem_cache
 ```
 
 # 2.  泄露内核地址篇<br>
-## 2.1 Oops泄露kernel地址
+## 2.1 Oops泄露kernel地址绕过kaslr<br>
 触发Oops后的情景如下:<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20251023001013.png)
 `R10的值ffffffff82a58c20为内核地址段，R12的值0xffff8880043a7000为物理映射区域，但是实际上，它会指向kernel的heap基址！`<br>
 
-# 3. 内核漏洞利用篇<br>
+# 3. 内核堆漏洞<br>
+通常，内核堆漏洞分为如下三种：<br>
 ## 3.1 oob(out of boundry)：堆溢出<br>
 顾名思义，其实就是在一个slot中填充多于其大小的内容，覆盖下一个slot中的其他值。<br>
 只有这个漏洞通常能够泄露下一个slot中的信息（如果有机密信息的话）<br>
 
-### 3.1.1 oom绕过freelist randomization<br>
-利用方法:<br>
-```
-方法一：
-条件1： 在open某个驱动文件时，会申请一个slot（里面存放函数指针）。
-条件2： 存在oom漏洞，能够越界写slot
-利用思路： 打开驱动文件2次，在第一次打开的驱动文件里利用oom漏洞越界写第二次打开的驱动文件的函数指针。
-```
-
 ## 3.2 UAF<br>
 uaf无需多说了。
 
+## 3.3 overlapping allocation<br>
+同理。<br>
 
+# 4. 内核堆利用技巧<br>
+## 4.1 Heap Spraying<br>
 
 
 
