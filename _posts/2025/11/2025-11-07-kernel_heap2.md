@@ -15,7 +15,7 @@ comments: true
   - [3.2 UAF](#32-uaf)
   - [3.3 overlapping allocation](#33-overlapping-allocation)
 - [4. 内核堆利用技巧](#4-内核堆利用技巧)
-  - [4.1 Heap Spraying](#41-heap-spraying)
+  - [4.1 Heap Spraying —— anit-freelist\_randomization](#41-heap-spraying--anit-freelist_randomization)
 
 
 
@@ -48,9 +48,20 @@ uaf无需多说了。
 # 4. 内核堆利用技巧<br>
 通常情况，找到了漏洞是以远远不够的。如何利用漏洞达成目的才是重点。为了达成目的，我们需要学习漏洞的利用手段.<br>
 
-## 4.1 Heap Spraying<br>
-heap spraying 是一个常见的内核堆利用技术，中文名堆喷射。<br>
+## 4.1 Heap Spraying —— anit-freelist_randomization<br>
+heap spraying 是一个常见的内核堆利用技术，中文名堆喷射。**在kernel heap当中，堆的布局往往是不可知的，最主要的原因是开启了`freelist_randomization`选项（默认开启）**<br>
+比如下图是一个slab中常见的object布局:<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20251028222255.png)
+对于攻击者而言，无法确认下一个分配到的object位于哪个位置。（除非你的堆溢出能够溢出非常多，且覆盖正常object不会对kernel运行造成影响）。<br>
+此时可以考虑利用`heap spraying`技术，我们可以申请多个object，让kernel耗尽当前kmem_cache_cpu中的slab，并让其重新申请一个slab：<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20251028223704.png)
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20251028223729.png)
+此时再申请受害object后，堆溢出就容易许多了。<br>
 
+应用场景:<br>
+```
+你有一个堆溢出读 / 写，但是堆布局对你而言是不可知的（比如说开启了 SLAB_FREELIST_RANDOM（默认开启）），你可以预先喷射大量特定结构体，从而保证对其中某个结构体的溢出。
+```
 
 
 
