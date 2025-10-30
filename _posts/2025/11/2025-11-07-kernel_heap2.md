@@ -17,7 +17,7 @@ comments: true
 - [4. 内核堆利用技巧](#4-内核堆利用技巧)
   - [4.1 Heap Spraying —— anit-freelist\_randomization](#41-heap-spraying--anit-freelist_randomization)
     - [4.1.1 OOB破解freelist\_randomization](#411-oob破解freelist_randomization)
-  - [4.3 申请Desirable Objects](#43-申请desirable-objects)
+  - [4.2 堆布局构造](#42-堆布局构造)
 
 
 
@@ -70,8 +70,16 @@ heap spraying 是一个常见的内核堆利用技术，中文名堆喷射。**�
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20251029222456.png)
 事实证明，
 
-## 4.3 申请Desirable Objects<br>
-在kernel heap场景当中，堆布局是非常困难的。`kmalloc`函数会从 `通用的kmalloc_kmem_cache`中返回对象。然而：**通用cache可以保存许多大小相似的不同对象类型**<br>
+## 4.2 堆布局构造<br>
+在kernel heap场景当中，堆布局是非常困难的。`kmalloc`函数会从 `通用的kmalloc_kmem_cache`中返回对象。然而：**通用cache可以保存许多大小相似的不同对象类型，这意味着：所有进程都会通过kmalloc分配通用slot（syscall也非常经常需要分配内存）**<br>
+在内核的堆当中，并不是所有slot都是平等的，slot也分三六九等！<br>
+我们需要的内核slot对象应该有如下的特性:<br>
+```
+1. object size可控
+2. 避免copy_to_user 和 copy_from_user的使用（避免先前提到的Hardened Usercopy检测）
+3. 保护ojbect ptr/function ptr（覆盖后就可以任意地址执行，十分方便）
+```
+
 
 
 
