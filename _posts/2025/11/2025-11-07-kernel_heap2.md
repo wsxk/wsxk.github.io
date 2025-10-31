@@ -79,6 +79,7 @@ heap spraying 是一个常见的内核堆利用技术，中文名堆喷射。**�
 2. 避免copy_to_user 和 copy_from_user的使用（避免先前提到的Hardened Usercopy检测）
 3. 保护ojbect ptr/function ptr（覆盖后就可以任意地址执行，十分方便）
 ```
+这里提到两个非常有用的结构体:`msg_msg`和`pipe_buffer`<br>
 
 
 
