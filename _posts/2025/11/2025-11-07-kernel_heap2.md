@@ -16,8 +16,9 @@ comments: true
   - [3.3 overlapping allocation](#33-overlapping-allocation)
 - [4. 内核堆利用技巧](#4-内核堆利用技巧)
   - [4.1 Heap Spraying —— anit-freelist\_randomization](#41-heap-spraying--anit-freelist_randomization)
-    - [4.1.1 OOB破解freelist\_randomization](#411-oob破解freelist_randomization)
-  - [4.2 堆布局构造](#42-堆布局构造)
+    - [4.1.1 OOB+Heap Spraying破解freelist\_randomization](#411-oobheap-spraying破解freelist_randomization)
+  - [4.2 UAF修改next\_ptr实现任意地址分配](#42-uaf修改next_ptr实现任意地址分配)
+  - [4.3 堆布局构造](#43-堆布局构造)
 
 
 
@@ -64,13 +65,16 @@ heap spraying 是一个常见的内核堆利用技术，中文名堆喷射。**�
 ```
 你有一个堆溢出读 / 写，但是堆布局对你而言是不可知的（比如说开启了 SLAB_FREELIST_RANDOM（默认开启）），你可以预先喷射大量特定结构体，从而保证对其中某个结构体的溢出。
 ```
-### 4.1.1 OOB破解freelist_randomization<br>
+### 4.1.1 OOB+Heap Spraying破解freelist_randomization<br>
 前提：关闭kaslr，通过利用OOB漏洞，执行一次任意地址函数调用，且rdi寄存器是一个指针（不可改变），指向的内存区域可控。<br>
-办法:执行`commit_creds(rdi)`。rdi指向的内存区域，抄袭init_cred的内容<br>
+办法:申请多个slot，每个slot都覆盖相邻slot存放的函数地址，执行`commit_creds(rdi)`。rdi指向的内存区域，抄袭init_cred的内容<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20251029222456.png)
 事实证明，
 
-## 4.2 堆布局构造<br>
+## 4.2 UAF修改next_ptr实现任意地址分配<br>
+
+
+## 4.3 堆布局构造<br>
 在kernel heap场景当中，堆布局是非常困难的。`kmalloc`函数会从 `通用的kmalloc_kmem_cache`中返回对象。然而：**通用cache可以保存许多大小相似的不同对象类型，这意味着：所有进程都会通过kmalloc分配通用slot（syscall也非常经常需要分配内存）**<br>
 在内核的堆当中，并不是所有slot都是平等的，slot也分三六九等！<br>
 我们需要的内核slot对象应该有如下的特性:<br>
