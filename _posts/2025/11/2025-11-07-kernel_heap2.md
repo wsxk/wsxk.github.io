@@ -73,7 +73,12 @@ heap spraying 是一个常见的内核堆利用技术，中文名堆喷射。**�
 
 ## 4.2 Oops泄露内核地址+UAF修改next_ptr实现任意地址分配<br>
 前提: 开启kaslr，存在UAF漏洞。kheap中存在函数地址，可执行一次该地址的调用，rdi执行的内存区域可控。<br>
-办法：Oops泄露内核基地址；利用UAF漏洞修改object中的`free_list ptr`，导致分配的内存能够操纵函数地址；覆盖函数地址为`commit_cred`，rdi指向的内存区域，抄袭init_cred的内容。<br>
+办法：<br>
+1. 首先利用UAF泄露`free_list ptr`得到内核堆地址；<br>
+2. 然后利用UAF漏洞修改object中的`free_list ptr`，导致分配的内存能够操纵函数地址；<br>
+3. 利用UAF漏洞泄露函数地址，得到内核基址信息;<br>
+4. 覆盖函数地址为`commit_cred`，rdi指向的内存区域，抄袭init_cred的内容。<br>
+
 
 ## 4.3 堆布局构造<br>
 在kernel heap场景当中，堆布局是非常困难的。`kmalloc`函数会从 `通用的kmalloc_kmem_cache`中返回对象。然而：**通用cache可以保存许多大小相似的不同对象类型，这意味着：所有进程都会通过kmalloc分配通用slot（syscall也非常经常需要分配内存）**<br>
