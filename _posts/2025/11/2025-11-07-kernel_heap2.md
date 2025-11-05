@@ -103,6 +103,7 @@ modprobe_path可以利用的原因如下:<br>
 4. 重新利用UAF漏洞修改object中的`free_list ptr`，使其分配到`modprobe_path`附近，将`modprobe_path`改为我们想要的路径，比如`/tmp/exp`。<br>
 5. 创建`/tmp/exp`文件，在其中写入我们想要执行的命令<br>
 
+
 ## 4.3 堆布局构造<br>
 在kernel heap场景当中，堆布局是非常困难的。`kmalloc`函数会从 `通用的kmalloc_kmem_cache`中返回对象。然而：**通用cache可以保存许多大小相似的不同对象类型，这意味着：所有进程都会通过kmalloc分配通用slot（syscall也非常经常需要分配内存）**<br>
 在内核的堆当中，并不是所有slot都是平等的，slot也分三六九等！<br>
