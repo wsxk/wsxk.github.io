@@ -14,7 +14,13 @@ comments: true
 
 
 # 1. msg_msg<br>
+`msg_msg`是linux提供的一种进程间通信（IPC）的结构体。<br>
 
+```c
+int msgsnd(int msqid, const void *msgp, size_t msgsz, int msgflg);
+
+ssize_t msgrcv(int msqid, void *msgp, size_t msgsz, long msgtyp, int msgflg);
+```
 
 # 2. pipe_buffer<br>
 
