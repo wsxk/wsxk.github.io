@@ -22,6 +22,7 @@ int msgsnd(int msqid, const void *msgp, size_t msgsz, int msgflg);
 ssize_t msgrcv(int msqid, void *msgp, size_t msgsz, long msgtyp, int msgflg);
 ```
 
+
 # 2. pipe_buffer<br>
 
 
