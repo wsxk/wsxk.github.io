@@ -116,10 +116,10 @@ void get_flag(void){
     system("chmod +x /tmp/dummy");
 
     puts("[*] Run unknown file");
-    system("/tmp/dummy");//细节2： 运行未知文件要写全局路径，不要用./
+    system("/tmp/dummy");//细节2： 运行未知文件要写全局路径，最好不要用./
 
     puts("[*] Hopefully flag is readable");
-    system("cat /tmp/flag");
+    system("cat /tmp/flag");// 细节3：内核态执行/tmp/x文件时，不能直接cat /flag，因为没有文件描述符，所以看不到内容。
 
     exit(0);
 }
@@ -132,10 +132,10 @@ void get_flag(void){
 ```
 1. object size可控
 2. 避免copy_to_user 和 copy_from_user的使用（避免先前提到的Hardened Usercopy检测）
-3. 保护ojbect ptr/function ptr（覆盖后就可以任意地址执行，十分方便）
+3. 存放ojbect ptr/function ptr（覆盖后就可以任意地址执行，十分方便）
 ```
 这里提到两个非常有用的结构体:`msg_msg`和`pipe_buffer`<br>
-
+详情请看下一章节~<br>
 
 
 
