@@ -11,6 +11,8 @@ comments: true
   - [1.1 msg常见用法](#11-msg常见用法)
   - [1.2 为什么要介绍msg？](#12-为什么要介绍msg)
 - [2. pipe\_buffer](#2-pipe_buffer)
+  - [2.1 pipe\_buffer 常见用法](#21-pipe_buffer-常见用法)
+  - [2.2 为什么要介绍pipe\_buffer?](#22-为什么要介绍pipe_buffer)
 
 
 
@@ -149,7 +151,10 @@ struct msg_msg *copy_msg(struct msg_msg *src, struct msg_msg *dst) {
 ```
 
 # 2. pipe_buffer<br>
+## 2.1 pipe_buffer 常见用法<br>
 `pipe_buffer`也是内核IPC通信的方法之一，通过管道`pipe`来进行通信；<br>
+
+## 2.2 为什么要介绍pipe_buffer?<br>
 pipe_buffer的定义如下:<br>
 ```c
 struct pipe_buffer {
@@ -160,6 +165,7 @@ struct pipe_buffer {
 	unsigned long private;
 };
 ```
+
 
 
 
