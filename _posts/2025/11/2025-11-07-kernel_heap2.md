@@ -8,6 +8,8 @@ comments: true
 ---
 
 - [1. kernel heap使用范式](#1-kernel-heap使用范式)
+  - [1.1 自定义kmem\_cache](#11-自定义kmem_cache)
+  - [1.2 内核接口](#12-内核接口)
 - [2. 内核堆漏洞](#2-内核堆漏洞)
   - [3.1 oob(out of boundry)：堆溢出](#31-oobout-of-boundry堆溢出)
   - [3.2 UAF](#32-uaf)
@@ -24,11 +26,20 @@ comments: true
 
 
 # 1. kernel heap使用范式<br>
+##  1.1 自定义kmem_cache<br>
 ```c
 cachep = (kmem_cache *)kmem_cache_create("kheap_obj", 472LL, 0LL, 84156416LL, 0LL);//大小为472
 v6 = kmem_cache_alloc(cachep, 0x400CC0LL);//从这个kmem_cache中分配一个slot
 kmem_cache_free(cachep, filp->private_data);//释放右侧chunk，归入cahchep中。
 kmem_cache_destroy(cachep); //摧毁kmem_cache
+```
+## 1.2 内核接口<br>
+```c
+void *kmalloc(size_t size, gfp_t flags)；//分配地址位于物理映射区域，且在物理地址上连续
+void kfree(const void *objp);
+
+void *vmalloc(unsigned long size);//分配一段虚拟地址连续的区域，但在物理地址上不一定连续
+void vfree(const void *addr);
 ```
 
 # 2. 内核堆漏洞<br>
