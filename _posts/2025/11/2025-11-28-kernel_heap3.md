@@ -167,7 +167,7 @@ struct pipe_buffer {
 ```
 
 希望人没事~<br>
-
+具体细节会在遇到实际的堆题目后开展~<br>
 
 
 <!-- Google tag (gtag.js) -->
