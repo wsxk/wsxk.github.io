@@ -68,17 +68,52 @@ scp -r user@remote:/path/to/remotedir/ ./localdir/ #拷贝远程目录到本地
 ```
 
 ## 2.3 通防<br>
+暂时没用上，核心思路是添加一个禁止`sys_execve`执行的系统调用:<br>
+```asm
+45 31 D2                      xor     r10d, r10d
+45 31 C0                      xor     r8d, r8d
+6A 26                         push    26h ; '&'
+5F                            pop     rdi
+31 D2                         xor     edx, edx
+6A 01                         push    1
+5E                            pop     rsi
+31 C0                         xor     eax, eax
+B0 9D                         mov     al, 9Dh
+0F 05                         syscall                                 ; LINUX - sys_prctl
+6A 06                         push    6
+48 B8 06 00 00 00 00 00 FF 7F mov     rax, 7FFF000000000006h
+50                            push    rax
+48 B8 15 00 01 00 3B 00 00 00 mov     rax, 3B00010015h
+50                            push    rax
+6A 20                         push    20h ; ' '
+54                            push    rsp
+6A 04                         push    4
+49 89 CA                      mov     r10, rcx
+6A 16                         push    16h
+5F                            pop     rdi
+48 89 E2                      mov     rdx, rsp
+6A 02                         push    2
+5E                            pop     rsi
+31 C0                         xor     eax, eax
+B0 9D                         mov     al, 9Dh
+0F 05                         syscall                                 ; LINUX - sys_prctl
+48 83 C4 30                   add     rsp, 30h
+```
 
 
 ## 2.4 流量检测<br>
-
+todo: 如何在docker启动题目的环境下以普通用户的权限进行流量抓取。<br>
 ## 2.5 后门查杀<br>
+暂时没用上
 
 ## 2.6 挖洞<br>
+以二进制而言，主要还是看你逆向分析的速度。<br>
 
 ## 2.7 修洞<br>
+[https://wsxk.github.io/awdpatch/](https://wsxk.github.io/awdpatch/)<br>
 
 ## 2.8 exp编写<br>
+跟平时做pwn题没什么区别。一定要说的话，就是不知道对手到底补了什么东西有点烦。<br>
 
 
 <!-- Google tag (gtag.js) -->
