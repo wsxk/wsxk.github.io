@@ -3,7 +3,7 @@ layout: post
 tags: [kernel_pwn]
 title: "kernel heap 2: msg_msg和pipe_buffer"
 author: wsxk
-date: 2025-11-28
+date: 2025-12-06
 comments: true
 ---
 
