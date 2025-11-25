@@ -83,6 +83,7 @@ heap spraying 是一个常见的内核堆利用技术，中文名堆喷射。**�
 办法:申请多个slot，每个slot都覆盖相邻slot存放的函数地址，执行`commit_creds(rdi)`。rdi指向的内存区域，抄袭init_cred的内容<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20251029222456.png)
 事实证明，**拷贝init_cred的内容后，`commit_creds(rdi)`仍然成立，另外内核中所谓的原子变量，其实只指导如何操作这些变量，实际存储时和正常数据没有区别**<br>
+***拷贝init_cred才有意义，如果开启了kaslr，这个方法就无法使用了，关键在于cred中的成员变量security的地址无法确认***<br>
 
 ## 4.2 modprobe_path —— 以内核权限执行任意文件<br>
 modprobe是最初由Rusty Russell编写的Linux程序，用于在Linux内核中添加可加载的内核模块。实际上，当我们在Linux内核中安装或卸载新模块时，就会执行这个程序。它的路径是一个内核全局变量，默认为`/sbin/modprobe`，我们可以通过运行以下命令来检查它：<br>
