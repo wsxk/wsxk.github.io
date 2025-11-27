@@ -15,7 +15,8 @@ comments: true
   - [2.2 为什么要介绍pipe\_buffer?](#22-为什么要介绍pipe_buffer)
 
 
-
+之前提到，在正常的linux kernel环境下，堆风水布局是十分困难的。主要原因是内核大都使用`kmalloc`来申请内存，有漏洞的驱动大概率也是用`kmalloc`申请的内存。<br>
+但是`msg_msg`和`pipe_buffer`给我们提供了一个有效的进行堆布局的方法.<br>
 
 # 1. msg_msg<br>
 `msg_msg`是linux提供的一种进程间通信（IPC）的结构体。<br>
