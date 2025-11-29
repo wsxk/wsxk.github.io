@@ -7,6 +7,8 @@ date: 2025-12-06
 comments: true
 ---
 
+todo: `mas_msg`和`pipe_buffer`在ctf/linux kernel漏洞利用的实际应用。<br>
+
 - [1. msg\_msg](#1-msg_msg)
   - [1.1 msg常见用法](#11-msg常见用法)
   - [1.2 为什么要介绍msg？](#12-为什么要介绍msg)
