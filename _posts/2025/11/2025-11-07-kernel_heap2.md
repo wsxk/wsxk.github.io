@@ -20,7 +20,7 @@ comments: true
   - [4.1 Heap Spraying —— anit-freelist\_randomization](#41-heap-spraying--anit-freelist_randomization)
     - [4.1.1 OOB+Heap Spraying破解freelist\_randomization](#411-oobheap-spraying破解freelist_randomization)
   - [4.2 modprobe\_path —— 以内核权限执行任意文件](#42-modprobe_path--以内核权限执行任意文件)
-  - [4.2.1 Oops泄露内核地址+UAF修改next\_ptr实现任意地址分配修改modprobe\_path](#421-oops泄露内核地址uaf修改next_ptr实现任意地址分配修改modprobe_path)
+    - [4.2.1 Oops泄露内核地址+UAF修改next\_ptr实现任意地址分配修改modprobe\_path](#421-oops泄露内核地址uaf修改next_ptr实现任意地址分配修改modprobe_path)
   - [4.3 堆布局构造](#43-堆布局构造)
 
 
@@ -106,7 +106,7 @@ modprobe_path可以利用的原因如下:<br>
 
 ***换句话说，如果我们有任意地址写的原语，那么可以将`modprobe_path`修改为我们想要执行的文件的路径，随后执行一下未知文件头的文件，即可完成以内核身份执行`modprobe_path`所指向的文件***<br>
 
-## 4.2.1 Oops泄露内核地址+UAF修改next_ptr实现任意地址分配修改modprobe_path<br>
+### 4.2.1 Oops泄露内核地址+UAF修改next_ptr实现任意地址分配修改modprobe_path<br>
 前提: 开启kaslr，存在UAF漏洞。kheap中存在函数地址，可执行一次该地址的调用，且rdi寄存器是一个指针（不可改变），指向的内存区域可控。<br>
 办法：<br>
 1. 首先利用UAF泄露`free_list ptr`得到内核堆地址；<br>
