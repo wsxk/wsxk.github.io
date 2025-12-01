@@ -15,6 +15,7 @@ todo: `mas_msg`和`pipe_buffer`在ctf/linux kernel漏洞利用的实际应用。
 - [2. pipe\_buffer](#2-pipe_buffer)
   - [2.1 pipe\_buffer 常见用法](#21-pipe_buffer-常见用法)
   - [2.2 为什么要介绍pipe\_buffer?](#22-为什么要介绍pipe_buffer)
+- [3. 具体案例](#3-具体案例)
 
 
 之前提到，在正常的linux kernel环境下，堆风水布局是十分困难的。主要原因是内核大都使用`kmalloc`来申请内存，有漏洞的驱动大概率也是用`kmalloc`申请的内存。<br>
@@ -169,8 +170,8 @@ struct pipe_buffer {
 };
 ```
 
-希望人没事~<br>
-具体细节会在遇到实际的堆题目后开展~<br>
+# 3. 具体案例<br>
+todo<br>
 
 
 <!-- Google tag (gtag.js) -->
