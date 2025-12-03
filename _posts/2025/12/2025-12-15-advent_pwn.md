@@ -9,12 +9,20 @@ comments: true
 
 - [day 1: check-list](#day-1-check-list)
 - [day 2: coal](#day-2-coal)
+- [day 3: ](#day-3-)
 
 
 # day 1: check-list<br>
 
 
 # day 2: coal<br>
+
+```
+ulimit -c unlimited
+```
+
+# day 3: <br>
+
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
