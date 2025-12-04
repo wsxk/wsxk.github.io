@@ -35,7 +35,12 @@ nice(1), core(5), elf(5), pty(7), signal(7)
 切换到练习模式获得root，改文件权限然后看内存即可~<br>
 
 # day 3: <br>
-
+条件竞争，在改权限前先以只读模式打开文件即可。<br>
+```
+exec 3</stocking 
+nice -n 2 sleep 2
+cat <&3
+```
 
 # day 4:<br>
 
