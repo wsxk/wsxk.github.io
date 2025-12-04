@@ -10,6 +10,7 @@ comments: true
 - [day 1: check-list](#day-1-check-list)
 - [day 2: coal](#day-2-coal)
 - [day 3: ](#day-3-)
+- [day 4:](#day-4)
 
 
 # day 1: check-list<br>
@@ -34,6 +35,9 @@ nice(1), core(5), elf(5), pty(7), signal(7)
 切换到练习模式获得root，改文件权限然后看内存即可~<br>
 
 # day 3: <br>
+
+
+# day 4:<br>
 
 
 <!-- Google tag (gtag.js) -->
