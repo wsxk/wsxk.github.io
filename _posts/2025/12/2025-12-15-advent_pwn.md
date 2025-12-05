@@ -9,8 +9,8 @@ comments: true
 
 - [day 1: check-list](#day-1-check-list)
 - [day 2: coal](#day-2-coal)
-- [day 3: ](#day-3-)
-- [day 4:](#day-4)
+- [day 3: stocking](#day-3-stocking)
+- [day 4:northhole](#day-4northhole)
 - [day 5:](#day-5)
 
 
@@ -35,7 +35,7 @@ nice(1), core(5), elf(5), pty(7), signal(7)
 设置`ulimit -c unlimited`后，执行程序然后`ctrl+\`dump出内存即可。<br>
 切换到练习模式获得root，改文件权限然后看内存即可~<br>
 
-# day 3: <br>
+# day 3: stocking<br>
 条件竞争，在改权限前先以只读模式打开文件即可。<br>
 ```
 exec 3</stocking 
@@ -43,7 +43,8 @@ nice -n 2 sleep 2
 cat <&3
 ```
 
-# day 4:<br>
+# day 4:northhole<br>
+
 
 # day 5:<br>
 
