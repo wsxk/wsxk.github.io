@@ -11,6 +11,7 @@ comments: true
 - [day 2: coal](#day-2-coal)
 - [day 3: ](#day-3-)
 - [day 4:](#day-4)
+- [day 5:](#day-5)
 
 
 # day 1: check-list<br>
@@ -43,6 +44,8 @@ cat <&3
 ```
 
 # day 4:<br>
+
+# day 5:<br>
 
 
 <!-- Google tag (gtag.js) -->
