@@ -10,7 +10,7 @@ comments: true
 - [day 1: check-list](#day-1-check-list)
 - [day 2: coal](#day-2-coal)
 - [day 3: stocking](#day-3-stocking)
-- [day 4:northhole](#day-4northhole)
+- [day 4: northhole](#day-4-northhole)
 - [day 5:](#day-5)
 
 
@@ -43,7 +43,7 @@ nice -n 2 sleep 2
 cat <&3
 ```
 
-# day 4:northhole<br>
+# day 4: northhole<br>
 是个跟`ebpf`有关的题目。<br>
 用户态的程序`northhole`在ebpf中加载了`tracker.bpf.o`的ebpf字节码。<br>
 并时刻检查`tracker.bpf.o`中的某个字段是否为1，是1则打印flag，不是则循环等待。<br>
