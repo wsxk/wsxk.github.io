@@ -44,7 +44,304 @@ cat <&3
 ```
 
 # day 4:northhole<br>
+是个跟`ebpf`有关的题目。<br>
+用户态的程序`northhole`在ebpf中加载了`tracker.bpf.o`的ebpf字节码。<br>
+并时刻检查`tracker.bpf.o`中的某个字段是否为1，是1则打印flag，不是则循环等待。<br>
+所以关键还是要看`bpf.o`中的ebpf字节码的逻辑。<br>
+简单介绍下ebpf，总之ebpf机制允许用户通过`bpf`系统调用，向内核注入`ebpf字节码`，再通过`kprobe`机制，在内核执行某个函数（比如这道题目的linkat系统调用）时，先进入用户的`ebpf`代码逻辑，再执行原有函数linkat。<br>
+[一文看懂eBPF、eBPF的使用（超详细）](https://zhuanlan.zhihu.com/p/480811707)<br>
+[linux 内核调试工具 kprobe](https://zhuanlan.zhihu.com/p/663837982)<br>
 
+```
+# llvm-objdump -S --no-show-raw-insn /challenge/tracker.bpf.o
+# bpf常见约定:
+# r1：kprobe 的上下文，一般是 struct pt_regs *.
+# r10：栈指针（frame pointer），栈向下增长，比如 r10 - 0x10。
+# call 0x1：基本可以认作 bpf_map_lookup_elem(...)。
+# call 0x2：bpf_map_update_elem(...)。
+# call 0x71/0x72：是某种 bpf_probe_read_*/bpf_probe_read_*_str，从内核/用户内存里把指针或字符串拷到栈上
+
+/challenge/tracker.bpf.o:       file format elf64-bpf
+
+Disassembly of section kprobe/__x64_sys_linkat:
+
+0000000000000000 <handle_do_linkat>:
+       0:       r6 = *(u64 *)(r1 + 0x70)
+       1:       r1 = 0x0
+       2:       *(u64 *)(r10 - 0x30) = r1
+       3:       *(u64 *)(r10 - 0x38) = r1
+       4:       if r6 == 0x0 goto +0x10e <handle_do_linkat+0x898>
+       5:       r3 = r6
+       6:       r3 += 0x68
+       7:       r1 = r10
+       8:       r1 += -0x30
+       9:       r2 = 0x8
+      10:       call 0x71
+      11:       r6 += 0x38
+      12:       r1 = r10
+      13:       r1 += -0x38
+      14:       r2 = 0x8
+      15:       r3 = r6
+      16:       call 0x71
+      17:       r3 = *(u64 *)(r10 - 0x30)
+      18:       if r3 == 0x0 goto +0x100 <handle_do_linkat+0x898>
+      19:       r1 = *(u64 *)(r10 - 0x38)
+      20:       if r1 == 0x0 goto +0xfe <handle_do_linkat+0x898>
+      21:       r1 = r10
+      22:       r1 += -0x28
+      23:       r2 = 0x10
+      24:       call 0x72
+      25:       r0 <<= 0x20
+      26:       r0 s>>= 0x20
+      27:       r1 = 0x1
+      28:       if r1 s> r0 goto +0xf6 <handle_do_linkat+0x898>
+      29:       r3 = *(u64 *)(r10 - 0x30)
+      30:       r1 = r10
+      31:       r1 += -0x10
+      32:       r2 = 0x10
+      33:       call 0x72
+      34:       r0 <<= 0x20
+      35:       r0 >>= 0x20
+      36:       if r0 != 0x7 goto +0xee <handle_do_linkat+0x898>
+      37:       r1 = *(u8 *)(r10 - 0x10)
+      38:       if r1 != 0x73 goto +0xec <handle_do_linkat+0x898>
+      39:       r1 = *(u8 *)(r10 - 0xf)
+      40:       if r1 != 0x6c goto +0xea <handle_do_linkat+0x898>
+      41:       r1 = *(u8 *)(r10 - 0xe)
+      42:       if r1 != 0x65 goto +0xe8 <handle_do_linkat+0x898>
+      43:       r1 = *(u8 *)(r10 - 0xd)
+      44:       if r1 != 0x69 goto +0xe6 <handle_do_linkat+0x898>
+      45:       r1 = *(u8 *)(r10 - 0xc)
+      46:       if r1 != 0x67 goto +0xe4 <handle_do_linkat+0x898>
+      47:       r1 = *(u8 *)(r10 - 0xb)
+      48:       if r1 != 0x68 goto +0xe2 <handle_do_linkat+0x898>
+      49:       r3 = *(u64 *)(r10 - 0x38)
+      50:       r1 = r10
+      51:       r1 += -0x28
+      52:       r2 = 0x10
+      53:       call 0x72
+      54:       r0 <<= 0x20
+      55:       r0 s>>= 0x20
+      56:       r1 = 0x1
+      57:       if r1 s> r0 goto +0xd9 <handle_do_linkat+0x898>
+      58:       r6 = *(u64 *)(r10 - 0x38)
+      59:       r7 = 0x0
+      60:       *(u32 *)(r10 - 0x14) = r7
+      61:       r2 = r10
+      62:       r2 += -0x14
+      63:       r1 = 0x0 ll
+      65:       call 0x1
+      66:       if r0 == 0x0 goto +0x1 <handle_do_linkat+0x220>
+      67:       r7 = *(u32 *)(r0 + 0x0)
+      68:       r1 = r10
+      69:       r1 += -0x10
+      70:       r2 = 0x10
+      71:       r3 = r6
+      72:       call 0x72
+      73:       r0 <<= 0x20
+      74:       r0 >>= 0x20
+      75:       if r0 != 0x7 goto +0xe <handle_do_linkat+0x2d0>
+      76:       r1 = *(u8 *)(r10 - 0x10)
+      77:       if r1 != 0x64 goto +0xc <handle_do_linkat+0x2d0>
+      78:       r1 = *(u8 *)(r10 - 0xf)
+      79:       if r1 != 0x61 goto +0xa <handle_do_linkat+0x2d0>
+      80:       r1 = *(u8 *)(r10 - 0xe)
+      81:       if r1 != 0x73 goto +0x8 <handle_do_linkat+0x2d0>
+      82:       r1 = *(u8 *)(r10 - 0xd)
+      83:       if r1 != 0x68 goto +0x6 <handle_do_linkat+0x2d0>
+      84:       r1 = *(u8 *)(r10 - 0xc)
+      85:       if r1 != 0x65 goto +0x4 <handle_do_linkat+0x2d0>
+      86:       r1 = *(u8 *)(r10 - 0xb)
+      87:       if r1 != 0x72 goto +0x2 <handle_do_linkat+0x2d0>
+      88:       r1 = 0x1
+      89:       goto +0xb0 <handle_do_linkat+0x850>
+      90:       if r7 s> 0x3 goto +0x18 <handle_do_linkat+0x398>
+      91:       if r7 == 0x1 goto +0x55 <handle_do_linkat+0x588>
+      92:       if r7 == 0x2 goto +0x94 <handle_do_linkat+0x788>
+      93:       if r7 == 0x3 goto +0x1 <handle_do_linkat+0x2f8>
+      94:       goto +0xaa <handle_do_linkat+0x848>
+      95:       r1 = r10
+      96:       r1 += -0x10
+      97:       r2 = 0x10
+      98:       r3 = r6
+      99:       call 0x72
+     100:       r0 <<= 0x20
+     101:       r0 >>= 0x20
+     102:       if r0 != 0x6 goto +0xa2 <handle_do_linkat+0x848>
+     103:       r1 = *(u8 *)(r10 - 0x10)
+     104:       if r1 != 0x76 goto +0xa0 <handle_do_linkat+0x848>
+     105:       r1 = *(u8 *)(r10 - 0xf)
+     106:       if r1 != 0x69 goto +0x9e <handle_do_linkat+0x848>
+     107:       r1 = *(u8 *)(r10 - 0xe)
+     108:       if r1 != 0x78 goto +0x9c <handle_do_linkat+0x848>
+     109:       r1 = *(u8 *)(r10 - 0xd)
+     110:       if r1 != 0x65 goto +0x9a <handle_do_linkat+0x848>
+     111:       r1 = *(u8 *)(r10 - 0xc)
+     112:       if r1 != 0x6e goto +0x98 <handle_do_linkat+0x848>
+     113:       r1 = 0x4
+     114:       goto +0x97 <handle_do_linkat+0x850>
+     115:       if r7 s> 0x5 goto +0x17 <handle_do_linkat+0x458>
+     116:       if r7 == 0x4 goto +0x52 <handle_do_linkat+0x638>
+     117:       if r7 == 0x5 goto +0x1 <handle_do_linkat+0x3b8>
+     118:       goto +0x92 <handle_do_linkat+0x848>
+     119:       r1 = r10
+     120:       r1 += -0x10
+     121:       r2 = 0x10
+     122:       r3 = r6
+     123:       call 0x72
+     124:       r0 <<= 0x20
+     125:       r0 >>= 0x20
+     126:       if r0 != 0x6 goto +0x8a <handle_do_linkat+0x848>
+     127:       r1 = *(u8 *)(r10 - 0x10)
+     128:       if r1 != 0x63 goto +0x88 <handle_do_linkat+0x848>
+     129:       r1 = *(u8 *)(r10 - 0xf)
+     130:       if r1 != 0x75 goto +0x86 <handle_do_linkat+0x848>
+     131:       r1 = *(u8 *)(r10 - 0xe)
+     132:       if r1 != 0x70 goto +0x84 <handle_do_linkat+0x848>
+     133:       r1 = *(u8 *)(r10 - 0xd)
+     134:       if r1 != 0x69 goto +0x82 <handle_do_linkat+0x848>
+     135:       r1 = *(u8 *)(r10 - 0xc)
+     136:       if r1 != 0x64 goto +0x80 <handle_do_linkat+0x848>
+     137:       r1 = 0x6
+     138:       goto +0x7f <handle_do_linkat+0x850>
+     139:       if r7 == 0x6 goto +0x4f <handle_do_linkat+0x6d8>
+     140:       if r7 == 0x7 goto +0x1 <handle_do_linkat+0x470>
+     141:       goto +0x7b <handle_do_linkat+0x848>
+     142:       r1 = r10
+     143:       r1 += -0x10
+     144:       r2 = 0x10
+     145:       r3 = r6
+     146:       call 0x72
+     147:       r0 <<= 0x20
+     148:       r0 >>= 0x20
+     149:       if r0 != 0x8 goto +0x73 <handle_do_linkat+0x848>
+     150:       r1 = *(u8 *)(r10 - 0x10)
+     151:       if r1 != 0x62 goto +0x71 <handle_do_linkat+0x848>
+     152:       r1 = *(u8 *)(r10 - 0xf)
+     153:       if r1 != 0x6c goto +0x6f <handle_do_linkat+0x848>
+     154:       r1 = *(u8 *)(r10 - 0xe)
+     155:       if r1 != 0x69 goto +0x6d <handle_do_linkat+0x848>
+     156:       r1 = *(u8 *)(r10 - 0xd)
+     157:       if r1 != 0x74 goto +0x6b <handle_do_linkat+0x848>
+     158:       r1 = *(u8 *)(r10 - 0xc)
+     159:       if r1 != 0x7a goto +0x69 <handle_do_linkat+0x848>
+     160:       r1 = *(u8 *)(r10 - 0xb)
+     161:       if r1 != 0x65 goto +0x67 <handle_do_linkat+0x848>
+     162:       r1 = *(u8 *)(r10 - 0xa)
+     163:       if r1 != 0x6e goto +0x65 <handle_do_linkat+0x848>
+     164:       r1 = 0x8
+     165:       *(u32 *)(r10 - 0x18) = r1
+     166:       r1 = 0x1
+     167:       *(u32 *)(r10 - 0x10) = r1
+     168:       r2 = r10
+     169:       r2 += -0x14
+     170:       r3 = r10
+     171:       r3 += -0x10
+     172:       r1 = 0x0 ll
+     174:       r4 = 0x0
+     175:       call 0x2
+     176:       goto +0x5a <handle_do_linkat+0x858>
+     177:       r1 = r10
+     178:       r1 += -0x10
+     179:       r2 = 0x10
+     180:       r3 = r6
+     181:       call 0x72
+     182:       r0 <<= 0x20
+     183:       r0 >>= 0x20
+     184:       if r0 != 0x7 goto +0x50 <handle_do_linkat+0x848>
+     185:       r1 = *(u8 *)(r10 - 0x10)
+     186:       if r1 != 0x64 goto +0x4e <handle_do_linkat+0x848>
+     187:       r1 = *(u8 *)(r10 - 0xf)
+     188:       if r1 != 0x61 goto +0x4c <handle_do_linkat+0x848>
+     189:       r1 = *(u8 *)(r10 - 0xe)
+     190:       if r1 != 0x6e goto +0x4a <handle_do_linkat+0x848>
+     191:       r1 = *(u8 *)(r10 - 0xd)
+     192:       if r1 != 0x63 goto +0x48 <handle_do_linkat+0x848>
+     193:       r1 = *(u8 *)(r10 - 0xc)
+     194:       if r1 != 0x65 goto +0x46 <handle_do_linkat+0x848>
+     195:       r1 = *(u8 *)(r10 - 0xb)
+     196:       if r1 != 0x72 goto +0x44 <handle_do_linkat+0x848>
+     197:       r1 = 0x2
+     198:       goto +0x43 <handle_do_linkat+0x850>
+     199:       r1 = r10
+     200:       r1 += -0x10
+     201:       r2 = 0x10
+     202:       r3 = r6
+     203:       call 0x72
+     204:       r0 <<= 0x20
+     205:       r0 >>= 0x20
+     206:       if r0 != 0x6 goto +0x3a <handle_do_linkat+0x848>
+     207:       r1 = *(u8 *)(r10 - 0x10)
+     208:       if r1 != 0x63 goto +0x38 <handle_do_linkat+0x848>
+     209:       r1 = *(u8 *)(r10 - 0xf)
+     210:       if r1 != 0x6f goto +0x36 <handle_do_linkat+0x848>
+     211:       r1 = *(u8 *)(r10 - 0xe)
+     212:       if r1 != 0x6d goto +0x34 <handle_do_linkat+0x848>
+     213:       r1 = *(u8 *)(r10 - 0xd)
+     214:       if r1 != 0x65 goto +0x32 <handle_do_linkat+0x848>
+     215:       r1 = *(u8 *)(r10 - 0xc)
+     216:       if r1 != 0x74 goto +0x30 <handle_do_linkat+0x848>
+     217:       r1 = 0x5
+     218:       goto +0x2f <handle_do_linkat+0x850>
+     219:       r1 = r10
+     220:       r1 += -0x10
+     221:       r2 = 0x10
+     222:       r3 = r6
+     223:       call 0x72
+     224:       r0 <<= 0x20
+     225:       r0 >>= 0x20
+     226:       if r0 != 0x7 goto +0x26 <handle_do_linkat+0x848>
+     227:       r1 = *(u8 *)(r10 - 0x10)
+     228:       if r1 != 0x64 goto +0x24 <handle_do_linkat+0x848>
+     229:       r1 = *(u8 *)(r10 - 0xf)
+     230:       if r1 != 0x6f goto +0x22 <handle_do_linkat+0x848>
+     231:       r1 = *(u8 *)(r10 - 0xe)
+     232:       if r1 != 0x6e goto +0x20 <handle_do_linkat+0x848>
+     233:       r1 = *(u8 *)(r10 - 0xd)
+     234:       if r1 != 0x6e goto +0x1e <handle_do_linkat+0x848>
+     235:       r1 = *(u8 *)(r10 - 0xc)
+     236:       if r1 != 0x65 goto +0x1c <handle_do_linkat+0x848>
+     237:       r1 = *(u8 *)(r10 - 0xb)
+     238:       if r1 != 0x72 goto +0x1a <handle_do_linkat+0x848>
+     239:       r1 = 0x7
+     240:       goto +0x19 <handle_do_linkat+0x850>
+     241:       r1 = r10
+     242:       r1 += -0x10
+     243:       r2 = 0x10
+     244:       r3 = r6
+     245:       call 0x72
+     246:       r0 <<= 0x20
+     247:       r0 >>= 0x20
+     248:       if r0 != 0x8 goto +0x10 <handle_do_linkat+0x848>
+     249:       r1 = *(u8 *)(r10 - 0x10)
+     250:       if r1 != 0x70 goto +0xe <handle_do_linkat+0x848>
+     251:       r1 = *(u8 *)(r10 - 0xf)
+     252:       if r1 != 0x72 goto +0xc <handle_do_linkat+0x848>
+     253:       r1 = *(u8 *)(r10 - 0xe)
+     254:       if r1 != 0x61 goto +0xa <handle_do_linkat+0x848>
+     255:       r1 = *(u8 *)(r10 - 0xd)
+     256:       if r1 != 0x6e goto +0x8 <handle_do_linkat+0x848>
+     257:       r1 = *(u8 *)(r10 - 0xc)
+     258:       if r1 != 0x63 goto +0x6 <handle_do_linkat+0x848>
+     259:       r1 = *(u8 *)(r10 - 0xb)
+     260:       if r1 != 0x65 goto +0x4 <handle_do_linkat+0x848>
+     261:       r1 = *(u8 *)(r10 - 0xa)
+     262:       if r1 != 0x72 goto +0x2 <handle_do_linkat+0x848>
+     263:       r1 = 0x3
+     264:       goto +0x1 <handle_do_linkat+0x850>
+     265:       r1 = 0x0
+     266:       *(u32 *)(r10 - 0x18) = r1
+     267:       r2 = r10
+     268:       r2 += -0x14
+     269:       r3 = r10
+     270:       r3 += -0x18
+     271:       r1 = 0x0 ll
+     273:       r4 = 0x0
+     274:       call 0x2
+     275:       r0 = 0x0
+     276:       exit
+```
+经过chatgpt5.1的高贵分析，得知只要按照顺序linkat文件，就能完成解题<br>
 
 # day 5:<br>
 
