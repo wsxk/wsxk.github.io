@@ -345,6 +345,9 @@ Disassembly of section kprobe/__x64_sys_linkat:
 经过chatgpt5.1的高贵分析，得知只要按照顺序linkat文件，就能完成解题<br>
 
 # day 5:<br>
+最近`io_uring`系统调用受到了广泛关注，因为这个系统调用几乎可模拟任意的系统调用。<br>
+特别的，高版本` (Linux Kernel Version >= 6.5)` 的`io_uring`中引入了`IORING_SETUP_NO_MMAP`标志，配合`IORING_SETUP_SQPOLL`可以一次`syscall`完成`orw`操作。十分的强力<br>
+
 
 # day 6:<br>
 
