@@ -12,6 +12,7 @@ comments: true
 - [day 3: stocking](#day-3-stocking)
 - [day 4: northhole](#day-4-northhole)
 - [day 5:](#day-5)
+- [day 6:](#day-6)
 
 
 # day 1: check-list<br>
@@ -345,6 +346,7 @@ Disassembly of section kprobe/__x64_sys_linkat:
 
 # day 5:<br>
 
+# day 6:<br>
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
