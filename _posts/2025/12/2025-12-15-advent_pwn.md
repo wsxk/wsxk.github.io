@@ -444,6 +444,11 @@ int main(){
 objdump -M intel -d --disassemble=shellcode a.out
 
 ```
+参考[https://idocdown.com/app/articles/blogs/detail/10310](https://idocdown.com/app/articles/blogs/detail/10310)<br>
+[一文详细讲解 io_uring](https://zhuanlan.zhihu.com/p/582562402)<br>
+[I/O 模型演化: Linux 的 io_uring](https://hackmd.io/@sysprog/iouring)<br>
+
+
 # day 6:<br>
 
 <!-- Google tag (gtag.js) -->
