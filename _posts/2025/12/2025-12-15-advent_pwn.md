@@ -9,9 +9,9 @@ comments: true
 
 - [day 1: check-list](#day-1-check-list)
 - [day 2: coal](#day-2-coal)
-- [day 3: stocking](#day-3-stocking)
-- [day 4: northhole](#day-4-northhole)
-- [day 5:](#day-5)
+- [day 3: race condition](#day-3-race-condition)
+- [day 4: ebpf](#day-4-ebpf)
+- [day 5: io\_uring](#day-5-io_uring)
 - [day 6:](#day-6)
 
 
@@ -36,7 +36,7 @@ nice(1), core(5), elf(5), pty(7), signal(7)
 设置`ulimit -c unlimited`后，执行程序然后`ctrl+\`dump出内存即可。<br>
 切换到练习模式获得root，改文件权限然后看内存即可~<br>
 
-# day 3: stocking<br>
+# day 3: race condition<br>
 条件竞争，在改权限前先以只读模式打开文件即可。<br>
 ```
 exec 3</stocking 
@@ -44,7 +44,7 @@ nice -n 2 sleep 2
 cat <&3
 ```
 
-# day 4: northhole<br>
+# day 4: ebpf<br>
 是个跟`ebpf`有关的题目。<br>
 用户态的程序`northhole`在ebpf中加载了`tracker.bpf.o`的ebpf字节码。<br>
 并时刻检查`tracker.bpf.o`中的某个字段是否为1，是1则打印flag，不是则循环等待。<br>
@@ -344,7 +344,7 @@ Disassembly of section kprobe/__x64_sys_linkat:
 ```
 经过chatgpt5.1的高贵分析，得知只要按照顺序linkat文件，就能完成解题<br>
 
-# day 5:<br>
+# day 5: io_uring<br>
 最近`io_uring`系统调用受到了广泛关注，因为这个系统调用几乎可模拟任意的系统调用。<br>
 特别的，高版本` (Linux Kernel Version >= 6.5)` 的`io_uring`中引入了`IORING_SETUP_NO_MMAP`标志，配合`IORING_SETUP_SQPOLL`可以一次`syscall`完成`orw`操作。十分的强力<br>
 但是现有资料，对于`io_uring`的`IORING_SETUP_NO_MMAP`的描述比较少，所以要从头开始写起，就很麻烦<br>
