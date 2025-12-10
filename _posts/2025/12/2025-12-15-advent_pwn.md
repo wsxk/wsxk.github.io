@@ -12,7 +12,7 @@ comments: true
 - [day 3: race condition](#day-3-race-condition)
 - [day 4: ebpf](#day-4-ebpf)
 - [day 5: io\_uring](#day-5-io_uring)
-- [day 6:](#day-6)
+- [day 6: 区块链](#day-6-区块链)
 
 
 # day 1: check-list<br>
@@ -490,7 +490,9 @@ dump binary memory shellcode.bin xxx xxx
 [I/O 模型演化: Linux 的 io_uring](https://hackmd.io/@sysprog/iouring)<br>
 
 
-# day 6:<br>
+# day 6: 区块链<br>
+似乎是区块链的题目<br>
+
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
