@@ -15,6 +15,10 @@ comments: true
 - [day 6: 区块链](#day-6-区块链)
 - [day 7：web](#day-7web)
 - [day 8：compiler](#day-8compiler)
+- [day 9：](#day-9)
+- [day 10: ](#day-10-)
+- [day 11: ](#day-11-)
+- [day 12: ](#day-12-)
 
 
 # day 1: check-list<br>
@@ -503,7 +507,14 @@ dump binary memory shellcode.bin xxx xxx
 # day 8：compiler<br>
 编译器题目<br>
 
+# day 9：<br>
 
+# day 10: <br>
+
+# day 11: <br>
+
+
+# day 12: <br>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
 <script>
