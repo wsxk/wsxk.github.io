@@ -13,6 +13,8 @@ comments: true
 - [day 4: ebpf](#day-4-ebpf)
 - [day 5: io\_uring](#day-5-io_uring)
 - [day 6: 区块链](#day-6-区块链)
+- [day 7：web](#day-7web)
+- [day 8：compiler](#day-8compiler)
 
 
 # day 1: check-list<br>
@@ -492,6 +494,14 @@ dump binary memory shellcode.bin xxx xxx
 
 # day 6: 区块链<br>
 似乎是区块链的题目<br>
+先pass，可以回头再看
+
+# day 7：web<br>
+是web的题目，pass<br>
+
+
+# day 8：compiler<br>
+编译器题目<br>
 
 
 <!-- Google tag (gtag.js) -->
