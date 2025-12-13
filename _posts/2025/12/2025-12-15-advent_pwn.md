@@ -19,6 +19,7 @@ comments: true
 - [day 10: ](#day-10-)
 - [day 11: ](#day-11-)
 - [day 12: ](#day-12-)
+- [小结](#小结)
 
 
 # day 1: check-list<br>
@@ -516,6 +517,9 @@ dump binary memory shellcode.bin xxx xxx
 
 # day 12: <br>
 
+
+# 小结<br>
+题目比较简单，属于是教你知识点的，我觉得挺好。<br>
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
