@@ -499,7 +499,7 @@ dump binary memory shellcode.bin xxx xxx
 
 # day 6: 区块链<br>
 似乎是区块链的题目<br>
-先pass，可以回头再看
+先pass
 
 # day 7：web<br>
 是web的题目，pass<br>
@@ -509,17 +509,20 @@ dump binary memory shellcode.bin xxx xxx
 编译器题目<br>
 
 # day 9：<br>
+pass
 
 # day 10: <br>
+pass
 
 # day 11: <br>
-
+pass
 
 # day 12: <br>
-
+pass
 
 # 小结<br>
 题目比较简单，属于是教你知识点的，我觉得挺好。<br>
+可惜工作后真的没多少时间一个个看题了，有点遗憾。<br>
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
