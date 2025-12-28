@@ -3,7 +3,7 @@ layout: post
 tags: [kernel_pwn]
 title: "kernel stack 1: 环境搭建& kernel stack保护机制"
 author: wsxk
-date: 2026-01-01
+date: 2026-01-30
 comments: true
 ---
 
