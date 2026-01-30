@@ -51,6 +51,7 @@ run.sh： 用qemu运行内核的脚本
 ./compress.sh 
 ```
 
+
 ## 2.3 run.sh<br>
 实际上就是`qemu`的启动命令<br>
 ```
