@@ -1,16 +1,17 @@
 ---
 layout: post
 tags: [Android]
-title: "android 技巧"
+title: "android 实用技巧"
 author: wsxk
-date: 2026-03-17
+date: 2026-03-27
 comments: true
 ---
 
 - [1. 双开](#1-双开)
 
 
-## 1. 双开
+## 1. 双开<br>
+
 
 
 
