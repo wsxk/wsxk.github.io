@@ -11,6 +11,8 @@ comments: true
   - [1.1 双开原理](#11-双开原理)
   - [1.2 双开工具](#12-双开工具)
 - [2. 汉化](#2-汉化)
+  - [2.1 汉化步骤](#21-汉化步骤)
+  - [2.2 汉化工具](#22-汉化工具)
 
 
 
@@ -33,10 +35,21 @@ comments: true
 
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20260322235458.png)
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20260322235550.png)
-
+安装即可。<br>
 
 # 2. 汉化<br>
+顾名思义，将他国语言的app转为本国语言，通常**汉化包括asrc汉化、xml汉化和dex汉化**<br>
+## 2.1 汉化步骤<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20260323215230.png)
 
+## 2.2 汉化工具<br>
+
+在`np`管理器中，对提取的apk进行搜索功能，使用高级搜索，在文件中包含内容里寻找相关字符串：<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20260323210920.png)
+找到字符串位置后，修改即可。<br>
+针对看不懂的语言，可以用[开发者助手](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/%E5%BC%80%E5%8F%91%E8%80%85%E5%8A%A9%E6%89%8B.apk)来试图并修改。<br>
+用开发者助手提取字符串，然后到`np`管理器里搜索对应的文本：
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20260323214154.png)
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
