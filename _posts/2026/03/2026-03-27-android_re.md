@@ -13,6 +13,8 @@ comments: true
 - [2. 汉化](#2-汉化)
   - [2.1 汉化步骤](#21-汉化步骤)
   - [2.2 汉化工具](#22-汉化工具)
+- [3. 修改smali汇编](#3-修改smali汇编)
+  - [3.1 np管理器修改smali代码](#31-np管理器修改smali代码)
 
 
 
@@ -50,6 +52,21 @@ comments: true
 针对看不懂的语言，可以用[开发者助手](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/%E5%BC%80%E5%8F%91%E8%80%85%E5%8A%A9%E6%89%8B.apk)来试图并修改。<br>
 用开发者助手提取字符串，然后到`np`管理器里搜索对应的文本：
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20260323214154.png)
+
+
+# 3. 修改smali汇编<br>
+android应用通常运行在dalvik虚拟机/art虚拟机当中，文件格式为dex（可以类比linux的elf），汇编代码为smali（类比x86）。<br>
+修改smali汇编的关键点在于快速定位代码位置，有**搜索关键字**和**抓取按钮id**两种方法。<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20260325231732.png)
+
+## 3.1 np管理器修改smali代码<br>
+定位到位置后，np管理器可以帮助我们方便的修改smali代码<br>
+修改smali代码时有几个关键点需要注意：<br>
+**.register xx标志了v（局部寄存器）和p（参数寄存器）的总数，且p总是在v的后面**<br>
+**在smali里的所有操作都必须经过寄存器来进行:本地寄存器用v开头数字结尾的符号来表示，如v0、 v1、v2。 参数寄存器则使用p开头数字结尾的符号来表示，如p0、p1、p2。特别注意的是，p0不一定是函数中的第一个参数，在非static函数中，p0代指“this"，p1表示函数的第一个 参数，p2代表函数中的第二个参数。而在static函数中p0才对应第一个参数（因为Java的static方法中没有this方法）**<br>
+修改完后保存，np管理器就会自动帮忙重新编译并打包签名。<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20260325234151.png)
+
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
