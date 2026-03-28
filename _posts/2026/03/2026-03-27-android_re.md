@@ -72,7 +72,7 @@ android应用通常运行在dalvik虚拟机/art虚拟机当中，文件格式为
 # 4. 去广告<br>
 ## 4.1 广告类型<br>
 广告类型有**启动广告（点开qq音乐有时候会有广告跳转到京东、淘宝等等）、弹窗/更新广告（弹个窗出来）、横幅广告（插在应用中**<br>
-
+要想去除广告需要运用到anrdoid activity相关的知识。<br>
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
