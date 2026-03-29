@@ -17,6 +17,7 @@ comments: true
   - [3.1 np管理器修改smali代码](#31-np管理器修改smali代码)
 - [4. 去广告](#4-去广告)
   - [4.1 广告类型](#41-广告类型)
+  - [4.2 安卓组件](#42-安卓组件)
 
 
 
@@ -51,7 +52,7 @@ comments: true
 在`np`管理器中，对提取的apk进行搜索功能，使用高级搜索，在文件中包含内容里寻找相关字符串：<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20260323210920.png)
 找到字符串位置后，修改即可。<br>
-针对看不懂的语言，可以用[开发者助手](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/%E5%BC%80%E5%8F%91%E8%80%85%E5%8A%A9%E6%89%8B.apk)来试图并修改。<br>
+针对看不懂的语言，可以用[开发者助手](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/%E5%BC%80%E5%8F%91%E8%80%85%E5%8A%A9%E6%89%8B.apk)来识图并修改。<br>
 用开发者助手提取字符串，然后到`np`管理器里搜索对应的文本：
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20260323214154.png)
 
@@ -72,7 +73,19 @@ android应用通常运行在dalvik虚拟机/art虚拟机当中，文件格式为
 # 4. 去广告<br>
 ## 4.1 广告类型<br>
 广告类型有**启动广告（点开qq音乐有时候会有广告跳转到京东、淘宝等等）、弹窗/更新广告（弹个窗出来）、横幅广告（插在应用中**<br>
-要想去除广告需要运用到anrdoid activity相关的知识。<br>
+要想去除广告需要运用到anrdoid组件相关的知识。因为广告通常会有一个**activity组件**与其进行对应<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20260329234445.png)
+
+## 4.2 安卓组件<br>
+
+| 组件                           | 描述                                                                                                                                                                                                                                  |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Activity(活动)                 | 在应用中的一个Activity可以用来表示一个界面，意思可以理解为“活动”，即一个活动开始，代表 Activity组件启动，活动结束，代表一个Activity的生命周期结束。一个Android应用必须通过Activity来运行和启动，Activity的生命周期交给系统统一管理。 |
+| Service(服务)                  | Service它可以在后台执行长时间运行操作而没有用户界面的应用组件，不依赖任何用户界面，例如后台播放音乐，后台下载文件等。                                                                                                                 |
+| Broadcast Receiver(广播接收器) | 一个用于接收广播信息，并做出对应处理的组件。比如我们常见的系统广播：通知时区改变、电量低、用户改变了语言选项等。                                                                                                                      |
+| Content Provider(内容提供者)    |作为应用程序之间唯一的共享数据的途径，Content Provider主要的功能就是存储并检索数据以及向其他应用程序提供访问数据的接口。Android内置的许多数据都是使用Content Provider形式，供开发者调用的（如视频，音频，图片，通讯录等）                                                                                                                                                                                                                                       |
+
+
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
