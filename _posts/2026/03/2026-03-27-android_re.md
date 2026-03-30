@@ -18,6 +18,9 @@ comments: true
 - [4. 去广告](#4-去广告)
   - [4.1 广告类型](#41-广告类型)
   - [4.2 安卓组件](#42-安卓组件)
+  - [4.3 activity生命周期](#43-activity生命周期)
+  - [4.4 去广告弹窗的方法](#44-去广告弹窗的方法)
+- [references](#references)
 
 
 
@@ -85,7 +88,60 @@ android应用通常运行在dalvik虚拟机/art虚拟机当中，文件格式为
 | Broadcast Receiver(广播接收器) | 一个用于接收广播信息，并做出对应处理的组件。比如我们常见的系统广播：通知时区改变、电量低、用户改变了语言选项等。                                                                                                                      |
 | Content Provider(内容提供者)    |作为应用程序之间唯一的共享数据的途径，Content Provider主要的功能就是存储并检索数据以及向其他应用程序提供访问数据的接口。Android内置的许多数据都是使用Content Provider形式，供开发者调用的（如视频，音频，图片，通讯录等）                                                                                                                                                                                                                                       |
 
+值得一提的是，安卓的应用的可视化界面（activity）都必须在`AndroidManifest`文件中进行申明，如下所示：<br>
+```xml
+        <!---声明实现应用部分可视化界面的 Activity，必须使用 AndroidManifest 中的 <activity> 元素表示所有 Activity。系统不会识别和运行任何未进行声明的Activity。----->
+        <activity  
+            android:label="@string/app_name"  
+            android:name="com.zj.wuaipojie.ui.MainActivity"  
+            android:exported="true">  <!--当前Activity是否可以被另一个Application的组件启动：true允许被启动；false不允许被启动-->
+            <!---指明这个activity可以以什么样的意图(intent)启动--->
+            <intent-filter>  
+                <!--表示activity作为一个什么动作启动，android.intent.action.MAIN表示作为主activity启动--->
+                <action  
+                    android:name="android.intent.action.MAIN" />  
+                <!--这是action元素的额外类别信息，android.intent.category.LAUNCHER表示这个activity为当前应用程序优先级最高的Activity-->
+                <category  
+                    android:name="android.intent.category.LAUNCHER" />  
+            </intent-filter>  
+        </activity>  
+        <activity  
+            android:name="com.zj.wuaipojie.ui.ChallengeFirst" />
+        <activity  
+            android:name="com.zj.wuaipojie.ui.ChallengeFifth"  
+            android:exported="true" />  
+        <activity  
+            android:name="com.zj.wuaipojie.ui.ChallengeFourth"  
+            android:exported="true" />  
+        <activity  
+            android:name="com.zj.wuaipojie.ui.ChallengeThird"  
+            android:exported="false" />  
+        <activity  
+            android:name="com.zj.wuaipojie.ui.ChallengeSecond"  
+            android:exported="false" />  
+        <activity  
+            android:name="com.zj.wuaipojie.ui.AdActivity" />  
+```
+**广告也是activity中的一种，所以代码中一定会有加载广告activity相关的逻辑**<br>
 
+## 4.3 activity生命周期<br>
+安卓对activity组件定义了各种生命周期:<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20260330221948.png)
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20260330222016.png)
+## 4.4 去广告弹窗的方法<br>
+```
+1.xml中的versioncode ：有些弹窗根据版本是否为旧版本来弹，可以改versioncode来满足版本要求。
+
+2.Hook弹窗(推荐算法助手开启弹窗定位) 
+
+3.修改dex弹窗代码：定位到弹窗的启动代码，注释掉
+
+4.抓包修改响应体(也可以路由器拦截) : 如果广告信息是从服务器来的，可以抓包
+```
+
+# references<br>
+[https://github.com/ZJ595/AndroidReverse/](https://github.com/ZJ595/AndroidReverse/)<br>
+大佬写的真好~<br>
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
