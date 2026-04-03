@@ -20,6 +20,7 @@ comments: true
   - [4.2 安卓组件](#42-安卓组件)
   - [4.3 activity生命周期](#43-activity生命周期)
   - [4.4 去广告弹窗的方法](#44-去广告弹窗的方法)
+  - [4.5 去广告实操](#45-去广告实操)
 - [references](#references)
 
 
@@ -138,6 +139,10 @@ android应用通常运行在dalvik虚拟机/art虚拟机当中，文件格式为
 
 4.抓包修改响应体(也可以路由器拦截) : 如果广告信息是从服务器来的，可以抓包
 ```
+
+## 4.5 去广告实操<br>
+
+
 
 # references<br>
 [https://github.com/ZJ595/AndroidReverse/](https://github.com/ZJ595/AndroidReverse/)<br>
