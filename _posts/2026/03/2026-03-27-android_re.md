@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [Android]
-title: "android 应用tips"
+title: "android 应用tips: 1"
 author: wsxk
 date: 2026-03-27
 comments: true
@@ -21,6 +21,7 @@ comments: true
   - [4.3 activity生命周期](#43-activity生命周期)
   - [4.4 去广告弹窗的方法](#44-去广告弹窗的方法)
   - [4.5 去广告实操](#45-去广告实操)
+    - [4.5.1 插曲：横幅广告](#451-插曲横幅广告)
 - [references](#references)
 
 
@@ -131,19 +132,34 @@ android应用通常运行在dalvik虚拟机/art虚拟机当中，文件格式为
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20260330222016.png)
 ## 4.4 去广告弹窗的方法<br>
 ```
-1.xml中的versioncode ：有些弹窗根据版本是否为旧版本来弹，可以改versioncode来满足版本要求。
+1.xml中的versioncode ：有些弹窗根据版本是否为旧版本来弹，可以改versioncode来满足版本要求。(不推荐)
 
 2.Hook弹窗(推荐算法助手开启弹窗定位) 
 
-3.修改dex弹窗代码：定位到弹窗的启动代码，注释掉
+3.修改dex弹窗代码：定位到弹窗的启动代码，注释掉（推荐good）
 
 4.抓包修改响应体(也可以路由器拦截) : 如果广告信息是从服务器来的，可以抓包
 ```
 
 ## 4.5 去广告实操<br>
 
+tips: 定位启动广告 可以用`np管理器`中的`activity 记录`功能。<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20260405210328.png)
 
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20260405210458.png)
+找到`AdActivity`类分析其广告逻辑，使用上文学到的smali修改能力即可完成修改。<br>
+其他的逻辑都大差不差，把广告的代码注释掉即可。<br>
 
+### 4.5.1 插曲：横幅广告<br>
+横幅广告往往不是用`activity`来启动的，[开发助手](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/%E5%BC%80%E5%8F%91%E5%8A%A9%E6%89%8B%20v6.4.3%20.apk)和开发者助手均可以截取页面布局。可以两个工具换着用，哪个能截取到页面用哪个（<br>
+截取到页面后，获取资源id，索引到对应的资源名称，找到资源布局xml文件:<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20260405231007.png)
+修改方法:<br>
+```
+1. 宽度和高度均改为0dp
+
+2. 添加一行android:visibility="gone"
+```
 # references<br>
 [https://github.com/ZJ595/AndroidReverse/](https://github.com/ZJ595/AndroidReverse/)<br>
 大佬写的真好~<br>
