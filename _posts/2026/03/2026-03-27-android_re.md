@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [Android]
-title: "android 应用tips: 1"
+title: "android 应用tips1: 双开&汉化&smali修改&去广告"
 author: wsxk
 date: 2026-03-27
 comments: true
