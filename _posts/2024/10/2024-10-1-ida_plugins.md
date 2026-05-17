@@ -17,6 +17,8 @@ comments: true
   - [2.4 auto-re](#24-auto-re)
   - [2.5 Gepetto](#25-gepetto)
   - [2.6 IDA-MCP](#26-ida-mcp)
+  - [2.7 hrtng](#27-hrtng)
+  - [2.8 d810-ng](#28-d810-ng)
 
 
 <!-- Google tag (gtag.js) -->
@@ -67,3 +69,12 @@ auto-re主要的功能是根据内部调用的api来为这个函数命名，比�
 
 ### 2.6 IDA-MCP<br>
 [https://wsxk.github.io/ida_mcp/?query=IDA](https://wsxk.github.io/ida_mcp/?query=IDA)<br>
+
+
+### 2.7 hrtng<br>
+[https://github.com/KasperskyLab/hrtng](https://github.com/KasperskyLab/hrtng)<br>
+
+### 2.8 d810-ng<br>
+据说是下一代去混淆插件。<br>
+[https://github.com/w00tzenheimer/d810-ng](https://github.com/w00tzenheimer/d810-ng)<br>
+
