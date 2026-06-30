@@ -45,6 +45,44 @@ void vfree(const void *addr);
 
 # 2. 内核保护机制查询<br>
 linux kernel集成了许多安全机制，查看了解当前kernel的安全机制非常重要，这告诉我们要绕过哪些防御。<br>
+`cat /proc/cmdline`命令能够查看内核启动时是否有设置一些安全机制:<br>
+```
+cat /proc/cmdline 
+rw rootfstype=9p rootflags=trans=virtio console=ttyS0 init=/opt/pwn.college/vm/init PATH=/run/challenge/bin:/run/dojo/bin:/root/.cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+```
+
+`cat /proc/cpuinfo`可以查看cpu有没有开启`smep/smap`<br>
+```
+cat /proc/cpuinfo 
+processor       : 0
+vendor_id       : AuthenticAMD
+cpu family      : 6
+model           : 6
+model name      : QEMU Virtual CPU version 2.5+
+stepping        : 3
+cpu MHz         : 2500.037
+cache size      : 512 KB
+physical id     : 0
+siblings        : 1
+core id         : 0
+cpu cores       : 1
+apicid          : 0
+initial apicid  : 0
+fpu             : yes
+fpu_exception   : yes
+cpuid level     : 13
+wp              : yes
+flags           : fpu de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 syscall nx lm nopl cpuid pni cx16 hypervisor lahf_lm svm 3dnowprefetch vmmcall smep smap
+bugs            : fxsave_leak sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass
+bogomips        : 5000.07
+TLB size        : 1024 4K pages
+clflush size    : 64
+cache_alignment : 64
+address sizes   : 40 bits physical, 48 bits virtual
+power management:
+```
+
+使用`dmesg | grep -iE 'kaslr|kpti|pti|isolation|smep|smap|Kernel Offset'`查看内核启动过程中是否添加了保护。<br>
 
 
 # 3. 内核堆漏洞<br>
