@@ -17,7 +17,9 @@ PS： 章节承接[https://wsxk.github.io/kernel_heap2/](https://wsxk.github.io/
 攻击条件: 可以任意读写某个 kernel slab的内容。可以多次分配/释放内存<br> 
 漏洞：某个kernel slab的 `uaf` `double free`<br>
 泄露地址:<br>
-
+```
+uaf 先读取 kernel heap地址
+```
 
 
 
