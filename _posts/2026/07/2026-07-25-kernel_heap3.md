@@ -18,7 +18,7 @@ PS： 章节承接[https://wsxk.github.io/kernel_heap2/](https://wsxk.github.io/
 漏洞：某个kernel slab的 `uaf` `double free`<br>
 泄露地址:<br>
 ```
-uaf 先读取 kernel heap地址
+
 ```
 
 
