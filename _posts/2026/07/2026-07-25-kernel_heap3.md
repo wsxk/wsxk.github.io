@@ -9,6 +9,10 @@ comments: true
 
 
 - [5.3  kaslr + randomized freelist](#53--kaslr--randomized-freelist)
+- [5.4](#54)
+- [5.5](#55)
+- [5.6](#56)
+- [5.7](#57)
 
 
 PS： 章节承接[https://wsxk.github.io/kernel_heap2/](https://wsxk.github.io/kernel_heap2/)<br>
@@ -21,6 +25,14 @@ PS： 章节承接[https://wsxk.github.io/kernel_heap2/](https://wsxk.github.io/
 1、 通过kernel crash获取kernel基址信息。
 ```
 
+## 5.4<br>
+
+## 5.5<br>
+
+
+## 5.6<br>
+
+## 5.7<br>
 
 
 
