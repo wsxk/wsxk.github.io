@@ -23,6 +23,9 @@ PS： 章节承接[https://wsxk.github.io/kernel_heap2/](https://wsxk.github.io/
 泄露地址:<br>
 ```
 1、 通过kernel crash获取kernel基址信息。
+因为有uaf，其实相当于我们可以随便改slab freelist的next_ptr地址。
+1、uaf修改next_ptr为非法地址
+2、申请到该非法地址，并尝试写入内容
 ```
 
 ## 5.4<br>
