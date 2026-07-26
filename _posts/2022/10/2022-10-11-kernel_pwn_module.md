@@ -14,7 +14,7 @@ comments: true
 
 
 
-PS:更新与`2024-11-11`<br>
+PS:更新与`2026-07-26`<br>
 
 ## 1. 常用字节码<br>
 
@@ -105,8 +105,6 @@ void environ_set(void){
     system("chmod +x /home/hacker/kernel_exploitation/dummy");
     //exit(0);
 }
-
-
 void get_flag(void){
     puts("[*] Run unknown file");
     system("cat /proc/sys/kernel/modprobe");
