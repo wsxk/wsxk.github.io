@@ -46,7 +46,7 @@ oops脚本:<br>
     printf("step4\n");
     int fd3 = open_device();
 ```
-第二步，根据泄露的地址进行漏洞利用，利用方法为改modprobe的路径。<br>
+第二步，根据泄露的地址进行漏洞利用，利用方法为改`modprobe_path`的路径。<br>
 
 
 ## 5.4<br>
