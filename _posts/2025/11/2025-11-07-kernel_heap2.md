@@ -151,6 +151,16 @@ modprobe_path可以利用的原因如下:<br>
 
 
 ***换句话说，如果我们有任意地址写的原语，那么可以将`modprobe_path`修改为我们想要执行的文件的路径，随后执行一下未知文件头的文件，即可完成以内核身份执行`modprobe_path`所指向的文件***<br>
+注意，修改`modprobe_path`周边有危险变量，不能随意更改:<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2026-4-26/20260729205724.png)**kmod_concurrent_max：modprobe并发信号量，其定义如下**<br>
+```c
+struct semaphore {
+    raw_spinlock_t lock; //锁
+    unsigned int count; //最多可同时运行的modprobe请求数量
+    struct list_head wait_list;
+};
+```
+这个变量被修改可能导致`modprobe`执行失败！<br>
 
 ### 5.2.1 Oops泄露内核地址+UAF修改next_ptr实现任意地址分配修改modprobe_path<br>
 前提: 开启kaslr，存在UAF漏洞。kheap中存在函数地址，可执行一次该地址的调用，且rdi寄存器是一个指针（不可改变），指向的内存区域可控。<br>
