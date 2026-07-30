@@ -84,6 +84,18 @@ oops脚本:<br>
 这里有一个坑点，需要注意`modprobe_path`+0x100的位置为`kmod_concurrent_max`,这个结构体不能随意修改。<br>
 
 ## 5.4 kaslr + randomized freelist + HARDENED freelist<br>
+攻击条件: 可以任意读写某个 kernel slab的内容。可以多次分配/释放内存<br> 
+漏洞：某个kernel slab的 `uaf` `double free`<br>
+泄露地址:<br>
+加了`HARDENED freelist`机制后，之前篡改`next_ptr`会导致kernel panic。暂且不知道理由为何<br>
+```
+1、 通过kernel crash获取kernel基址信息。（这里需要先获取 s->random ^ swab(ptr_addr) ）的值，可以通过分配完一个slab中的所有slot，再释放slot a，这样a实际下一个堆块为null，所以a->free_list = s->random ^ swab(ptr_addr)
+因为有uaf，其实相当于我们可以随便改slab freelist的next_ptr地址。
+2、uaf修改next_ptr为非法地址
+3、申请到该非法地址，触发oops
+```
+
+
 
 ## 5.5<br>
 
