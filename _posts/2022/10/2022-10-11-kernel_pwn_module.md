@@ -26,6 +26,7 @@ PS:更新与`2026-07-26`<br>
 ```c
 // gcc -fcf-protection=none -masm=intel -static xxx.c -o xxx
 #include <sys/types.h>
+#include <sys/wait.h> // waitpid
 #include <stdio.h>
 #include <linux/userfaultfd.h>
 #include <pthread.h>
