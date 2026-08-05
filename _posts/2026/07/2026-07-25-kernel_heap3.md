@@ -171,8 +171,11 @@ int main(){
 
 
 ## 5.5 kaslr + randomized freelist + HARDENED freelist + 不具备读能力<br>
-攻击条件: 可以任意写某个 kernel slab的内容。可以多次分配/释放内存<br> 
-漏洞：某个kernel slab的 `uaf` `double free`<br>
+攻击条件: 可以任意写一个 kernel slot（并非ko自己调用`kmem_cache_alloc`申请的`kmem_cache`，而是**`kmalloc_trace(kmalloc_caches[51], 4197568, 464);`申请**）的内容。可以多次分配/释放内存<br> 
+漏洞：某个kernel slot的 `uaf` `double free`<br>
+这里的目标不是提权，而是获取flag，flag会放入由另一个`kmalloc_trace(kmalloc_caches[51], 4197568, 464);`申请的slot中，不可读。<br>
+这里的目标是设法获取kernel中该slot的内容。<br>
+这就要提到[kernel heap 利用技巧: msg_msg和pipe_buffer](https://wsxk.github.io/kernel_heap_tech/)里的`msg`结构体了。<br>
 
 
 ## 5.6<br>
