@@ -106,3 +106,5 @@ comments: true
 
 ## Total Training Process<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2023-7-6/MachineLearning.jpg)
+`2026-8-6`，查看ai生成的详细图:<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2026-4-26/20260806233606.png)
