@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [kernel_pwn]
-title: "kernel heap 2: 内核堆利用技巧综述"
+title: "kernel heap 2: 内核堆利用技巧 1"
 author: wsxk
 date: 2025-11-07
 comments: true

