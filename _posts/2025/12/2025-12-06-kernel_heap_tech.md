@@ -112,6 +112,7 @@ int main(){
 首先看内核中`msg_msg`对象的定义:<br>
 ```c
 /* one msg_msg structure for each message */
+// 每个消息的头，最多可容纳0x1000-0x30 = 0xfd0个用户数据
 struct msg_msg {
 	struct list_head m_list;
 	long m_type;
@@ -123,7 +124,15 @@ struct msg_msg {
 
 //m_list contains pointers to messages in the message queue 
 //m_ts determines this size of the message text
+
+// 消息段，最多可容纳0x1000-0x08 = 0xff8个用户数据，利用时，因为msg_msg的字段太多，因此大多数利用都是依靠msg_msgseg来实现
+struct msg_msgseg {
+    struct msg_msgseg *next;   // 0x00
+    char data[];               // 0x08
+};
 ```
+
+
 
 我们接下来看一下msg_msg是如何分配的：<br>
 ```c
