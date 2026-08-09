@@ -10,8 +10,8 @@ comments: true
 
 - [5.3  kaslr + randomized freelist](#53--kaslr--randomized-freelist)
 - [5.4 kaslr + randomized freelist + HARDENED freelist](#54-kaslr--randomized-freelist--hardened-freelist)
-- [5.5 kaslr + randomized freelist + HARDENED freelist + 不具备读能力](#55-kaslr--randomized-freelist--hardened-freelist--不具备读能力)
-- [5.6](#56)
+- [5.5 kaslr + randomized freelist + HARDENED freelist + 不具备读能力：读取flag](#55-kaslr--randomized-freelist--hardened-freelist--不具备读能力读取flag)
+- [5.6 kaslr + randomized freelist + HARDENED freelist + 不具备读能力：提权](#56-kaslr--randomized-freelist--hardened-freelist--不具备读能力提权)
 - [5.7](#57)
 
 
@@ -171,10 +171,11 @@ int main(){
 ```
 
 
-## 5.5 kaslr + randomized freelist + HARDENED freelist + 不具备读能力<br>
-攻击条件: 可以任意写一个 kernel slot（并非ko自己调用`kmem_cache_alloc`申请的`kmem_cache`，而是**`kmalloc_trace(kmalloc_caches[51], 4197568, 464);`申请**）的内容。可以多次分配/释放内存<br> 
+## 5.5 kaslr + randomized freelist + HARDENED freelist + 不具备读能力：读取flag<br>
+攻击条件: 可以任意写一个 kernel slot（并非ko自己调用`kmem_cache_alloc`申请的`kmem_cache`，而是 **`kmalloc_trace(kmalloc_caches[51], 4197568, 464);`申请**）的内容。可以多次分配/释放内存<br> 
 漏洞：某个kernel slot的 `uaf` `double free`<br>
 这里的目标不是提权，而是获取flag，flag会放入由另一个`kmalloc_trace(kmalloc_caches[51], 4197568, 464);`申请的slot中，不可读。<br>
+`kmalloc_trace(kmalloc_caches[51], 4197568, 464);`为在linux自带的kmem_cache中申请的内存。<br>
 这里的目标是设法获取kernel中该slot的内容。<br>
 这就要提到[kernel heap 利用技巧: msg_msg和pipe_buffer](https://wsxk.github.io/kernel_heap_tech/)里的`msg`结构体了。<br>
 ```c
@@ -220,7 +221,14 @@ int main(){
 
 
 
-## 5.6<br>
+## 5.6 kaslr + randomized freelist + HARDENED freelist + 不具备读能力：提权<br>
+攻击条件: 可以写一个 kernel slot（并非ko自己调用`kmem_cache_alloc`申请的`kmem_cache`，而是 **`kmalloc_trace(kmalloc_caches[51], 4197568, 464);`申请**）的内容。可以多次分配/释放内存<br> 
+漏洞：某个kernel slot的 `uaf` `double free`<br>
+这里的目标是提权。<br>
+`kmalloc_trace(kmalloc_caches[51], 4197568, 464);`为在linux自带的kmem_cache中申请的内存。<br>
+因为要提权，第一步还是要想办法获得kernel的地址信息.<br>
+
+
 
 ## 5.7<br>
 
