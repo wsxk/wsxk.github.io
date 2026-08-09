@@ -103,8 +103,10 @@ uaf无需多说了。
 触发Oops后的情景如下:<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2025-9-25/20251023001013.png)
 `R10的值ffffffff82a58c20为内核地址段，R12的值0xffff8880043a7000为物理映射区域，但是实际上，它会指向kernel的heap基址！`<br>
-
-
+**前提条件: panic_on_oops=0**<br>
+```
+cat /proc/sys/kernel/panic_on_oops
+```
 
 
 # 5. 内核堆利用技巧<br>
