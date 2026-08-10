@@ -166,17 +166,70 @@ struct msg_msg *copy_msg(struct msg_msg *src, struct msg_msg *dst) {
 # 2. pipe_buffer<br>
 ## 2.1 pipe_buffer 常见用法<br>
 `pipe_buffer`也是内核IPC通信的方法之一，通过管道`pipe`来进行通信；<br>
+在用户态创建`pipe`后，内核就会维护`pipe_buffer`<br>
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+int main(void)
+{
+    int pipe_fd[2];
+    const char message[] = "hello from pipe_buffer";
+    char buffer[128] = {0};
+    size_t message_len = strlen(message);
+    ssize_t written;
+    ssize_t received;
+
+    /* pipe_fd[0] is the read end; pipe_fd[1] is the write end. */
+    if (pipe(pipe_fd) == -1) {
+        perror("pipe");
+        return EXIT_FAILURE;
+    }
+
+    written = write(pipe_fd[1], message, message_len);
+    if (written == -1) {
+        perror("write");
+        close(pipe_fd[0]);
+        close(pipe_fd[1]);
+        return EXIT_FAILURE;
+    }
+
+    /* No more data will be written. A later read can therefore see EOF. */
+    close(pipe_fd[1]);
+
+    received = read(pipe_fd[0], buffer, sizeof(buffer) - 1);
+    if (received == -1) {
+        perror("read");
+        close(pipe_fd[0]);
+        return EXIT_FAILURE;
+    }
+
+    buffer[received] = '\0';
+    printf("write: %zd bytes\n", written);
+    printf("read:  %zd bytes\n", received);
+    printf("data:  %s\n", buffer);
+
+    close(pipe_fd[0]);
+    return EXIT_SUCCESS;
+}
+
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2026-4-26/20260810212403.png)
 
 ## 2.2 为什么要介绍pipe_buffer?<br>
 pipe_buffer的定义如下:<br>
 ```c
 struct pipe_buffer {
-	struct page *page;
-	unsigned int offset, len;
-	const struct pipe_buf_operations *ops;//包含函数指针，越界写即可完成控制流劫持！
-	unsigned int flags;
-	unsigned long private;
-};
+    /* 0x00 */ struct page *page;
+    /* 0x08 */ unsigned int offset;
+    /* 0x0c */ unsigned int len;
+    /* 0x10 */ const struct pipe_buf_operations *ops;
+    /* 0x18 */ unsigned int flags;
+    /* 0x1c */ unsigned int padding;
+    /* 0x20 */ unsigned long private;
+}; /* sizeof = 0x28 */
 ```
 
 # 3. 具体案例<br>
