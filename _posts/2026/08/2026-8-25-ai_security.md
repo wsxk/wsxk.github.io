@@ -17,8 +17,11 @@ comments: true
 btw,llm辅助二进制逆向挖洞这个方向已经被pass掉了（还无法完整分析大型程序）<br>
 
 # 前期调研<br>
+[https://github.com/purpleroc/llm_code_audit/blob/main/llm-code-audit-report.md](https://github.com/purpleroc/llm_code_audit/blob/main/llm-code-audit-report.md)<br>
+这篇文档，虽然是chatgpt写的，但是实际上某种程度上也说明了当前llm辅助源码的探究方向。<br>
 
-
+[https://x.com/sujingshen/article/2048278721107530231](https://x.com/sujingshen/article/2048278721107530231)<br>
+这篇文章里提到当前AI系统
 
 
 
