@@ -10,6 +10,7 @@ comments: true
 - [写在前面](#写在前面)
 - [前期调研](#前期调研)
   - [评测标准调研](#评测标准调研)
+- [1. LLM源码审计](#1-llm源码审计)
 
 
 # 写在前面<br>
@@ -27,6 +28,13 @@ btw,llm辅助二进制逆向挖洞这个方向已经被pass掉了（还无法完
 当前流行的agentic模式，是让AI根据需要读代码，也只能沿着搜索路径走，无法系统性遍历整个代码库。<br>
 
 ## 评测标准调研<br>
+
+[https://github.com/scaleapi/SWE-bench_Pro-os](https://github.com/scaleapi/SWE-bench_Pro-os)<br>
+似乎看起来是有点不错的benchmark<br>
+
+
+# 1. LLM源码审计<br>
+目前看下来，`LLM源码审计`中可以用到的技术有： `RAG与知识库`，`代码检索mcp工具`、`静态分析工具`、`动态验证技术`四种。<br>
 
 
 
