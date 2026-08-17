@@ -48,7 +48,7 @@ btw,llm辅助二进制逆向挖洞这个方向已经被pass掉了（还无法完
 
 
 ## 1.3 动态验证技术<br>
-容器<br>
+容器、或者给agent提供一个可运行验证的环境+skill（使用方法）+mcp（使用工具）即可<br>
 
 ## 1.4 RAG与知识库<br>
 [https://github.com/nashsu/llm_wiki](https://github.com/nashsu/llm_wiki)<br>
