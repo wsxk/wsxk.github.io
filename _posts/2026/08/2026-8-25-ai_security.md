@@ -12,6 +12,8 @@ comments: true
   - [评测标准调研](#评测标准调研)
 - [1. LLM源码审计](#1-llm源码审计)
   - [1.1 静态分析工具](#11-静态分析工具)
+  - [1.2 代码检索mcp工具](#12-代码检索mcp工具)
+  - [1.3 动态验证技术](#13-动态验证技术)
 
 
 # 写在前面<br>
@@ -38,7 +40,14 @@ btw,llm辅助二进制逆向挖洞这个方向已经被pass掉了（还无法完
 目前看下来，`LLM源码审计`中可以用到的技术有： `RAG与知识库`，`代码检索mcp工具`、`静态分析工具`、`动态验证技术`四种。<br>
 ## 1.1 静态分析工具<br>
 
+[https://github.com/opengrep/opengrep](https://github.com/opengrep/opengrep)<br>
 
+## 1.2 代码检索mcp工具<br>
+[https://github.com/colbymchenry/codegraph](https://github.com/colbymchenry/codegraph)<br>
+
+
+## 1.3 动态验证技术<br>
+容器<br>
 
 
 
