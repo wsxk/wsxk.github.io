@@ -14,6 +14,7 @@ comments: true
   - [1.1 静态分析工具](#11-静态分析工具)
   - [1.2 代码检索mcp工具](#12-代码检索mcp工具)
   - [1.3 动态验证技术](#13-动态验证技术)
+  - [1.4 RAG与知识库](#14-rag与知识库)
 
 
 # 写在前面<br>
@@ -49,6 +50,8 @@ btw,llm辅助二进制逆向挖洞这个方向已经被pass掉了（还无法完
 ## 1.3 动态验证技术<br>
 容器<br>
 
+## 1.4 RAG与知识库<br>
+[https://github.com/nashsu/llm_wiki](https://github.com/nashsu/llm_wiki)<br>
 
 
 
