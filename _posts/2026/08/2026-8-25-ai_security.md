@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [AI]
-title: "LLM 源码审计 研究"
+title: "LLM 源码审计 现状分析"
 author: wsxk
 date: 2026-08-25
 comments: true
@@ -15,6 +15,7 @@ comments: true
   - [1.2 代码检索mcp工具](#12-代码检索mcp工具)
   - [1.3 动态验证技术](#13-动态验证技术)
   - [1.4 RAG与知识库](#14-rag与知识库)
+  - [1.5 现状分析](#15-现状分析)
 
 
 # 写在前面<br>
@@ -56,7 +57,9 @@ btw,llm辅助二进制逆向挖洞这个方向已经被pass掉了（还无法完
 [https://github.com/nashsu/llm_wiki](https://github.com/nashsu/llm_wiki)<br>
 
 
-
+## 1.5 现状分析<br>
+其实当前辅助LLM进行漏洞挖掘的技术有很多，但是每个都很难说能够实际意义上可以被观测到，对源码挖掘有帮助。<br>
+最有效的应该是动态验证，能直接发现问题并复现，看到现象是最好的，但是并不是每个问题都能被复现。<br>
 
 
 <!-- Google tag (gtag.js) -->
