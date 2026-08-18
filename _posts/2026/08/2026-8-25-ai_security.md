@@ -39,6 +39,8 @@ btw,llm辅助二进制逆向挖洞这个方向已经被pass掉了（还无法完
 
 # 1. LLM源码审计<br>
 目前看下来，`LLM源码审计`中可以用到的技术有： `RAG与知识库`，`代码检索mcp工具`、`静态分析工具`、`动态验证技术`四种。<br>
+值得一提的是，目前还没有一个统一的分析，说明这些技术使用后能够让模型识别源码问题的效率更高，精度更准。<br>
+
 ## 1.1 静态分析工具<br>
 
 [https://github.com/opengrep/opengrep](https://github.com/opengrep/opengrep)<br>
