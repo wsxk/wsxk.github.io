@@ -90,7 +90,7 @@ qemu-system-x86_64 \
 
 4. Supervisor Mode Access Prevention (SMAP) ：进入内核态后，将页表中所有用户态相关的页设置为不可读写。通过标记CR4寄存器的第21个bit来使能。 -cpu选项添加 +smap可开启， -append 添加 nosmap关闭
 
-5.Kernel page-table isolation (KPTI)： 这个功能启动后，内核会将用户页表和内核页表完全分离。内核页表保留了用户态和内核态的地址空间，但只在内核态使用。 用户页表只保留用户态地址和最少的内核空间地址。 -append中添加 kpti=1开启， nopti关闭。
+5.Kernel page-table isolation (KPTI)： 这个功能启动后，内核会将用户页表和内核页表完全分离。内核页表保留了用户态和内核态的地址空间，但只在内核态使用。 用户页表只保留用户态地址和最少的内核空间地址。 -append中添加 kpti=1开启， nopti关闭。但是kpti开启后会导致内核态用户地址映射空间被标记为不可执行。
 ```
 
 
