@@ -8,7 +8,8 @@ comments: true
 ---
 
 - [例题: hxp 2020 kernel-rop](#例题-hxp-2020-kernel-rop)
-- [4. ret2usr](#4-ret2usr)
+- [4. ret2usr：只有canary机制](#4-ret2usr只有canary机制)
+- [5.](#5)
 
 
 # 例题: hxp 2020 kernel-rop<br>
@@ -18,7 +19,7 @@ comments: true
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2026-4-26/20260822203851.png)
 还有一个栈溢出读。<br>
 
-# 4. ret2usr<br>
+# 4. ret2usr：只有canary机制<br>
 本质是劫持内核控制流，使其跳转到用户态的函数并执行。<br>
 正如[https://wsxk.github.io/kernel_stack1/](https://wsxk.github.io/kernel_stack1/)提到的，要想使用ret2usr技术，需要关闭`smep、smap、kpti`3个机制的保护才行。<br>
 ```sh
@@ -249,10 +250,10 @@ int main(){
     tmp_buf[19] = 0;
     tmp_buf[20] = (unsigned long )escalate_privs;
     write(fd,tmp_buf,size+8);
-
 }
 ```
 
+# 5. 
 
 
 
