@@ -8,8 +8,9 @@ comments: true
 ---
 
 - [例题: hxp 2020 kernel-rop](#例题-hxp-2020-kernel-rop)
-- [4. ret2usr：只有canary机制](#4-ret2usr只有canary机制)
-- [5.](#5)
+- [4. canary：ret2usr](#4-canaryret2usr)
+- [5. canary+smep：ROP](#5-canarysmeprop)
+  - [5.1 smep的原理](#51-smep的原理)
 
 
 # 例题: hxp 2020 kernel-rop<br>
@@ -19,7 +20,7 @@ comments: true
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2026-4-26/20260822203851.png)
 还有一个栈溢出读。<br>
 
-# 4. ret2usr：只有canary机制<br>
+# 4. canary：ret2usr<br>
 本质是劫持内核控制流，使其跳转到用户态的函数并执行。<br>
 正如[https://wsxk.github.io/kernel_stack1/](https://wsxk.github.io/kernel_stack1/)提到的，要想使用ret2usr技术，需要关闭`smep、smap、kpti`3个机制的保护才行。<br>
 ```sh
@@ -253,7 +254,18 @@ int main(){
 }
 ```
 
-# 5. 
+# 5. canary+smep：ROP<br>
+## 5.1 smep的原理<br>
+`smep`，本质上是内核提供的一种特性，**在内核态时，无法执行用户态页表中的代码**<br>
+可以通过设置内核的`CR(control register)4寄存器的第20位bit为1`来启动该特性。<br>
+内核态是可以自由控制CR4寄存器的值的，所以能够劫持内核态的控制流，理论上就能关闭smep<br>
+内核其实提供了修改CR4寄存器的函数`native_write_cr4(value)`<br>
+```bash
+cat /proc/kallsyms | grep native_write_cr4
+ffffffff814443e0 T native_write_cr4
+```
+而cr4寄存器的具体值，其实可以通过`kernel panic`或者gdb调试给出。（一般情况下该值不会发生变化）<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2026-4-26/20260824235043.png)
 
 
 
