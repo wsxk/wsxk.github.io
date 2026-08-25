@@ -11,7 +11,8 @@ comments: true
 - [4. canary：ret2usr](#4-canaryret2usr)
 - [5. canary+smep：ROP](#5-canarysmeprop)
   - [5.1 smep的原理](#51-smep的原理)
-  - [5.2 ROP + native\_write\_cr4(已失效)](#52-rop--native_write_cr4已失效)
+  - [5.2 ROP + native\_write\_cr4 + ret2usr(已失效)](#52-rop--native_write_cr4--ret2usr已失效)
+  - [5.3 ROP提权](#53-rop提权)
 
 
 # 例题: hxp 2020 kernel-rop<br>
@@ -284,7 +285,7 @@ qemu-system-x86_64 \
     -s
 ```
 
-## 5.2 ROP + native_write_cr4(已失效)<br>
+## 5.2 ROP + native_write_cr4 + ret2usr(已失效)<br>
 第一个尝试的绕过方法是 rop调用`native_write_cr4`函数，改cr4寄存器的值。<br>
 主要差异体现在如下代码:<br>
 ```c
@@ -337,7 +338,7 @@ set_register:
 ```
 所以直接调用`native_write_cr4`的方法已经失效了。<br>
 
-
+## 5.3 ROP提权<br>
 
 
 <!-- Google tag (gtag.js) -->
