@@ -340,7 +340,20 @@ set_register:
 
 ## 5.3 ROP提权<br>
 虽然直接调用`native_write_cr4函数`的方法已经失效，直接用ROP方式调用提权函数还是可行的。<br>
-
+ROP思路如下:<br>
+```
+1. pop rdi, ret # rdi设置为0
+2. prepare_kernel_cred 
+3. mov rdi, rax 
+4. commit_cred
+5. swapgs
+6. iretq
+rip # get root的函数
+cs
+rflags
+sp
+ss
+```
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
