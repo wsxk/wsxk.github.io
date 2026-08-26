@@ -339,6 +339,7 @@ set_register:
 所以直接调用`native_write_cr4`的方法已经失效了。<br>
 
 ## 5.3 ROP提权<br>
+虽然直接调用`native_write_cr4函数`的方法已经失效，直接用ROP方式调用提权函数还是可行的。<br>
 
 
 <!-- Google tag (gtag.js) -->
