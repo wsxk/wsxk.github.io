@@ -354,6 +354,8 @@ rflags
 sp
 ss
 ```
+ROP的逻辑是很简单的，但是实际上很难找到能用的gadget完成利用<br>
+
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
