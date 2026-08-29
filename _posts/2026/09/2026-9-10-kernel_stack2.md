@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [kernel_pwn]
-title: "kernel stack 2: ret2usr"
+title: "kernel stack 2: ret2usr & ROP"
 author: wsxk
 date: 2026-9-10
 comments: true
@@ -375,6 +375,10 @@ ROP的逻辑是很简单的，但是实际上很难找到能用的gadget完成�
 很可惜的是**push rax; pop rdi; ret**所在位置为不可执行的page中，所以执行报错。<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2026-4-26/20260829003025.png)
 `ROPgadget`在搜索gadget的时候并不会考虑gadget是否位于可执行的page中，所以这是个麻烦。<br>
+为了去除这个问题，可以使用`ROPgadget`的`--range`参数，只搜索具有可执行的text段的gadget。<br>
+```bash
+ROPgadget --binary vmlinux --range 0xffffffff81000000-0xffffffff81be8000 > gadgets.txt
+```
 
 
 <!-- Google tag (gtag.js) -->
