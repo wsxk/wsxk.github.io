@@ -15,6 +15,8 @@ comments: true
   - [5.3 ROP提权](#53-rop提权)
     - [5.3.1 错误的尝试：gadget在不可执行的page中](#531-错误的尝试gadget在不可执行的page中)
     - [5.3.2 正确的努力：先设置状态寄存器以达成目标](#532-正确的努力先设置状态寄存器以达成目标)
+  - [5.4 STACK PIVOT+ROP](#54-stack-pivotrop)
+- [references](#references)
 
 
 # 例题: hxp 2020 kernel-rop<br>
@@ -429,7 +431,20 @@ int main(){
     write(fd,tmp_buf,size);   
 }
 ```
+## 5.4 STACK PIVOT+ROP<br>
+`STACK PIVOT`技术相信大家都知道，不过多赘叙，这项技术用于更苛刻的利用场景：**假设你只能栈溢出覆盖函数的返回地址**<br>
+这种场景直接在kernel stack构建ROP就变得不现实，栈迁移技术非常适合此场景.而且内核栈迁移，相对于用户态栈偏移简直不要容易太多，核心原因还是因为内核程序太大了，gadgets有很多，可以找修改`esp/rsp`寄存器本身的gadget<br>
+```shell
+cat gadgets.txt | grep -E 'mov rsp.*0 ;'  # 该题目中没找到
+cat gadgets.txt | grep -E 'mov esp.*0 ;'  # 能找到且很多
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2026-4-26/20260830233524.png)
+**只要修改了`esp`寄存器，我们只要在用户态通过mmap申请一块地址为0x5b000000的内存，设置可读可写标志即可**<br>
+这里想必大家有个疑惑:<br>
 
+
+# references<br>
+[https://lkmidas.github.io/posts/20210128-linux-kernel-pwn-part-2/](https://lkmidas.github.io/posts/20210128-linux-kernel-pwn-part-2/)<br>
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
