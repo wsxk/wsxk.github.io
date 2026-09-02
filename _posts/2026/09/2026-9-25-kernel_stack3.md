@@ -15,6 +15,8 @@ comments: true
 - [7. canary+smep+kpti+smap: ROP](#7-canarysmepkptismap-rop)
   - [7.1 SMAP原理](#71-smap原理)
   - [7.2 KPTI trampoline + ROP](#72-kpti-trampoline--rop)
+- [8. canary+smep+kpti+smap+kaslr: ROP](#8-canarysmepkptismapkaslr-rop)
+  - [8.1 kaslr和fg-kaslr](#81-kaslr和fg-kaslr)
 - [references](#references)
 
 
@@ -300,6 +302,9 @@ int main(){
 }
 ```
 但是原本更复杂场景，栈迁移的技术就不可用了。<br>
+
+# 8. canary+smep+kpti+smap+kaslr: ROP<br>
+## 8.1 kaslr和fg-kaslr<br>
 
 
 
