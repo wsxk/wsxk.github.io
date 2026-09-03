@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [kernel_pwn]
-title: "kernel stack 3: canary+smep+kpti绕过"
+title: "kernel stack 3: canary+smep+kpti+fg-kaslr绕过"
 author: wsxk
 date: 2026-9-25
 comments: true
@@ -15,8 +15,9 @@ comments: true
 - [7. canary+smep+kpti+smap: ROP](#7-canarysmepkptismap-rop)
   - [7.1 SMAP原理](#71-smap原理)
   - [7.2 KPTI trampoline + ROP](#72-kpti-trampoline--rop)
-- [8. canary+smep+kpti+smap+kaslr: ROP](#8-canarysmepkptismapkaslr-rop)
+- [8. canary+smep+kpti+smap+fg-kaslr: ROP](#8-canarysmepkptismapfg-kaslr-rop)
   - [8.1 kaslr和fg-kaslr](#81-kaslr和fg-kaslr)
+  - [8.2 多次trampoline+ROP](#82-多次trampolinerop)
 - [references](#references)
 
 
@@ -259,7 +260,6 @@ qemu-system-x86_64 \
 ## 7.2 KPTI trampoline + ROP<br>
 原先的代码原封不动就能用:<br>
 ```c
-```c
 unsigned long pop_rdi_ret = 0xffffffff81006370;
 unsigned long cmp_esi_esi_ret = 0xffffffff81906934;
 unsigned long mov_rdi_rax_ja_pop_rbp_ret = 0xffffffff818c6ebd;
@@ -301,13 +301,53 @@ int main(){
     write(fd,tmp_buf,size);   
 }
 ```
+
 但是原本更复杂场景，栈迁移的技术就不可用了。<br>
 
-# 8. canary+smep+kpti+smap+kaslr: ROP<br>
+# 8. canary+smep+kpti+smap+fg-kaslr: ROP<br>
 ## 8.1 kaslr和fg-kaslr<br>
 `kaslr，是Kernel address space layout randomization的缩写`<br>
 和用户态aslr类似，kaslr就是kernel地址空间布局随机化。本质上是内核的基地址发生了变化。<br>
 传统的kaslr机制的话，通过这道题的越界读问题其实是可以读到kernel image的text段地址的，直接就破解了。然而这道题不一样，它启动了`fg-kaslr,Function Granular KASLR`，**fg-kaslr就是在kernel启动时，以函数为单位重新排列内核代码，且只会增加大约一秒的启动时间**,理论上，每个函数为单位重新编排的话，这意味着每个函数的偏移在启动时都会发生变化，那我们不可能在kernel中找到我们想要的gadgets的地址。然而这个机制也是有弱点的。<br>
+**首先，内核开启fg-kaslr，并不是全部代码都会做fg-kaslr,_text段到`__x86_retpoline_r15`的部分只会做基本的kaslr**。即内核起始的若干区域是不会变化的。因为里面放着特殊的代码，不方便随机化<br>
+```
+.text
+│
+├── startup_64
+├── early boot ASM
+├── 一些特殊入口代码
+└── ...
+                         ← 这一段内部布局基本不变
+.text.func_C
+.text.func_A
+.text.func_D
+.text.func_B              ← 后面的函数随机排序
+```
+查看ida也能看到这段区域:<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2026-4-26/20260903234711.png)
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2026-4-26/20260903234838.png)
+执行命令也能看到地址:<br>
+```bash
+cat /proc/kallsyms | grep __x86_retpoline_r15
+ffffffff81400dc6 T __x86_retpoline_r15
+```
+我们可以在这段区域里找gadget:<br>
+```bash
+ROPgadget --binary vmlinux --range 0xffffffff81000000-0xFFFFFFFF81400DC6 > gadgets.txt
+```
+虽然内核提权的函数不在此列，但是`swapgs_restore_regs_and_return_to_usermode`还是存在text段中的。<br>
+**另外，kernel的符号表`ksymtab`也不会被随机化。**<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2026-4-26/20260903235724.png)
+里面记录了偏移信息:<br>
+```c
+struct kernel_symbol {
+	  int value_offset; // 开启fg-kaslr后函数实际布局地址 和 只开启kaslr后函数实际布局地址的差值，可以value_offset计算出fg-kaslr后的地址。 
+	  int name_offset;
+	  int namespace_offset;
+};
+```
+
+## 8.2 多次trampoline+ROP<br>
 
 
 # references<br>
