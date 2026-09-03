@@ -305,7 +305,9 @@ int main(){
 
 # 8. canary+smep+kpti+smap+kaslr: ROP<br>
 ## 8.1 kaslr和fg-kaslr<br>
-
+`kaslr，是Kernel address space layout randomization的缩写`<br>
+和用户态aslr类似，kaslr就是kernel地址空间布局随机化。本质上是内核的基地址发生了变化。<br>
+传统的kaslr机制的话，通过这道题的越界读问题其实是可以读到kernel image的text段地址的，直接就破解了。然而这道题不一样，它启动了`fg-kaslr,Function Granular KASLR`，**fg-kaslr就是在kernel启动时，以函数为单位重新排列内核代码，且只会增加大约一秒的启动时间**,理论上，每个函数为单位重新编排的话，这意味着每个函数的偏移在启动时都会发生变化，那我们不可能在kernel中找到我们想要的gadgets的地址。然而这个机制也是有弱点的。<br>
 
 
 # references<br>
