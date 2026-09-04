@@ -336,16 +336,26 @@ ffffffff81400dc6 T __x86_retpoline_r15
 ROPgadget --binary vmlinux --range 0xffffffff81000000-0xFFFFFFFF81400DC6 > gadgets.txt
 ```
 虽然内核提权的函数不在此列，但是`swapgs_restore_regs_and_return_to_usermode`还是存在text段中的。<br>
-**另外，kernel的符号表`ksymtab`也不会被随机化。**<br>
+**另外，kernel的符号表`ksymtab`也不会被随机化。本质上是fg-kaslr只随机化.text.*段，数据段是不会随机化的。**<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2026-4-26/20260903235724.png)
 里面记录了偏移信息:<br>
 ```c
 struct kernel_symbol {
-	  int value_offset; // 开启fg-kaslr后函数实际布局地址 和 只开启kaslr后函数实际布局地址的差值，可以value_offset计算出fg-kaslr后的地址。 
+	  int value_offset; // 函数符号表地址 和 函数实际布局地址的差值，函数符号表地址+value_offset = 函数实际布局地址。 
 	  int name_offset;
 	  int namespace_offset;
 };
 ```
+调试的时候可以看看它们的地址:<br>
+```bash
+/ # cat /proc/kallsyms | grep prepare_kernel_cred
+ffffffffabd76670 T prepare_kernel_cred
+ffffffffac58d4fc r __ksymtab_prepare_kernel_cred
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2026-4-26/20260904213421.png)
+`ffffffffac58d4fc+ ff7e9174(本质上相当于-0x816e8c) = ffffffffabd76670`
+
+
 
 ## 8.2 多次trampoline+ROP<br>
 
