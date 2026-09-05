@@ -358,7 +358,8 @@ ffffffffac58d4fc r __ksymtab_prepare_kernel_cred
 
 
 ## 8.2 多次trampoline+ROP<br>
-区域有限，可用的gadget太少了，只能尝试别的方法。<br>
+区域有限，可用的gadget太少了，无法通过一次ROP完成利用。只能尝试分段rop的方法。<br>
+
 
 
 # references<br>
