@@ -18,6 +18,7 @@ comments: true
 - [8. canary+smep+kpti+smap+fg-kaslr: ROP](#8-canarysmepkptismapfg-kaslr-rop)
   - [8.1 kaslr和fg-kaslr](#81-kaslr和fg-kaslr)
   - [8.2 多次trampoline+ROP](#82-多次trampolinerop)
+- [9. retspill](#9-retspill)
 - [references](#references)
 
 
@@ -708,6 +709,14 @@ int main(){
     stage1_leak_prepare_kernel_cred_addr();   
 }
 ```
+
+# 9. retspill<br>
+RetSpill 提出的是一种 Linux 内核漏洞利用方法：利用系统调用过程中自然保存到内核栈上的用户可控数据，在获得控制流劫持能力后，把这些数据组织成 ROP 链；进一步通过反复执行不同的短链，实现提权、内核读写和内核函数调用。<br>
+[https://adamdoupe.com/publications/retspill-ccs2023.pdf](https://adamdoupe.com/publications/retspill-ccs2023.pdf)<br>
+[https://github.com/sefcom/RetSpill](https://github.com/sefcom/RetSpill)<br>
+[https://bsauce.github.io/2024/05/21/RetSpill/](https://bsauce.github.io/2024/05/21/RetSpill/)<br>
+本质上讲的是，**在获得控制流劫持原语（能够修改内核某个函数指针，并调用它）的情况下，可以利用系统调用，把尽可能多的用户数据传到内核栈上，然后修改内核函数指针为某个`add rsp, x; ret`的gadget中，微调栈空间，最终完成利用**<br>
+
 
 # references<br>
 [https://lkmidas.github.io/posts/20210128-linux-kernel-pwn-part-2/](https://lkmidas.github.io/posts/20210128-linux-kernel-pwn-part-2/)<br>
