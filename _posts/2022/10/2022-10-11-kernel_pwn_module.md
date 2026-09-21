@@ -49,7 +49,12 @@ PS:更新与`2026-07-26`<br>
 #include <sys/msg.h> // msg_msg 
 #include <sched.h> 
 #include <stdint.h>
-
+#include <err.h>
+#include <inttypes.h>
+#include <net/if.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <linux/netfilter_ipv4/ip_tables.h>
 
 size_t commit_creds= 0xffffffff814c6410;
 size_t prepare_kernel_cred =0xffffffff814c67f0;
