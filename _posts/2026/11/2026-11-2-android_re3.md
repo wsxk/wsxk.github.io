@@ -28,7 +28,7 @@ frida更新还是很快到，到了17及以上版本，版本变更导致安装�
 npm install frida-java-bridge # 新增
 npm install @types/frida-gum
 ```
-创建`tsconfig.json`：<br>
+当前工作目录下创建`tsconfig.json`：<br>
 ```json
 {
   "compilerOptions": {
@@ -46,7 +46,10 @@ npm install @types/frida-gum
   "exclude": ["node_modules", "dist"]
 }
 ```
-
+在写hook脚本前，需要引入如下库:<br>
+```typescript
+import Java from "frida-java-bridge"
+```
 
 
 
