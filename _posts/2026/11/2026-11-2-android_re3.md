@@ -10,6 +10,8 @@ comments: true
 - [前言](#前言)
 - [1. frida 17以上版本的差异点](#1-frida-17以上版本的差异点)
   - [1.1 代码补全](#11-代码补全)
+- [2. frida 语法](#2-frida-语法)
+  - [2.1](#21)
 
 
 # 前言<br>
@@ -50,6 +52,10 @@ npm install @types/frida-gum
 ```typescript
 import Java from "frida-java-bridge"
 ```
+
+
+# 2. frida 语法<br>
+## 2.1 
 
 
 
