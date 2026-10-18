@@ -14,6 +14,9 @@ comments: true
   - [2.1 附加调用：Java.perform](#21-附加调用javaperform)
   - [2.2 java层hook: java.use和java.choose](#22-java层hook-javause和javachoose)
   - [2.3 native层hook： interceptor.attach](#23-native层hook-interceptorattach)
+    - [2.3.1 native层 inline hook](#231-native层-inline-hook)
+  - [2.4 native层主动调用: NativeFunction](#24-native层主动调用-nativefunction)
+- [references](#references)
 
 
 # 前言<br>
@@ -102,6 +105,78 @@ Java.choose: Java.choose用于获取类在Java VM 中的实例化对象
 ```
 Interceptor.attach: hook native层函数，即so中的函数。
 ```
+
+### 2.3.1 native层 inline hook<br>
+相当于篡改某段程序执行的逻辑。<br>
+```js
+function inline_hook() {
+    var soAddr = Module.findBaseAddress("lib52pojie.so");
+    if (soAddr) {
+        var func_addr = soAddr.add(0x10428);
+        Java.perform(function () {
+            Interceptor.attach(func_addr, {
+                onEnter: function (args) {
+                    console.log(this.context.x22); //注意此时就没有args概念了
+                    this.context.x22 = ptr(1); //赋值方法参考上一节课
+                },
+                onLeave: function (retval) {
+                }
+            }
+            )
+        })
+    }
+}
+```
+某段代码解析为汇编:<br>
+```js
+var soAddr = Module.findBaseAddress("lib52pojie.so");
+var codeAddr = Instruction.parse(soAddr.add(0x10428));
+console.log(codeAddr.toString());
+```
+
+直接patch某段代码:<br>
+```js
+var soAddr = Module.findBaseAddress("lib52pojie.so");
+var codeAddr = soAddr.add(0x10428);
+Memory.patchCode(codeAddr, 4, function(code) {
+const writer = new Arm64Writer(code, { pc: codeAddr });
+writer.putBytes(hexToBytes("20008052"));
+writer.flush();
+});
+function hexToBytes(str) {
+var pos = 0;
+var len = str.length;
+if (len % 2 != 0) {
+    return null;
+}
+len /= 2;
+var hexA = new Array();
+for (var i = 0; i < len; i++) {
+    var s = str.substr(pos, 2);
+    var v = parseInt(s, 16);
+    hexA.push(v);
+    pos += 2;
+}
+return hexA;
+}
+```
+[https://armconverter.com/](https://armconverter.com/) arm转hex在线工具。<br>
+
+## 2.4 native层主动调用: NativeFunction<br>
+```js
+var funcAddr = Module.findBaseAddress("lib52pojie.so").add(0x1054C);
+//声明函数指针
+//NativeFunction的第一个参数是地址，第二个参数是返回值类型，第三个[]里的是传入的参数类型(有几个就填几个)
+var aesAddr = new NativeFunction(funcAddr , 'pointer', ['pointer', 'pointer']);
+var encry_text = Memory.allocUtf8String("OOmGYpk6s0qPSXEPp4X31g==");    //开辟一个指针存放字符串       
+var key = Memory.allocUtf8String('wuaipojie0123456'); 
+console.log(aesAddr(encry_text ,key).readCString());
+```
+
+# references<br>
+[《安卓逆向这档事》十五、是时候学习一下Frida一把梭了(下)](https://www.52pojie.cn/thread-1840174-1-1.html)<br>
+[《安卓逆向这档事》十六、是时候学习一下Frida一把梭了(终)](https://www.52pojie.cn/thread-1859820-1-1.html)<br>
+
 
 
 <!-- Google tag (gtag.js) -->
