@@ -16,6 +16,7 @@ comments: true
   - [2.3 native层hook： interceptor.attach](#23-native层hook-interceptorattach)
     - [2.3.1 native层 inline hook](#231-native层-inline-hook)
   - [2.4 native层主动调用: NativeFunction](#24-native层主动调用-nativefunction)
+- [3. JNI\_Onload的执行逻辑](#3-jni_onload的执行逻辑)
 - [references](#references)
 
 
@@ -172,6 +173,14 @@ var encry_text = Memory.allocUtf8String("OOmGYpk6s0qPSXEPp4X31g==");    //开辟
 var key = Memory.allocUtf8String('wuaipojie0123456'); 
 console.log(aesAddr(encry_text ,key).readCString());
 ```
+
+
+# 3. JNI_Onload的执行逻辑<br>
+[https://wsxk.github.io/android_re2/](https://wsxk.github.io/android_re2)
+里提到了android应用加载so的逻辑，只到`JNI_Onload`<br>
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2026-4-26/20261020000356.png)
+
+
 
 # references<br>
 [《安卓逆向这档事》十五、是时候学习一下Frida一把梭了(下)](https://www.52pojie.cn/thread-1840174-1-1.html)<br>
