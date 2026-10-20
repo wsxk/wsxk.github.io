@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [Android]
-title: "android 应用tips3: frida一把梭"
+title: "android 应用tips3: frida17+一把梭"
 author: wsxk
 date: 2026-11-2
 comments: true
@@ -17,6 +17,7 @@ comments: true
     - [2.3.1 native层 inline hook](#231-native层-inline-hook)
   - [2.4 native层主动调用: NativeFunction](#24-native层主动调用-nativefunction)
 - [3. JNI\_Onload的执行逻辑](#3-jni_onload的执行逻辑)
+- [4. frida rpc](#4-frida-rpc)
 - [references](#references)
 
 
@@ -179,6 +180,10 @@ console.log(aesAddr(encry_text ,key).readCString());
 [https://wsxk.github.io/android_re2/](https://wsxk.github.io/android_re2)
 里提到了android应用加载so的逻辑，只到`JNI_Onload`<br>
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2026-4-26/20261020000356.png)
+
+
+# 4. frida rpc<br>
+（本质开发python脚本去自动化得注入js/ts脚本）<br>
 
 
 
