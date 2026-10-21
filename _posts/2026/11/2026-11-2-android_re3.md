@@ -17,7 +17,10 @@ comments: true
     - [2.3.1 native层 inline hook](#231-native层-inline-hook)
   - [2.4 native层主动调用: NativeFunction](#24-native层主动调用-nativefunction)
 - [3. JNI\_Onload的执行逻辑](#3-jni_onload的执行逻辑)
-- [4. frida rpc](#4-frida-rpc)
+- [4. PC手机调试指南](#4-pc手机调试指南)
+  - [4.1 桌面显示: scrcpy](#41-桌面显示-scrcpy)
+  - [4.2 adb 安装app应用](#42-adb-安装app应用)
+  - [4.3 python注入frida脚本开发（frida rpc）](#43-python注入frida脚本开发frida-rpc)
 - [references](#references)
 
 
@@ -182,7 +185,32 @@ console.log(aesAddr(encry_text ,key).readCString());
 ![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2026-4-26/20261020000356.png)
 
 
-# 4. frida rpc<br>
+# 4. PC手机调试指南<br>
+
+## 4.1 桌面显示: scrcpy<br>
+[https://github.com/Genymobile/scrcpy](https://github.com/Genymobile/scrcpy)<br>
+```
+scrcpy --video-codec=h265 --max-size=1920 --max-fps=60 --no-audio --keyboard=uhid
+```
+```
+参数	作用
+scrcpy	启动 Android 设备投屏及控制工具
+--video-codec=h265	使用 H.265 视频编码，压缩效率高、画质好，但可能增加延迟
+--max-size=1920	限制投屏画面最长边不超过 1920 像素，保持原始宽高比
+--max-fps=60	限制最高帧率为 60 FPS，使画面更流畅（不保证达到 60 FPS）
+--no-audio	禁用音频转发，只传输画面
+--keyboard=uhid	模拟物理 USB HID 键盘，支持更完整的键盘输入和快捷键
+```
+![](https://raw.githubusercontent.com/wsxk/wsxk_pictures/main/2026-4-26/20261021233826.png)
+
+
+## 4.2 adb 安装app应用<br>
+```
+adb install -r xxx.apk
+```
+
+
+## 4.3 python注入frida脚本开发（frida rpc）<br>
 （本质开发python脚本去自动化得注入js/ts脚本）<br>
 
 
