@@ -47,7 +47,7 @@ npm install @types/frida-gum
     "target": "ES2020",
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "lib": ["ES2020"],
+    "lib": ["ES2020","DOM"],
     "types": ["frida-gum"],
     "strict": true,
     "esModuleInterop": true,
@@ -212,6 +212,66 @@ adb install -r xxx.apk
 
 ## 4.3 python注入frida脚本开发（frida rpc）<br>
 （本质开发python脚本去自动化得注入js/ts脚本）<br>
+```python
+
+import frida
+
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent
+
+def on_message(message, data):
+    if message["type"] == "send":
+        print("[Agent]", message["payload"])
+    elif message["type"] == "error":
+        print("[Error]", message.get("stack", message))
+    else:
+        print("[Message]", message)
+
+
+# 1. 编译 TypeScript
+compiler = frida.Compiler()
+compiler.on(
+    "diagnostics",
+    lambda diag: print("[Compile]", diag)
+)
+bundle = compiler.build(
+    str(BASE_DIR / "hook.ts"),
+    project_root=str(BASE_DIR)
+)
+print("[+] TypeScript compiled")
+
+# 2. 获取 USB 设备
+device = frida.get_usb_device(timeout=5)
+# 3. 附加到目标进程
+session = device.attach(27146) # 通过frida-ps -U 找到对应进程id，attach上去
+print("[+] Attached")
+
+# 4. 创建并加载 Agent
+script = session.create_script(bundle)
+script.on("message", on_message)
+script.load()
+
+print("[+] ts injected")
+
+
+# 5. 保持注入会话
+try:
+    input("Press Enter to exit...\n")
+finally:
+    session.detach()
+```
+
+ts脚本模板如下:<br>
+```typescript
+import Java from "frida-java-bridge"
+
+Java.perform(()=>{
+    console.log("hello");    
+    send("hhhh");
+})
+```
+
 
 
 
