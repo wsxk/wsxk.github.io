@@ -21,6 +21,7 @@ comments: true
   - [4.1 桌面显示: scrcpy](#41-桌面显示-scrcpy)
   - [4.2 adb 安装app应用](#42-adb-安装app应用)
   - [4.3 python注入frida脚本开发（frida rpc）](#43-python注入frida脚本开发frida-rpc)
+- [5. 实战](#5-实战)
 - [references](#references)
 
 
@@ -271,6 +272,9 @@ Java.perform(()=>{
     send("hhhh");
 })
 ```
+
+# 5. 实战<br>
+[《安卓逆向这档事》番外实战篇2-【2024春节】解题领红包活动，启动](https://www.52pojie.cn/thread-1893708-1-1.html)，可以下载到题目。<br>
 
 
 
