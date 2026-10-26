@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: [Android]
-title: "android 应用tips3: frida17+一把梭"
+title: "android 应用tips3: frida17+一把梭 &"
 author: wsxk
 date: 2026-11-2
 comments: true
@@ -280,6 +280,11 @@ Java.perform(()=>{
 
 # 实战<br>
 [《安卓逆向这档事》番外实战篇2-【2024春节】解题领红包活动，启动](https://www.52pojie.cn/thread-1893708-1-1.html)，可以下载到题目。<br>
+两道初级题很简单，frida一下就搞完了。<br>
+中级题目比较有意思:<br>
+学到一个`adb logcat --pid=2276 -v time`能够打印相关信息日志方法。<br>
+
+
 
 
 
