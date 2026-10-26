@@ -23,6 +23,7 @@ comments: true
   - [4.3 python注入frida脚本开发（frida rpc）](#43-python注入frida脚本开发frida-rpc)
   - [4.4 jadx-mcp](#44-jadx-mcp)
 - [实战](#实战)
+- [5. unidbg](#5-unidbg)
 - [references](#references)
 
 
@@ -285,7 +286,9 @@ Java.perform(()=>{
 学到一个`adb logcat --pid=2276 -v time`能够打印相关信息日志方法。<br>
 
 
-
+# 5. unidbg<br>
+todo<br>
+[https://github.com/zhkl0228/unidbg](https://github.com/zhkl0228/unidbg)<br>
 
 
 
