@@ -9,7 +9,9 @@ comments: true
 
 
 - [1. 安全三要素(CIA)](#1-安全三要素cia)
-- [2. 一些有用的工具](#2-一些有用的工具)
+- [2. linux bash魔术](#2-linux-bash魔术)
+  - [2.1 program和builtin的帮助指南](#21-program和builtin的帮助指南)
+  - [2.2 好用的命令：diff](#22-好用的命令diff)
 
 
 # 1. 安全三要素(CIA)<br>
@@ -18,8 +20,17 @@ comments: true
 **完整性（integrity）**：你的数据有没有被篡改<br>
 **可用性（availability）**：服务是否还能响应<br>
 
-# 2. 一些有用的工具<br>
+# 2. linux bash魔术<br>
+## 2.1 program和builtin的帮助指南<br>
+先讲一下program和builtin的区别，program是linux系统里的程序（有文件承载，如ls），builtin是linux中shell内置的命令（如cd）。<br>
+主要有三种方式:<br>
+```
+man program
+program --help
+help builtin
+```
 
+## 2.2 好用的命令：diff<br>
 
 
 
