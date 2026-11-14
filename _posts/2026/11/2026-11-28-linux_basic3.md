@@ -52,8 +52,8 @@ linux用法:<br>
 ```
 command <file1  # < 以只读方式打开file1，并把command的标准输入（0）重定向到这个文件
 command >file1  # > 以只写方式打开file1，并把command的标准输出重定向到这个文件
-command 2>&1    # >& 把fd1重定向到fd2
-command 2<&1    # <& 把fd1重定向到fd2  规则: 左边的 FD 被修改，右边的 FD 是复制来源
+command 2>&1    # >& 把fd2重定向到fd1
+command 2<&1    # <& 把fd2重定向到fd1  规则: 左边的 FD 被修改，右边的 FD 是复制来源
 ```
 
 ## 2.4 管道<br>
